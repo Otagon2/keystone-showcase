@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Keystone — Docs</title>
+<style>
+:root{
+  --background:#020817; --card:#0b1220; --foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
+  --primary:#f8fafc; --ring:#94a3b8; --accent:#8b5cf6;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;display:flex;height:100vh;overflow:hidden}
+a{color:#a78bfa}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--input);border-radius:7px;border:3px solid var(--background);background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+/* sidebar */
+.side{width:310px;flex:none;border-right:1px solid var(--border);background:var(--card);overflow-y:auto;padding:16px 12px}
+.home{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--muted-foreground);font-family:var(--mono);font-size:12.5px;padding:6px 8px;border-radius:6px}
+.home:hover{background:var(--muted);color:var(--foreground)}
+.home .g{width:22px;height:22px;border-radius:6px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800;font-size:11px}
+.grouplabel{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-foreground);padding:16px 8px 5px}
+.docitem{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:9px 10px;border-radius:8px;color:inherit;transition:background .15s}
+.docitem:hover{background:var(--muted)}
+.docitem.on{background:var(--muted);box-shadow:inset 2px 0 0 var(--accent)}
+.docitem b{display:block;font-size:13px;font-weight:600}
+.docitem span{display:block;font-size:11.5px;color:var(--muted-foreground);line-height:1.45;margin-top:2px}
+.pdflink{display:flex;align-items:center;gap:8px;margin:14px 8px 4px;font-size:12.5px;color:#a78bfa;text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.pdflink:hover{background:var(--muted)}
+/* reading pane */
+.read{flex:1;overflow-y:auto;padding:40px 48px 90px}
+.doc{max-width:820px;margin:0 auto}
+.crumbbar{max-width:820px;margin:0 auto 8px;font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);display:flex;gap:8px;align-items:center}
+.md{font-size:14.5px;line-height:1.68;color:#dbe2ea}
+.md h1{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:6px 0 14px;color:var(--foreground)}
+.md h2{font-size:19px;font-weight:650;margin:30px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--foreground)}
+.md h3{font-size:15.5px;font-weight:650;margin:22px 0 8px;color:var(--foreground)}
+.md h4{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);margin:18px 0 6px}
+.md p{margin:0 0 13px}
+.md ul,.md ol{margin:0 0 14px;padding-left:22px}
+.md li{margin-bottom:5px}
+.md strong{color:var(--foreground);font-weight:650}
+.md em{color:#c4cdd8}
+.md hr{border:none;border-top:1px solid var(--border);margin:22px 0}
+.md blockquote{border-left:3px solid var(--input);margin:0 0 13px;padding:2px 14px;color:var(--muted-foreground)}
+.md code{font-family:var(--mono);font-size:12.5px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:#e7c6ff}
+.md pre{background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:0 0 14px}
+.md pre code{background:none;border:none;padding:0;color:#cdd6e0;font-size:12.5px;line-height:1.55}
+.md table{border-collapse:collapse;width:100%;margin:0 0 16px;font-size:12.8px;display:block;overflow-x:auto}
+.md th{background:var(--muted);text-align:left;padding:8px 11px;border:1px solid var(--border);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-foreground);font-weight:600;white-space:nowrap}
+.md td{padding:8px 11px;border:1px solid var(--border);vertical-align:top;line-height:1.5}
+.md a{word-break:break-word}
+.loading{color:var(--muted-foreground);font-family:var(--mono);font-size:13px}
+@media (max-width:820px){.side{display:none}.read{padding:24px 20px 80px}}
+</style>
+</head>
+<body>
+<nav class="side" id="side"></nav>
+<main class="read"><div class="crumbbar" id="crumb"></div><div class="doc"><div class="md" id="md"><div class="loading">Loading…</div></div></div></main>
+<script>
+'use strict';
+const DOCS=[
+ {g:'Overview',s:'readme',t:'README — folder index',sum:'The front door: what every prototype and doc is, and how to run them.'},
+ {g:'Overview',s:'engagement-report',t:'Engagement report',sum:'The narrative record — deliverables, the 7 principles, every design decision + why, and the method.'},
+ {g:'Research & decisions',s:'domain-guide',t:'Domain guide + jargon',sum:'Prompt management from zero: the market (Langfuse/Phoenix), 14 future-assumption → design bets, ~120-term glossary.'},
+ {g:'Research & decisions',s:'gap-analysis',t:'Gap analysis',sum:'What Zaki’s contract wants vs what was originally planned — every reversal, expansion, and alignment.'},
+ {g:'Research & decisions',s:'shadcn-newyork-spec',t:'shadcn New York spec',sum:'The implementation reference: radius ladder, component anatomy, elevation, and a fidelity checklist.'},
+ {g:'Research & decisions',s:'execution-plan',t:'Execution plan',sum:'The master plan: phases, screen inventory, the PRD-vs-repo gap audit, and the seeded GitHub questions.'},
+ {g:'Research & decisions',s:'audit-notes',t:'Audit notes',sum:'Six rounds of UI/UX audit + refinement: findings, severities, fixes, and deliberate non-changes.'},
+ {g:'The briefs (specs)',s:'brief-prompts',t:'#1 Prompt Management',sum:'The prompt-management surface: jobs-to-be-done, the Maya scenario, screen-by-screen appendices.'},
+ {g:'The briefs (specs)',s:'brief-org-admin',t:'#2 Organization Admin',sum:'Synthesized brief — org-scope governance: roles, secrets, connections, billing, audit.'},
+ {g:'The briefs (specs)',s:'brief-inbox',t:'#3 Inbox',sum:'Informational vs actionable, the Needs-action queue, and the message catalog.'},
+ {g:'The briefs (specs)',s:'brief-system-admin',t:'#4 System Admin',sum:'The control plane: the tenant boundary and the audited Enter-org assume-role.'},
+ {g:'The briefs (specs)',s:'style-contract',t:'Style contract',sum:'The binding visual + interaction contract shared by all four prototypes.'},
+ {g:'The briefs (specs)',s:'redesign-brief',t:'Redesign brief',sum:'The shadcn New York fidelity pass the v2 prototypes followed.'},
+ {g:'GitHub',s:'github-comments',t:'GitHub comment drafts',sum:'Ready-to-paste replies for issues #1–#4, with the open backend questions.'}
+];
+/* ---- tiny self-contained markdown renderer (headings, tables, lists, code, quote, hr, inline) ---- */
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function inl(s){
+ return esc(s)
+  .replace(/`([^`]+)`/g,(m,c)=>'<code>'+c+'</code>')
+  .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+  .replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>')
+  .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function isTableSep(x){return x&&x.includes('-')&&/^\s*\|?[\s:|-]+\|?\s*$/.test(x)}
+function isBlockStart(x,nx){
+ return /^#{1,6}\s/.test(x)||/^```/.test(x)||/^\s*[-*]\s/.test(x)||/^\s*\d+\.\s/.test(x)||/^\s*>/.test(x)||/^\s*([-*_])\1{2,}\s*$/.test(x)||(x.includes('|')&&isTableSep(nx));
+}
+function md2html(src){
+ const L=src.replace(/\r\n/g,'\n').split('\n'); let h='',i=0;
+ while(i<L.length){
+  let l=L[i];
+  if(/^```/.test(l)){i++;let b=[];while(i<L.length&&!/^```/.test(L[i])){b.push(L[i]);i++}i++;h+='<pre><code>'+esc(b.join('\n'))+'</code></pre>';continue}
+  if(l.includes('|')&&isTableSep(L[i+1])){
+   const rows=[l];i+=2;
+   while(i<L.length&&L[i].includes('|')&&L[i].trim()!==''){rows.push(L[i]);i++}
+   const cells=r=>r.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c=>c.trim());
+   let t='<table><thead><tr>'+cells(rows[0]).map(c=>'<th>'+inl(c)+'</th>').join('')+'</tr></thead><tbody>';
+   for(let k=1;k<rows.length;k++)t+='<tr>'+cells(rows[k]).map(c=>'<td>'+inl(c)+'</td>').join('')+'</tr>';
+   h+=t+'</tbody></table>';continue;
+  }
+  let m=l.match(/^(#{1,6})\s+(.*)$/); if(m){h+='<h'+m[1].length+'>'+inl(m[2])+'</h'+m[1].length+'>';i++;continue}
+  if(/^\s*([-*_])\1{2,}\s*$/.test(l)){h+='<hr>';i++;continue}
+  if(/^\s*>/.test(l)){let b=[];while(i<L.length&&/^\s*>/.test(L[i])){b.push(L[i].replace(/^\s*>\s?/,''));i++}h+='<blockquote>'+inl(b.join(' '))+'</blockquote>';continue}
+  if(/^\s*[-*]\s+/.test(l)){let b=[];while(i<L.length&&/^\s*[-*]\s+/.test(L[i])){b.push(L[i].replace(/^\s*[-*]\s+/,''));i++}h+='<ul>'+b.map(x=>'<li>'+inl(x)+'</li>').join('')+'</ul>';continue}
+  if(/^\s*\d+\.\s+/.test(l)){let b=[];while(i<L.length&&/^\s*\d+\.\s+/.test(L[i])){b.push(L[i].replace(/^\s*\d+\.\s+/,''));i++}h+='<ol>'+b.map(x=>'<li>'+inl(x)+'</li>').join('')+'</ol>';continue}
+  if(l.trim()===''){i++;continue}
+  let b=[l];i++;
+  while(i<L.length&&L[i].trim()!==''&&!isBlockStart(L[i],L[i+1])){b.push(L[i]);i++}
+  h+='<p>'+inl(b.join(' '))+'</p>';
+ }
+ return h;
+}
+function renderSide(cur){
+ let g='',html='<a class="home" href="index.html">'+'<span class="g">K</span>keystone / docs</a>';
+ DOCS.forEach(d=>{if(d.g!==g){g=d.g;html+='<div class="grouplabel">'+g+'</div>'}
+  html+='<button class="docitem'+(d.s===cur?' on':'')+'" onclick="location.hash=\''+d.s+'\'"><b>'+d.t+'</b><span>'+d.sum+'</span></button>'});
+ html+='<a class="pdflink" href="Keystone-Design-Report.pdf" target="_blank" rel="noopener">↓ Design report (PDF)</a>';
+ document.getElementById('side').innerHTML=html;
+}
+async function load(){
+ let s=location.hash.replace('#','')||'readme';
+ if(!DOCS.find(d=>d.s===s))s='readme';
+ const d=DOCS.find(x=>x.s===s);
+ renderSide(s);
+ document.getElementById('crumb').innerHTML='docs / '+d.t;
+ document.title='Keystone — '+d.t;
+ const md=document.getElementById('md'); md.innerHTML='<div class="loading">Loading…</div>';
+ try{const r=await fetch('md/'+s+'.md'); if(!r.ok)throw 0; const txt=await r.text(); md.innerHTML=md2html(txt); document.querySelector('.read').scrollTop=0;}
+ catch(e){md.innerHTML='<p class="loading">Could not load this document.</p>'}
+}
+window.addEventListener('hashchange',load); load();
+</script>
+</body>
+</html>
