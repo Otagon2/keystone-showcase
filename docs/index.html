@@ -34,6 +34,32 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:22px 0 8px}
 .cardlink p{font-size:13px;color:var(--muted-foreground);line-height:1.55}
 .cardlink .open{margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);display:inline-flex;align-items:center;gap:6px}
 .p1{--accent:var(--prompts)} .p2{--accent:var(--org)} .p3{--accent:var(--inbox)} .p4{--accent:var(--platform)}
+/* github updates section */
+.gh{margin-top:46px;border-top:1px solid var(--border);padding-top:30px}
+.gh h2{font-size:20px;font-weight:680;letter-spacing:-.01em;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.ghsub{font-family:var(--mono);font-size:12px;color:var(--muted-foreground);font-weight:400;letter-spacing:.02em}
+.ghlede{font-size:13.5px;color:var(--muted-foreground);line-height:1.62;max-width:640px;margin:9px 0 20px}
+.ghlede a{color:#a78bfa}
+.ghitem{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;position:relative}
+.ghitem::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.ghitem>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:14px 16px 14px 19px;user-select:none}
+.ghitem>summary::-webkit-details-marker{display:none}
+.ghitem>summary:hover{background:var(--muted)}
+.ghtag{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--accent);flex:none}
+.ghtitle{font-size:14.5px;font-weight:620;flex:1;min-width:0}
+.ghstatus{font-size:11px;font-weight:600;color:#4ade80;border:1px solid #14532d;background:#0d1f14;border-radius:6px;padding:3px 8px;white-space:nowrap}
+.ghstatus.warn{color:#fbbf24;border-color:#78350f;background:#231605}
+.ghchev{flex:none;width:15px;height:15px;stroke:var(--muted-foreground);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+.ghitem[open] .ghchev{transform:rotate(90deg)}
+.ghbody{padding:0 19px 18px 19px;font-size:13px;color:#cbd5e1;line-height:1.62}
+.ghbody p{margin:0 0 10px}
+.ghbody b{color:var(--foreground);font-weight:620}
+.ghbody .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);display:block;margin:13px 0 5px}
+.ghbody ul{margin:0;padding-left:18px}
+.ghbody li{margin-bottom:5px}
+.ghbody code{font-family:var(--mono);font-size:11.5px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:#e7c6ff}
+.ghopen{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 11px;transition:background .15s,border-color .15s}
+.ghopen:hover{background:var(--muted);border-color:var(--input)}
 footer{margin-top:44px;font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);border-top:1px solid var(--border);padding-top:18px;line-height:1.9}
 footer a{color:var(--muted-foreground)}
 </style>
@@ -77,6 +103,65 @@ footer a{color:var(--muted-foreground)}
     <h2><span class="dot"></span>Read the thinking →</h2>
     <p>Research, the four briefs, the gap analysis, design principles &amp; decisions, and the six-round audit — 14 docs, readable in-browser, plus the design-report PDF.</p>
   </a>
+
+  <section class="gh">
+    <h2>GitHub updates <span class="ghsub">· replies to issues #1–#4</span></h2>
+    <p class="ghlede">The status posted back on each of Zaki's four issues — what shipped, the decisions to ratify, and the open questions before backend wiring. Each links to its clickable prototype; the full write-ups are in the <a href="docs.html#github-comments">GitHub comment drafts</a> doc.</p>
+
+    <details class="ghitem p1" open>
+      <summary><span class="ghtag">#1</span><span class="ghtitle">Prompt Management</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="ghbody">
+        <p>All ten jobs-to-be-done are mockable and reachable: <b>List</b> (env badges, labels, hover-run, ⋯ menu) · <b>Edit</b> (chat + text, <code>{{variable}}</code> highlighting, reference chips, live token budget) · <b>Run</b> (Single / Batch / Compare / Inspect) · <b>Compress</b> (three LLMLingua methods with token economics) · <b>Manage</b> · ⌘K.</p>
+        <span class="lbl">Decisions to ratify</span>
+        <ul>
+          <li>Every save <b>auto-versions</b> ("Saved as v13"); <b>Restore is non-destructive</b> (restores into a new version), matching <code>keystone-main</code>.</li>
+          <li><b>Kind is fixed at creation</b> (chat vs text); dark is default, light is fully implemented + AA-checked.</li>
+        </ul>
+        <span class="lbl">Open questions before wiring</span>
+        <ul>
+          <li>Variable syntax: the brief writes <code>{{message}}</code>, but <code>keystone-main</code> ships f-string <code>{message}</code> — which should the UI teach?</li>
+          <li>The library entity stores a single flat <code>template</code>; a chat prompt's <code>messages[]</code> has nowhere to live — is a per-kind <code>body</code> shape the committed direction?</li>
+          <li>No price table exists in the repo — is a rate card planned, or should cost stay estimate-labelled?</li>
+        </ul>
+        <a class="ghopen" href="prompts.html">Open prototype →</a>
+      </div>
+    </details>
+
+    <details class="ghitem p2">
+      <summary><span class="ghtag">#2</span><span class="ghtitle">Organization Admin</span><span class="ghstatus warn">Ready · confirm brief</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="ghbody">
+        <p>The issue arrived with <b>no brief text</b>, so — to avoid blocking — I synthesized one from the Pencil/Admin design lineage and the alignment research, then built the prototype. <b>Please sanity-check the synthesized brief</b> (<code>briefs/ISSUE-2-org-admin.md</code>) against your intent.</p>
+        <p>Eight org-scope surfaces: <b>Overview</b> (rollups + "Needs attention") · <b>Members</b> (Owner/Admin/Editor/Viewer, invites, role matrix) · Projects · <b>Secrets</b> (write-once, masked-forever) · Connections · <b>Billing</b> (budget gate + rate card + invoices) · API keys · <b>Audit</b> (with the <code>operator.entered_org</code> transparency row).</p>
+        <a class="ghopen" href="org-admin.html">Open prototype →</a>
+      </div>
+    </details>
+
+    <details class="ghitem p3">
+      <summary><span class="ghtag">#3</span><span class="ghtitle">Inbox</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="ghbody">
+        <p>The load-bearing rule is <b>enforced in code, not just drawn</b>: informational = read-to-clear, actionable = <b>act-to-clear</b> (mark-read never touches an actionable). Deciding resolves in place — the item leaves Needs-action, stays in All with an outcome chip, and the account-block badge decrements live.</p>
+        <ul>
+          <li>Needs-action sorts by urgency; All is reverse-chronological.</li>
+          <li>One approval <b>auto-resolves ~20s after you open the Inbox</b> ("Resolved by another approver") — the first-decision-wins / no-zombie-tasks property, demonstrated. An expired approval shows "expired · missed".</li>
+        </ul>
+        <span class="lbl">Deferred exactly per your non-goals</span>
+        <ul><li>Preferences/channels, bulk approve, threads, grouping/digests.</li></ul>
+        <a class="ghopen" href="inbox.html">Open prototype →</a>
+      </div>
+    </details>
+
+    <details class="ghitem p4">
+      <summary><span class="ghtag">#4</span><span class="ghtitle">System Admin</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="ghbody">
+        <p>The control plane with the <b>tenant boundary enforced</b>: three operator surfaces (Organizations · Platform Settings · Platform Audit), no project shell. Org lifecycle with guarded actions — <b>Delete disabled until suspended</b>, resend-invite only while pending-setup.</p>
+        <ul>
+          <li><b>Enter org (the showpiece)</b>: re-auth → "you'll act as an administrator; this session is audited" → the shell switches to that org's Admin under a persistent banner. The northwind "no reachable admin" recovery journey works end-to-end.</li>
+          <li>Delete is guarded: suspend-first → re-auth → type-the-name with blast radius → 30-day soft window + Restore. <b>Platform Audit</b> highlights <code>operator.*</code> rows — the "prove isolation" view.</li>
+        </ul>
+        <a class="ghopen" href="platform.html">Open prototype →</a>
+      </div>
+    </details>
+  </section>
 
   <footer>
     shadcn/ui New York · lucide icons · dark + light · one interaction rule · ⌘K everywhere · mock, no backend<br>
