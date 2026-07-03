@@ -69,6 +69,13 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:22px 0 8px}
 .daypage{display:inline-flex;align-items:center;gap:6px;margin-top:13px;font-size:12.5px;font-weight:600;color:var(--foreground);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 11px;transition:background .15s,border-color .15s}
 .daypage:hover{background:var(--muted);border-color:var(--input)}
 .daynote{margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);border-top:1px dashed var(--border);padding-top:9px;line-height:1.5}
+.dayslack{margin-top:14px;border:1px solid var(--border);border-radius:8px;background:var(--background);overflow:hidden}
+.dayslackhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;border-bottom:1px solid var(--border);background:var(--muted)}
+.dayslackhead b{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)}
+.slackcopy{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.slackcopy:hover{background:var(--muted);border-color:var(--input)}
+.slackcopy.done{color:#4ade80;border-color:#14532d}
+.slacktext{margin:0;padding:11px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#cbd5e1;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow:auto}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px}
 @media (max-width:680px){.grid{grid-template-columns:1fr}}
 .cardlink{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .16s,transform .08s,box-shadow .16s;position:relative;overflow:hidden}
@@ -157,7 +164,7 @@ footer a{color:var(--muted-foreground)}
     <a class="cardlink p2" href="org-admin.html">
       <div class="tag">ISSUE #2</div>
       <h2><span class="dot"></span>Organization Admin</h2>
-      <p>Org-scope governance: members &amp; roles, projects, write-once secrets, model connections, billing with a budget gate, API keys, and an audit lens.</p>
+      <p>Org-scope governance in five surfaces: members &amp; roles (domain-bound, promote/demote), the project portfolio with transfer-ownership, an org label taxonomy, settings, and a read-only audit lens.</p>
       <div class="open">Open prototype →</div>
     </a>
     <a class="cardlink p3" href="inbox.html">
@@ -204,10 +211,17 @@ footer a{color:var(--muted-foreground)}
     </details>
 
     <details class="ghitem p2">
-      <summary><span class="ghtag">#2</span><span class="ghtitle">Organization Admin</span><span class="ghstatus warn">Ready · confirm brief</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <summary><span class="ghtag">#2</span><span class="ghtitle">Organization Admin</span><span class="ghstatus">Rebuilt to your brief</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
       <div class="ghbody">
-        <p>The issue arrived with <b>no brief text</b>, so — to avoid blocking — I synthesized one from the Pencil/Admin design lineage and the alignment research, then built the prototype. <b>Please sanity-check the synthesized brief</b> (<code>briefs/ISSUE-2-org-admin.md</code>) against your intent.</p>
-        <p>Eight org-scope surfaces: <b>Overview</b> (rollups + "Needs attention") · <b>Members</b> (Owner/Admin/Editor/Viewer, invites, role matrix) · Projects · <b>Secrets</b> (write-once, masked-forever) · Connections · <b>Billing</b> (budget gate + rate card + invoices) · API keys · <b>Audit</b> (with the <code>operator.entered_org</code> transparency row).</p>
+        <p>Now rebuilt to the <b>full brief you published</b> (the earlier version was synthesized while #2 had no text). The surface is the <b>five governance surfaces</b> the brief specifies — nothing more:</p>
+        <ul>
+          <li><b>Members</b> — org roles (<code>org_admin</code>/<code>member</code>) + a <code>can_create_projects</code> flag; <b>domain-bound</b> invites (rejects non-<code>@northwind.com</code>); remove <b>reassigns owned projects</b> first; the at-least-one-admin guardrail.</li>
+          <li><b>Projects</b> — the portfolio + <b>transfer-ownership</b> (the one power no project role has); archive/unarchive.</li>
+          <li><b>Labels</b> — the org <code>key:value</code> taxonomy (usage counts, rename, <b>merge</b>, delete); read-only to projects.</li>
+          <li><b>Settings</b> — org name/region/residency; email domain <b>read-only</b> (system-admin owned).</li>
+          <li><b>Audit</b> — read-only org-lens stream; scope + source badges; before→after; export.</li>
+        </ul>
+        <p><b>Dropped per your scope (§10):</b> Secrets, Connections, Billing, API keys — project-scoped or deferred for v1.</p>
         <a class="ghopen" href="org-admin.html">Open prototype →</a>
       </div>
     </details>
@@ -270,7 +284,29 @@ const DAYS=[
      {t:'System Admin prototype', href:'platform.html', done:true},
      {t:'Documentation viewer — 15 docs, at-a-glance + copy-markdown', href:'docs.html', done:true},
    ],
-   note:'Base links for design review. Docs need Amaan’s review next.' },
+   note:'Base links for design review. Docs need Amaan’s review next.',
+   slack:`:rocket: *Keystone — Day 1 · Fri, Jul 3*
+
+The clickable base for the design work is live and ready to review — all mock (no backend), for look, flow and feel.
+
+*What's ready (base links for review)*
+• All four surfaces as clickable prototypes — Prompt Management, Organization Admin, Inbox, System Admin (shadcn "New York", dark console theme)
+• A docs viewer with the full thinking — research, the four briefs, gap analysis, design principles, audit notes (15 docs, each copy-able)
+• A live tracker of Zaki's four PRDs + a day-by-day timeline of the work
+
+*Last 24 hours*
+• Built and refined the four prototypes and published them as a live showcase
+• Wrote the full documentation set + a design-report PDF
+• Stood up the showcase, docs viewer, PRD tracker and day-log calendar; mirrored deliverables to Google Drive
+
+*PRD watch*
+• #2 Organization Admin's full brief landed — the prototype is already rebuilt to it (five governance surfaces: members, projects, labels, settings, audit). #1 Prompt Management was also updated; folding that into tomorrow's iteration. #3 and #4 are unchanged.
+
+*Next*
+• Docs are ready for my review
+• Tomorrow (Day 2) I'll drop the first design iterations — folding in the doc review + the latest PRDs
+
+🔗 Today's work: https://aman-esberi.github.io/esberi.github.com/` },
  { n:2, date:'2026-07-04', status:'planned',
    title:'First design iterations (expected)',
    summary:'Planned for Day 2 — the first iteration pass on the designs, folding in the reviewed docs and the latest PRDs. Links appear here as the work ships.',
@@ -301,8 +337,16 @@ const DAYS=[
   const d=DAYS.find(x=>x.n===sel)||current;
   panel.innerHTML='<h4>'+esc(d.title)+'</h4><div class="dsum">'+esc(d.summary)+'</div><ul class="dayitems">'+
    d.items.map(it=>'<li>'+(it.done?CHK:DOT)+(it.href?'<a href="'+it.href+'">'+esc(it.t)+'</a>':'<span>'+esc(it.t)+'</span>')+'</li>').join('')+
-   '</ul>'+(d.page?'<a class="daypage" href="'+d.page+'">Open the full Day '+d.n+' page →</a>':'')+(d.note?'<div class="daynote">'+esc(d.note)+'</div>':'');
+   '</ul>'+(d.page?'<a class="daypage" href="'+d.page+'">Open the full Day '+d.n+' page →</a>':'')+(d.note?'<div class="daynote">'+esc(d.note)+'</div>':'')+
+   (d.slack?'<div class="dayslack"><div class="dayslackhead"><b>Slack update · Day '+d.n+'</b><button class="slackcopy" type="button">Copy message</button></div><pre class="slacktext">'+esc(d.slack)+'</pre></div>':'');
   tabs.querySelectorAll('.daytab').forEach(b=>b.addEventListener('click',()=>render(+b.dataset.n)));
+  const sc=panel.querySelector('.slackcopy');
+  if(sc)sc.addEventListener('click',async()=>{
+   const msg=(DAYS.find(x=>x.n===sel)||{}).slack||'';let ok=true;
+   try{await navigator.clipboard.writeText(msg);}catch(e){try{const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(e2){ok=false;}}
+   sc.textContent=ok?'Copied':'Copy failed';sc.classList.toggle('done',ok);
+   setTimeout(()=>{sc.textContent='Copy message';sc.classList.remove('done');},1600);
+  });
  }
  render(current.n);
 })();
