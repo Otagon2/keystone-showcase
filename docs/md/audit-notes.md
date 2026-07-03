@@ -64,5 +64,15 @@ Notes — deliberate non-changes:
 
 All four re-verified in the browser (Members, Secrets, Billing dark+light, v2 badge fidelity), zero console errors.
 
+## Round 7 — responsive pass + weird-layout cleanup + doc viewer
+*"The designs need to be responsive," "clean any weird transitions or layouts," "cover all flows." A layout-only layer — no interaction logic changed, so every audited flow (streaming, drag-reorder, queue-resolution, skeletons, undo, Enter-org, ⌘K, Secrets/Billing) survives untouched. All four re-passed `node --check`; verified live at 390×780 and 1440 on the pushed site.*
+
+- **Off-canvas sidebar drawer (all 4)** — below 900px the fixed sidebar becomes a hamburger-triggered drawer that slides in over a scrim (`toggleSB()` + `.sb-scrim`); tapping the scrim or a nav item closes it. Above 900px the hamburger is hidden and the sidebar is permanent — desktop is unaffected.
+- **Stacked splits + fluid grids** — Prompts editor (canvas + inspector) and Inbox (feed + reading pane) stack vertically on narrow screens; stat grids collapse 4→2→1; the Compare grid forces a single column so variant cards never crush.
+- **Table overflow fix (the real bug)** — flex table rows were compressing below content width and *overlapping* on mobile. Fixed by giving every `.table`/`.resulttable` a `min-width` (720–760px) inside an `overflow-x:auto` content wrapper, so wide tables scroll horizontally instead of colliding. Verified fixed on Prompts, Members, Platform orgs.
+- **Doc viewer (`docs/docs.html`) made responsive too** — sidebar stacks above the reading pane below 820px; reading padding tightened; tables scroll.
+
+**Doc viewer — "Copy markdown" per doc.** Each document now has a **Copy markdown** button in the breadcrumb bar. It copies the current doc as *clean, well-formatted* Markdown — a fence-aware `cleanMd()` normalizer trims trailing whitespace, guarantees blank lines around headings, collapses runs of blank lines to one, and ends on a single newline (code fences are preserved verbatim). Async Clipboard API with a `execCommand` textarea fallback; button flips to "Copied" for 1.7s. Verified: renders, fires with zero console errors, and the normalizer passes a 6-assertion unit test. (The two Keystone-PromptManagement context docs — the execution plan and domain guide — were already in the viewer as `execution-plan.md` / `domain-guide.md`.)
+
 ## What already works (don't lose in future refactors)
 Squint test passes on every screen (one focal point); group-gaps > inner-gaps throughout; numbers right-aligned `tabular-nums`; destructive friction scaled (type-name-to-confirm with gated red button); designed empty states everywhere; the Inbox act-to-clear vs read-to-clear distinction is enforced in code, not just styled.
