@@ -71,6 +71,7 @@ a{color:#a78bfa}
 <script>
 'use strict';
 const DOCS=[
+ {g:'Overview',s:'overview',t:'At a glance',sum:'Start here — a one-screen summary of the whole documentation set: what was delivered, how the docs are organised, and where to begin.'},
  {g:'Overview',s:'readme',t:'README — folder index',sum:'The front door: what every prototype and doc is, and how to run them.'},
  {g:'Overview',s:'engagement-report',t:'Engagement report',sum:'The narrative record — deliverables, the 7 principles, every design decision + why, and the method.'},
  {g:'Research & decisions',s:'domain-guide',t:'Domain guide + jargon',sum:'Prompt management from zero: the market (Langfuse/Phoenix), 14 future-assumption → design bets, ~120-term glossary.'},
@@ -132,8 +133,8 @@ function renderSide(cur){
  document.getElementById('side').innerHTML=html;
 }
 async function load(){
- let s=location.hash.replace('#','')||'readme';
- if(!DOCS.find(d=>d.s===s))s='readme';
+ let s=location.hash.replace('#','')||'overview';
+ if(!DOCS.find(d=>d.s===s))s='overview';
  const d=DOCS.find(x=>x.s===s);
  renderSide(s);
  document.getElementById('crumb').innerHTML='docs / '+d.t;
