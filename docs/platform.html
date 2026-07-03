@@ -220,6 +220,22 @@ select.inp{appearance:auto}
 .sk{background:linear-gradient(90deg,var(--muted) 25%,var(--accent) 40%,var(--muted) 60%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;border-radius:6px;height:12px;display:inline-block}
 .sk-row{display:flex;align-items:center;gap:14px;padding:13px 12px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ============ responsive ============ */
+.hamburger{display:none}
+.sb-scrim{display:none}
+@media(max-width:900px){
+ .hamburger{display:grid;place-items:center;width:36px;height:36px;border-radius:6px;color:var(--muted-foreground);flex:none;border:none;background:none}
+ .hamburger:hover{background:var(--accent)}
+ .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:350;transform:translateX(-100%);transition:transform .2s var(--ease);box-shadow:var(--shadow-lg)}
+ .sidebar.open{transform:none}
+ .sb-scrim.show{display:block;position:fixed;inset:0;z-index:340;background:rgba(2,8,23,.5)}
+ .statgrid{grid-template-columns:repeat(2,1fr)}
+ .wrap{padding:16px 14px}
+ .opbanner{font-size:12px;padding:8px 14px}
+ .table{min-width:720px}
+}
+@media(max-width:560px){.statgrid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -231,6 +247,7 @@ select.inp{appearance:auto}
 /* ============ icons ============ */
 const ICONS={
 search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+menu:'<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
 plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
 chevD:'<polyline points="6 9 12 15 18 9"/>',
 check:'<polyline points="4 12 10 18 20 6"/>',
@@ -478,6 +495,7 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape'){closeDlg();closeMenus()}});
 
 /* ============ root ============ */
+function toggleSB(){const s=document.querySelector('.sidebar');if(s)s.classList.toggle('open');const c=document.querySelector('.sb-scrim');if(c)c.classList.toggle('show')}
 function render(){const r=route();
  if(!S.auth||r.scr==='login'){document.getElementById('app').innerHTML='<div class="frame">'+loginScreen()+'</div>';return}
  let hdr,body;
@@ -492,7 +510,7 @@ function render(){const r=route();
   (r.scr==='audit'?'<button class="btn outline sm" onclick="toast(\'Exported the filtered view (CSV, mock)\',\'download\')">'+icon('download')+'Export</button>':'')+
   '<button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button></div>';
   body=r.scr==='orgdetail'?orgDetail(r.id):r.scr==='settings'?settingsScreen():r.scr==='audit'?auditScreen():orgsScreen()}
- document.getElementById('app').innerHTML=banner()+'<div class="frame">'+sidebar(r)+'<div class="main"><header class="header">'+hdr+'</header><div class="content">'+body+'</div></div></div>';
+ document.getElementById('app').innerHTML=banner()+'<div class="frame"><div class="sb-scrim" onclick="toggleSB()"></div>'+sidebar(r)+'<div class="main"><header class="header"><button class="hamburger" onclick="toggleSB()" aria-label="Menu">'+icon('menu')+'</button>'+hdr+'</header><div class="content">'+body+'</div></div></div>';
  if(S.flashAudit){S.flashAudit=false;if(r.scr==='audit'){const a=document.querySelector('.arow');if(a)requestAnimationFrame(()=>a.classList.add('flash'))}}}
 render();
 </script>

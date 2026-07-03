@@ -332,6 +332,24 @@ input[type=range]{width:100%;accent-color:var(--primary)}
 .toast-act:hover{background:var(--accent);border-color:var(--border)}
 .cmp-tally{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--success);font-weight:600}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ============ responsive ============ */
+.hamburger{display:none}
+.sb-scrim{display:none}
+@media(max-width:900px){
+ .hamburger{display:grid;place-items:center;width:36px;height:36px;border-radius:6px;color:var(--muted-foreground);flex:none;border:none;background:none}
+ .hamburger:hover{background:var(--accent)}
+ .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:350;transform:translateX(-100%);transition:transform .2s var(--ease);box-shadow:var(--shadow-lg)}
+ .sidebar.open{transform:none}
+ .sb-scrim.show{display:block;position:fixed;inset:0;z-index:340;background:rgba(2,8,23,.5)}
+ .editor{flex-direction:column}
+ .inspector{width:100%;border-left:none;border-top:1px solid var(--border)}
+ .qr{width:100%}
+ .content{overflow-x:auto}
+ .tablewrap,.runwrap,.managewrap{padding:14px}
+ .table,.resulttable{min-width:760px}
+}
+@media(max-width:600px){.cmp{grid-template-columns:1fr!important}.header{gap:8px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -343,6 +361,7 @@ input[type=range]{width:100%;accent-color:var(--primary)}
 /* ================= icons (lucide-style, inline) ================= */
 const ICONS={
 search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+menu:'<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
 plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
 chevD:'<polyline points="6 9 12 15 18 9"/>',
 chevR:'<polyline points="9 6 15 12 9 18"/>',
@@ -794,10 +813,11 @@ function closeMenus(){document.querySelectorAll('.menu').forEach(m=>m.remove())}
 document.addEventListener('click',()=>closeMenus());
 
 /* ================= render root ================= */
+function toggleSB(){const s=document.querySelector('.sidebar');if(s)s.classList.toggle('open');const c=document.querySelector('.sb-scrim');if(c)c.classList.toggle('show')}
 function render(){const r=route();let hdr,body;
  if(r.scr==='list'){hdr='<div class="crumb">'+icon('braces')+'<span class="cur">Prompts</span><span class="ctxnote" style="margin-left:6px">'+PROMPTS.filter(p=>!p.archived).length+' prompts · acme-support</span></div>'+listHeader();body=listScreen()}
  else{const p=byId(r.id);hdr=editorHeader(p,r.mode);body=r.mode==='edit'?editScreen(p):r.mode==='run'?runScreen(p):manageScreen(p)}
- document.getElementById('app').innerHTML=sidebar(r)+'<div class="main"><header class="header">'+hdr+'</header><div class="content">'+body+'</div></div>';animateCounts()}
+ document.getElementById('app').innerHTML=sidebar(r)+'<div class="sb-scrim" onclick="toggleSB()"></div><div class="main"><header class="header"><button class="hamburger" onclick="toggleSB()" aria-label="Menu">'+icon('menu')+'</button>'+hdr+'</header><div class="content">'+body+'</div></div>';animateCounts()}
 render();
 </script>
 </body>
