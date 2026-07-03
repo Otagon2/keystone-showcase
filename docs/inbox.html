@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone — Inbox</title>
+<style>
+/* ============ shadcn New York token system (shared with all Keystone prototypes) ============ */
+:root{
+  --background:#ffffff; --foreground:#020817; --card:#ffffff;
+  --primary:#0f172a; --primary-foreground:#f8fafc;
+  --secondary:#f1f5f9; --secondary-foreground:#0f172a;
+  --muted:#f1f5f9; --muted-foreground:#5b6472;
+  --accent:#f1f5f9; --accent-foreground:#0f172a;
+  --destructive:#dc2626; --destructive-foreground:#f8fafc;
+  --border:#e2e8f0; --input:#7e889c; --ring:#0f172a;
+  --success:#15803d; --warning:#b45309; --running:#2563eb;
+  --radius:8px;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+  --shadow-md:0 4px 12px -2px rgba(2,8,23,.12);
+  --shadow-lg:0 12px 32px -8px rgba(2,8,23,.24);
+}
+.dark{
+  --background:#020817; --foreground:#f8fafc; --card:#0b1220;
+  --primary:#f8fafc; --primary-foreground:#0f172a;
+  --secondary:#16202f; --secondary-foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5;
+  --accent:#1a2436; --accent-foreground:#f8fafc;
+  --destructive:#f87171; --destructive-foreground:#0f172a;
+  --border:#1e293b; --input:#475569; --ring:#94a3b8;
+  --success:#4ade80; --warning:#fbbf24; --running:#60a5fa;
+  --shadow-md:0 4px 12px -2px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 32px -8px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);font-size:14px;line-height:1.5;background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px}
+input,textarea,select{font:inherit;color:inherit}
+::placeholder{color:var(--muted-foreground);opacity:.7}
+svg.ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+kbd{font-family:var(--mono);font-size:11px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--muted-foreground)}
+.ctxnote{font-size:12px;color:var(--muted-foreground)}
+
+/* ============ App shell (identical anatomy to the other Keystone prototypes) ============ */
+#app{display:flex;height:100vh;overflow:hidden}
+/* shadcn: Sidebar */
+.sidebar{width:240px;flex:none;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border)}
+.sb-top{padding:12px;border-bottom:1px solid var(--border)}
+.proj-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--background)}
+.proj-btn:hover{background:var(--accent)}
+.proj-logo{width:22px;height:22px;flex:none;border-radius:6px;background:var(--primary);color:var(--primary-foreground);display:grid;place-items:center;font-size:11px;font-weight:700}
+.proj-name{flex:1;text-align:left;font-weight:600;font-size:13px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.sb-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;border-radius:6px;color:var(--muted-foreground);font-size:13px;font-weight:500}
+.nav-item:hover{background:var(--accent);color:var(--foreground)}
+.nav-item.on{background:var(--secondary);color:var(--foreground)}
+.sb-foot{border-top:1px solid var(--border);padding:10px}
+.acct{display:flex;align-items:center;gap:10px;width:100%;padding:6px;border-radius:var(--radius);position:relative}
+.acct:hover{background:var(--accent)}
+/* shadcn: Avatar */
+.avatar{width:28px;height:28px;flex:none;border-radius:999px;background:var(--secondary);border:1px solid var(--border);display:grid;place-items:center;font-size:11px;font-weight:700}
+.acct-info{flex:1;text-align:left;min-width:0}
+.acct-info b{display:block;font-size:13px;line-height:1.2}
+.acct-info span{font-size:11px;color:var(--muted-foreground)}
+/* the pending-actionable count badge riding on the account block */
+.acct-badge{position:absolute;top:2px;left:26px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--destructive);color:var(--destructive-foreground);font-size:10.5px;font-weight:700;display:grid;place-items:center;border:2px solid var(--card);cursor:pointer}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.header{flex:none;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--card);flex-wrap:wrap}
+/* shadcn: Breadcrumb */
+.crumb{display:flex;align-items:center;gap:6px;font-size:13.5px}
+.crumb a{color:var(--muted-foreground);cursor:pointer}
+.crumb a:hover{color:var(--foreground)}
+.crumb .sep{color:var(--muted-foreground);opacity:.5}
+.crumb .cur{font-weight:600}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.content{flex:1;overflow:hidden;display:flex}
+
+/* ============ Buttons (shadcn: Button) ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--primary-foreground)}
+.btn.primary:hover{opacity:.9}
+.btn.outline{border-color:var(--input);background:transparent}
+.btn.outline:hover{background:var(--accent)}
+.btn.ghost:hover{background:var(--accent)}
+.btn.destructive{background:var(--destructive);color:var(--destructive-foreground)}
+.btn.success{background:var(--success);color:var(--primary-foreground)}
+.btn.sm{height:26px;padding:0 9px;font-size:12px}
+.iconbtn{display:grid;place-items:center;width:30px;height:30px;border-radius:6px;color:var(--muted-foreground)}
+.iconbtn:hover{background:var(--accent);color:var(--foreground)}
+
+/* ============ Badges / chips ============ */
+/* shadcn: Badge */
+/* v2 — shadcn New York fidelity: badges are rounded-md, not pills */
+.badge{display:inline-flex;align-items:center;gap:5px;height:19px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;background:var(--secondary);white-space:nowrap}
+.chip{display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap;background:transparent}
+.chip.pending{color:var(--warning);border-color:color-mix(in srgb,var(--warning) 45%,transparent)}
+.chip.approved,.chip.resolved,.chip.renewed,.chip.accepted,.chip.granted{color:var(--success);border-color:color-mix(in srgb,var(--success) 45%,transparent)}
+.chip.rejected,.chip.declined,.chip.denied{color:var(--destructive);border-color:color-mix(in srgb,var(--destructive) 45%,transparent)}
+.chip.expired{color:var(--muted-foreground);border-color:var(--border)}
+.sev{width:8px;height:8px;border-radius:99px;flex:none}
+.sev.info{background:var(--running)} .sev.warning{background:var(--warning)} .sev.critical{background:var(--destructive)}
+.due{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--warning);font-family:var(--mono)}
+.unread-dot{width:7px;height:7px;border-radius:99px;background:var(--running);flex:none}
+
+/* ============ Tabs / segments (shadcn: Tabs) ============ */
+.tabs{display:inline-flex;background:var(--muted);border-radius:var(--radius);padding:3px;gap:2px}
+.tab{height:28px;padding:0 13px;border-radius:6px;font-size:13px;font-weight:500;color:var(--muted-foreground);display:inline-flex;align-items:center;gap:7px}
+.tab:hover{color:var(--foreground)}
+.tab.on{background:var(--background);color:var(--foreground);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.tab .cnt{min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--destructive);color:var(--destructive-foreground);font-size:10px;font-weight:700;display:grid;place-items:center}
+
+/* ============ Split content (shadcn: ResizablePanel look) ============ */
+.split{flex:1;display:flex;min-width:0}
+.feed{width:46%;min-width:380px;border-right:1px solid var(--border);overflow-y:auto;background:var(--background)}
+.reading{flex:1;overflow-y:auto;background:var(--card)}
+.hintbar{display:flex;gap:8px;align-items:center;padding:9px 14px;font-size:12px;color:var(--muted-foreground);border-bottom:1px solid var(--border);background:var(--muted)}
+.frow{display:flex;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;position:relative}
+.frow:hover{background:var(--accent)}
+.frow.sel{background:var(--secondary)}
+.frow .ficon{width:30px;height:30px;flex:none;border-radius:7px;background:var(--muted);display:grid;place-items:center;color:var(--muted-foreground)}
+.frow .fbody{flex:1;min-width:0}
+.frow .ft{font-size:13px;font-weight:600;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.frow .fm{font-size:11.5px;color:var(--muted-foreground);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.frow .facts{display:flex;gap:6px;margin-top:8px}
+/* actionable rows are visually loud: accent bar + raised bg */
+.frow.act{background:color-mix(in srgb,var(--warning) 4%,var(--background));}
+.frow.act::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--warning)}
+.frow.act.resolved::before{background:var(--success)}
+.frow.act.expired::before{background:var(--muted-foreground)}
+.frow.act:hover{background:color-mix(in srgb,var(--warning) 8%,var(--background))}
+.frow.act.sel{background:color-mix(in srgb,var(--warning) 12%,var(--background))}
+.frow.read .ft{font-weight:500;color:var(--muted-foreground)}
+
+/* reading pane */
+.detail{padding:24px 28px;max-width:640px}
+.detail .dh{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.detail h2{font-size:17px;line-height:1.35}
+.detail .meta{font-size:12px;color:var(--muted-foreground);margin:6px 0 18px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* shadcn: Card */
+.ctx{background:var(--background);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px}
+.ctx .krow{display:flex;gap:10px;padding:4px 0}
+.ctx .krow b{width:130px;flex:none;color:var(--muted-foreground);font-weight:500;font-size:12px}
+.ctx .arr{color:var(--muted-foreground)}
+.quote{border-left:3px solid var(--input);padding:6px 12px;color:var(--muted-foreground);font-style:italic;margin:8px 0}
+.dactions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.dnote{font-size:12px;color:var(--warning);display:flex;gap:6px;align-items:center;margin-bottom:12px}
+.outcome{display:flex;gap:8px;align-items:center;padding:10px 14px;border:1px solid color-mix(in srgb,var(--success) 40%,transparent);border-radius:var(--radius);color:var(--success);font-size:13px;font-weight:500;margin:14px 0}
+.emptyd{display:grid;place-items:center;height:100%;color:var(--muted-foreground);font-size:13px}
+.empty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:70px 20px;color:var(--muted-foreground);text-align:center}
+.empty svg.ic{width:30px;height:30px;opacity:.5}
+.empty b{color:var(--foreground)}
+
+/* ============ Menus (shadcn: DropdownMenu) ============ */
+.menu{position:fixed;z-index:300;min-width:190px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:5px;font-size:13px}
+.menu .mi{display:flex;align-items:center;gap:9px;width:100%;padding:7px 9px;border-radius:5px;text-align:left}
+.menu .mi:hover{background:var(--accent)}
+.menu .msep{height:1px;background:var(--border);margin:5px 4px}
+.menu .mlabel{font-size:11px;color:var(--muted-foreground);padding:4px 9px}
+
+/* ============ Command palette (shadcn: Command) + dialogs ============ */
+.scrim{position:fixed;inset:0;z-index:400;background:rgba(2,8,23,.6);display:flex;align-items:flex-start;justify-content:center;padding-top:12vh}
+.cmdk{width:560px;max-width:92vw;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
+.cmdk .cin{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.cmdk input{flex:1;background:none;border:none;outline:none;font-size:14px}
+.cmdk .list{max-height:44vh;overflow-y:auto;padding:7px}
+.cmdk .glabel{font-size:11px;color:var(--muted-foreground);padding:7px 10px 3px;font-weight:600}
+.cmdk .crow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer}
+.cmdk .crow:hover,.cmdk .crow.sel{background:var(--accent)}
+.cmdk .cfoot{display:flex;gap:14px;padding:9px 15px;border-top:1px solid var(--border);font-size:11px;color:var(--muted-foreground)}
+
+/* ============ Toasts (shadcn: Sonner) ============ */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:11px 14px;font-size:13px;animation:tin .18s ease-out;max-width:380px}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* placeholder project screen */
+.projstub{flex:1;display:grid;place-items:center;color:var(--muted-foreground);text-align:center}
+select.inp{height:28px;border:1px solid var(--input);border-radius:6px;background:var(--background);font-size:12.5px;padding:0 6px}
+/* ============ design polish: elevation + motion ============ */
+:root{--ease:cubic-bezier(.16,.84,.44,1);--dur:.17s;
+ --elev-1:0 1px 2px rgba(15,23,42,.05),0 1px 1px rgba(15,23,42,.04);
+ --shadow-md:0 2px 6px rgba(15,23,42,.08),0 10px 24px -8px rgba(15,23,42,.18);
+ --shadow-lg:0 8px 18px rgba(15,23,42,.12),0 28px 56px -16px rgba(15,23,42,.32)}
+.dark{--elev-1:0 1px 2px rgba(0,0,0,.35);
+ --shadow-md:0 2px 8px rgba(0,0,0,.46),0 14px 30px -8px rgba(0,0,0,.62);
+ --shadow-lg:0 10px 22px rgba(0,0,0,.55),0 36px 68px -18px rgba(0,0,0,.74)}
+@keyframes ov-fade{from{opacity:0}to{opacity:1}}
+@keyframes ov-dlg{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes ov-menu{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes badgepulse{0%{transform:scale(1)}45%{transform:scale(1.42)}100%{transform:scale(1)}}
+@keyframes rowflash{0%{background:color-mix(in srgb,var(--success) 20%,transparent)}100%{background:transparent}}
+.btn,.iconbtn{transition:background var(--dur),color var(--dur),border-color var(--dur),box-shadow var(--dur),transform .07s}
+.btn:active,.iconbtn:active{transform:translateY(1px)}
+.btn.primary,.btn.success{box-shadow:0 1px 2px rgba(2,8,23,.22)}
+.nav-item,.mi,.crow,.tab{transition:background var(--dur),color var(--dur)}
+.frow{transition:background var(--dur),max-height .26s var(--ease),opacity .18s,transform .2s var(--ease),padding .26s}
+.frow.leaving{max-height:0!important;opacity:0;transform:translateX(18px);padding-top:0!important;padding-bottom:0!important;border-color:transparent!important}
+.frow.flash{animation:rowflash 1.1s ease-out}
+.ctx,.loginbox{box-shadow:var(--elev-1)}
+.scrim{animation:ov-fade .16s ease-out}
+.cmdk{animation:ov-dlg .18s var(--ease)}
+.menu{animation:ov-menu .14s var(--ease);transform-origin:bottom}
+.acct-badge{transition:transform .2s var(--ease)}
+.acct-badge.pulse{animation:badgepulse .45s var(--ease)}
+.tab .cnt{transition:transform .2s var(--ease)}
+::selection{background:color-mix(in srgb,var(--ring) 32%,transparent)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--input);border-radius:7px;border:3px solid var(--background);background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--muted-foreground)}
+::-webkit-scrollbar-track{background:transparent}
+.header::-webkit-scrollbar{height:0}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,var(--muted) 25%,var(--accent) 40%,var(--muted) 60%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;border-radius:6px;height:12px;display:inline-block}
+.sk-row{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.toast-act{margin-left:4px;font-weight:600;color:var(--running);padding:2px 9px;border-radius:5px;border:1px solid transparent}
+.toast-act:hover{background:var(--accent);border-color:var(--border)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="overlays"></div>
+<div id="toasts"></div>
+<script>
+'use strict';
+/* ============ icons (lucide-style) ============ */
+const ICONS={
+search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+chevD:'<polyline points="6 9 12 15 18 9"/>',
+check:'<polyline points="4 12 10 18 20 6"/>',
+x:'<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
+clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-4.5-4.7"/>',
+bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a2 2 0 0 0 3.4 0"/>',
+alertT:'<path d="M10.3 3.8L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.6" r=".6" fill="currentColor" stroke="none"/>',
+key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12L21 2"/><path d="M17 6l3 3"/>',
+shieldCheck:'<path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10z"/><polyline points="9 11.5 11.5 14 15.5 9"/>',
+userPlus:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>',
+external:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+activity:'<polyline points="3 12 7 12 10 5 14 19 17 12 21 12"/>',
+flask:'<path d="M10 2v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3L14 8V2"/><line x1="8" y1="2" x2="16" y2="2"/>',
+box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="22"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>',
+upload:'<path d="M12 16V4"/><polyline points="6 10 12 4 18 10"/><path d="M4 20h16"/>',
+readC:'<circle cx="12" cy="12" r="9"/><polyline points="8.5 12 11 14.5 15.5 9.5"/>',
+tray:'<path d="M22 13h-5l-2 3h-6l-2-3H2"/><path d="M5 5h14l3 8v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+more:'<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+layers:'<polygon points="12 2 22 8 12 14 2 8 12 2"/><polyline points="2 13 12 19 22 13"/>',
+braces:'<path d="M8 3c-2 0-3 1-3 3v3c0 1-1 2-2 2 1 0 2 1 2 2v4c0 2 1 3 3 3"/><path d="M16 3c2 0 3 1 3 3v3c0 1 1 2 2 2-1 0-2 1-2 2v4c0 2-1 3-3 3"/>',
+db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+sliders:'<line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="7" cy="18" r="2"/>',
+star:'<polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21.5 12 17.3 5.5 21.5 7.5 14 2 9.3 9 9"/>'};
+function icon(n,s){return '<svg class="ic" viewBox="0 0 24 24"'+(s?' style="'+s+'"':'')+'>'+(ICONS[n]||ICONS.box)+'</svg>'}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(m,ic,action){const t=document.createElement('div');t.className='toast';t.innerHTML=icon(ic||'check')+'<span>'+esc(m)+'</span>';
+ if(action){const b=document.createElement('button');b.className='toast-act';b.textContent=action.label;b.onclick=()=>{action.fn();t.remove()};t.appendChild(b)}
+ document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),action?5400:3400)}
+const SEEN={};
+
+/* ============ item catalog (seeded per the brief's message catalog) ============ */
+/* cls: 'act' (act-to-clear) | 'info' (read-to-clear). state: pending|<outcome>|expired for act; unread|read for info. */
+const ITEMS=[
+ {id:'al1',cls:'info',type:'alert',state:'unread',sev:'critical',t:'2m ago',proj:'acme-support',ent:'endpoint /triage',actor:'Observe · alert rule',title:'Critical: error rate 14% on /triage (threshold 5%)',
+  ctx:[['Alert rule','error-rate > 5% over 10 min'],['Window','13:40 – 13:50'],['Failing model','claude-sonnet-4-6 · timeout'],['Affected runs','31']],act2:['Acknowledge','View']},
+ {id:'ap1',cls:'act',type:'approval',state:'pending',sev:'warning',t:'18m ago',due:'due in 4h',dueH:4,proj:'internal-tools',ent:'flow data-cleanup',actor:'paused run #2214',title:'Approval needed — data-cleanup is paused before a production write',
+  ctx:[['Flow','data-cleanup · step 4 of 6'],['Waiting on','write to customers table (production)'],['Rows affected','12,480'],['Change','customers_v1 <span class="arr">→</span> customers_v2'],['Requested by','scheduled run · nightly']]},
+ {id:'in1',cls:'act',type:'invite',state:'pending',t:'32m ago',proj:'churn-radar',ent:'project',actor:'Maya Chen',title:'Maya Chen invited you to churn-radar',
+  ctx:[['Project','churn-radar'],['Offered role','Editor'],['Invited by','Maya Chen (Owner)'],['Note','"need your eyes on the retention prompts"']]},
+ {id:'cm1',cls:'act',type:'comment_assigned',state:'pending',t:'1h ago',proj:'acme-support',ent:'support-triage v12',actor:'Maya Chen',title:'Maya Chen assigned you a comment on support-triage v12',
+  quote:'"The billing category still catches refund disputes — should those escalate instead? Assigning to you to decide."',
+  ctx:[['Prompt','support-triage · v12 (production)'],['Thread','3 replies'],['Resolve','when the decision is made']]},
+ {id:'ap2',cls:'act',type:'approval',state:'pending',sev:'info',t:'2h ago',due:'due in 1d',dueH:24,proj:'acme-support',ent:'flow deploy-gate',actor:'paused run #2199',title:'Approval needed — deploy-gate before publishing churn model',
+  multi:true,ctx:[['Flow','deploy-gate · final step'],['Waiting on','publish model endpoint v3'],['Approvers','you · Dana Ortiz · Maya Chen (first decision wins)'],['Eval status','48/50 passed']]},
+ {id:'ar1',cls:'act',type:'access_request',state:'pending',sev:'info',t:'3h ago',proj:'internal-tools',ent:'project access',actor:'Leo Park',title:'Leo Park requested access to internal-tools',
+  ctx:[['Requester','leo@acme.com'],['Requested role','Editor'],['Note','"need to fix the cleanup flow mapping"'],['Routes to','project owners/admins (you)']]},
+ {id:'tk1',cls:'act',type:'token_expiring',state:'pending',sev:'warning',t:'5h ago',due:'expires in 2d',dueH:48,proj:'acme-support',ent:'token acme-ci',actor:'credentials',title:'API token acme-ci expires in 2 days',
+  ctx:[['Token','acme-ci · created 90d ago'],['Used by','CI pipeline · 214 calls this week'],['Expiry','Jul 5, 09:00 UTC'],['Renew','rotates the token; old value valid 24h']]},
+ {id:'rn1',cls:'info',type:'run_finished',state:'unread',t:'6h ago',proj:'acme-support',ent:'support-triage',actor:'batch run #412',title:'Run #412 finished — support-triage batch (50 rows, 1 flagged)',
+  ctx:[['Result','49 ok · 1 flagged'],['Tokens','11.2k in · 0.3k out'],['Cost','$0.041'],['Duration','48s']]},
+ {id:'rf1',cls:'info',type:'run_failed',state:'unread',sev:'warning',t:'7h ago',proj:'acme-support',ent:'escalation-detector',actor:'run #411',title:'Run #411 failed — escalation-detector (missing reference pii-scrubber)',
+  ctx:[['Error','reference pii-scrubber not found'],['Step','assemble template'],['Fix','create the prompt or remove the reference']]},
+ {id:'mn1',cls:'info',type:'mention',state:'unread',t:'8h ago',proj:'acme-support',ent:'support-triage v12',actor:'Maya Chen',title:'Maya Chen mentioned you on support-triage v12',
+  quote:'"@amaan the v12 wording fixed the misrouted refunds — nice. One more idea in thread."',
+  ctx:[['Thread','on version v12'],['Replies','2']]},
+ {id:'ex1',cls:'info',type:'experiment_done',state:'read',t:'yesterday',proj:'acme-support',ent:'experiment triage-v11-v12',actor:'Evaluate',title:'Experiment finished — v11 vs v12: v12 wins 48/50',
+  ctx:[['Dataset','helpdesk-tickets-2026-06'],['Winner','v12 (+4 exact-match)'],['Cost','$0.09']]},
+ {id:'pp1',cls:'info',type:'prompt_promoted',state:'read',t:'yesterday',proj:'acme-support',ent:'support-triage',actor:'Maya Chen',title:'Maya Chen promoted support-triage v12 to production',
+  ctx:[['Version','v12'],['Environment','staging <span class="arr">→</span> production'],['By','Maya Chen']]},
+ {id:'rn2',cls:'info',type:'run_finished',state:'read',t:'yesterday',proj:'internal-tools',ent:'tone-rewriter',actor:'run #409',title:'Run #409 finished — tone-rewriter single',ctx:[['Result','ok'],['Cost','$0.002']]},
+ {id:'og1',cls:'info',type:'org_role_changed',state:'read',t:'2d ago',proj:'acme-org',ent:'organization',actor:'Zaki A',title:'Your org role is now Admin',ctx:[['Role','Member <span class="arr">→</span> Admin'],['Changed by','Zaki A (Owner)']]},
+ {id:'op1',cls:'info',type:'operator_entered_org',state:'unread',t:'2d ago',proj:'acme-org',ent:'organization audit',actor:'platform operator',title:'A platform operator accessed acme-org',
+  ctx:[['When','Jul 1, 22:14 UTC'],['Session','governance session, audited'],['Purpose','restore a locked-out admin'],['Every action','recorded in Organization → Audit']]},
+ {id:'iv0',cls:'act',type:'invite',state:'accepted',outcomeBy:'you',t:'2d ago',proj:'internal-tools',ent:'project',actor:'Dana Ortiz',title:'Dana Ortiz invited you to internal-tools',
+  ctx:[['Project','internal-tools'],['Offered role','Editor'],['Outcome','accepted']]},
+ {id:'ex0',cls:'act',type:'approval',state:'expired',t:'3d ago',proj:'internal-tools',ent:'flow schema-migration',actor:'paused run #2107',title:'Approval expired — schema-migration maintenance window (missed)',
+  ctx:[['Flow','schema-migration'],['Expired','Jun 30, 02:00 UTC'],['Effect','run was stopped safely'],['Note','expired items never masquerade as done']]},
+ {id:'sy1',cls:'info',type:'system',state:'read',t:'3d ago',proj:'platform',ent:'release',actor:'system',title:'Keystone upgraded to 0.9.2 — prompt compression preview enabled',ctx:[['Release notes','0.9.2']]},
+ {id:'arch1',cls:'info',type:'run_finished',state:'read',archived:true,t:'1w ago',proj:'acme-support',ent:'nightly-batch',actor:'run #388',title:'Run #388 finished — nightly batch (archived example)',ctx:[['Result','ok']]}
+];
+const TYPEICON={approval:'shieldCheck',invite:'userPlus',token_expiring:'key',access_request:'users',comment_assigned:'msg',mention:'msg',alert:'alertT',run_finished:'activity',run_failed:'alertT',experiment_done:'flask',prompt_promoted:'upload',org_role_changed:'users',operator_entered_org:'eye',system:'box'};
+const DECISIONS={approval:[['Approve','approved','success'],['Reject','rejected','destructive']],invite:[['Accept','accepted','success'],['Decline','declined','outline']],access_request:[['Grant','granted','success'],['Deny','denied','outline']],token_expiring:[['Renew','renewed','primary'],['Acknowledge','approved','outline']],comment_assigned:[['Resolve','resolved','primary'],['Open','open','outline']]};
+const byId=id=>ITEMS.find(i=>i.id===id);
+
+/* ============ state & routing ============ */
+const S={seg:'all',type:'all',proj:'all',sel:null,hint:true,ksel:0,autoArmed:false};
+function pendingCount(){return ITEMS.filter(i=>i.cls==='act'&&i.state==='pending'&&!i.archived).length}
+function route(){const h=location.hash||'#/build';const m=h.match(/^#\/inbox\/(needs|all|unread|archived)/);if(m)return{scr:'inbox',seg:m[1]};return{scr:'build'}}
+function go(h){location.hash=h}
+window.addEventListener('hashchange',()=>{const r=route();if(r.scr==='inbox'){S.seg=r.seg;armAuto()}render()});
+function armAuto(){if(S.autoArmed)return;S.autoArmed=true;
+ setTimeout(()=>{const it=byId('ap2');if(it&&it.state==='pending'){it.state='approved';it.outcomeBy='Dana Ortiz (another approver)';
+ toast('deploy-gate approval was resolved by Dana Ortiz — first decision wins, no zombie tasks','shieldCheck');resolveAnim('ap2')}},20000)}
+
+/* ============ filtering & sorting ============ */
+const SEVR={critical:0,warning:1,info:2,undefined:3};
+function typeMatch(i){if(S.type==='all')return true;if(S.type==='comments')return i.type==='mention'||i.type==='comment_assigned';if(S.type==='runs')return ['run_finished','run_failed','experiment_done'].includes(i.type);return i.type===S.type}
+function visible(){let l=ITEMS.filter(i=>typeMatch(i)&&(S.proj==='all'||i.proj===S.proj));
+ if(S.seg==='archived')return l.filter(i=>i.archived);
+ l=l.filter(i=>!i.archived);
+ if(S.seg==='needs')return l.filter(i=>i.cls==='act'&&i.state==='pending').sort((a,b)=>(SEVR[a.sev]-SEVR[b.sev])||((a.dueH||999)-(b.dueH||999)));
+ if(S.seg==='unread')return l.filter(i=>(i.cls==='info'&&i.state==='unread'));
+ return l}
+
+/* ============ actions (the two "done" semantics) ============ */
+function decide(id,label,end){const i=byId(id);if(i.state!=='pending')return;
+ if(label==='Open'){openCtx(id);return}
+ i.state=end;i.outcomeBy='you';
+ if(i.type==='approval')toast(end==='approved'?'Approved — run resumed':'Rejected — run stopped safely','shieldCheck');
+ else if(i.type==='invite')toast(end==='accepted'?'Joined '+i.proj:'Invite declined','userPlus');
+ else if(i.type==='token_expiring')toast(label==='Renew'?'Token rotated — old value valid for 24h':'Acknowledged — still expires Jul 5','key');
+ else if(i.type==='access_request')toast(end==='granted'?'Access granted to Leo Park (Editor)':'Access denied','users');
+ else toast('Comment resolved at its source','msg');
+ resolveAnim(id)}
+function resolveAnim(id){S.pulse=true;
+ const row=(S.seg==='needs'||S.seg==='unread')?document.querySelector('.frow[data-id="'+id+'"]'):null;
+ if(row){const h=row.offsetHeight;row.style.maxHeight=h+'px';row.style.overflow='hidden';requestAnimationFrame(()=>row.classList.add('leaving'));setTimeout(render,260)}
+ else{S.flash=id;render()}}
+function ackAlert(id){const i=byId(id);i.state='read';toast('Alert acknowledged','bell');resolveAnim(id)}
+function toggleRead(id){const i=byId(id);if(i.cls!=='info')return;i.state=i.state==='unread'?'read':'unread';render()}
+function markAll(){let n=0;ITEMS.forEach(i=>{if(i.cls==='info'&&!i.archived&&i.state==='unread'){i.state='read';n++}});
+ toast('Marked '+n+' informational items read — pending actionables are untouched','readC');render()}
+function archiveIt(id){const i=byId(id);if(i.cls==='act'&&i.state==='pending'){toast('A pending actionable can\'t be archived — only its decision (or expiry) clears it','alertT');return}
+ i.archived=true;if(i.cls==='info'&&i.state==='unread')i.state='read';S.sel=null;render();toast('Archived '+i.type.replace(/_/g,' '),'archive',{label:'Undo',fn:()=>{i.archived=false;render();toast('Restored to the feed','archive')}})}
+function openCtx(id){const i=byId(id);toast('Deep-link: opening '+i.ent+' in '+i.proj+' (mock destination)','external');go('#/build')}
+function selectItem(id){S.sel=id;const i=byId(id);if(i.cls==='info'&&i.state==='unread'){i.state='read'}render()}
+
+/* ============ shell ============ */
+function sidebar(active){
+ const nav=(ic,label,on,cb)=>'<button class="nav-item'+(on?' on':'')+'" onclick="'+cb+'">'+icon(ic)+label+'</button>';
+ return '<aside class="sidebar"><div class="sb-top"><button class="proj-btn" onclick="toast(\'Project switcher (mock) — Inbox is cross-project either way\',\'box\')"><span class="proj-logo">A</span><span class="proj-name">acme-support</span>'+icon('chevD')+'</button></div>'+
+ '<nav class="sb-nav"><div class="sb-label">Pinned</div>'+nav('star','support-triage',false,'stub()')+
+ '<div class="sb-label">Build</div>'+nav('layers','Flows',false,'stub()')+nav('braces','Prompts',active==='build','go(\'#/build\')')+
+ '<div class="sb-label">Evaluate</div>'+nav('flask','Experiments',false,'stub()')+nav('db','Datasets',false,'stub()')+
+ '<div class="sb-label">Observe</div>'+nav('activity','Runs',false,'stub()')+
+ '<div class="sb-label">Manage</div>'+nav('users','Members',false,'stub()')+nav('sliders','Settings',false,'stub()')+'</nav>'+
+ '<div class="sb-foot"><button class="acct" onclick="acctMenu(event)"><span class="avatar">SK</span>'+(pendingCount()?'<span class="acct-badge" onclick="event.stopPropagation();go(\'#/inbox/needs\')" title="'+pendingCount()+' items need you — open Inbox">'+(pendingCount()>99?'99+':pendingCount())+'</span>':'')+'<span class="acct-info"><b>Sam K</b><span>Builder · 3 projects</span></span>'+icon('chevD')+'</button></div></aside>'}
+function stub(){toast('Outside this prototype — it demonstrates the Inbox','box')}
+function acctMenu(e){e.stopPropagation();closeMenus();const m=document.createElement('div');m.className='menu';
+ m.innerHTML='<div class="mlabel">sam@acme.com</div><button class="mi" onclick="closeMenus();go(\'#/inbox/all\')">'+icon('tray')+'Inbox'+(pendingCount()?' <span class="badge" style="background:var(--destructive);color:var(--destructive-foreground)">'+pendingCount()+'</span>':'')+'</button><button class="mi" onclick="closeMenus();toast(\'User settings — separate surface\',\'sliders\')">'+icon('sliders')+'User settings</button><div class="msep"></div><button class="mi" onclick="closeMenus();document.documentElement.classList.toggle(\'dark\');render()">'+icon(document.documentElement.classList.contains('dark')?'sun':'moon')+'Toggle light / dark</button><button class="mi" onclick="closeMenus();toast(\'Signed out (mock)\',\'x\')">'+icon('x')+'Sign out</button>';
+ document.body.appendChild(m);const r=e.currentTarget.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=(r.top-m.offsetHeight-6)+'px'}
+function closeMenus(){document.querySelectorAll('.menu').forEach(m=>m.remove())}
+document.addEventListener('click',()=>closeMenus());
+
+/* ============ build placeholder screen ============ */
+function buildScreen(){return '<div class="projstub"><div>'+icon('braces','width:34px;height:34px;opacity:.4')+'<h2 style="font-size:16px;margin:10px 0 6px">Build ▸ Prompts <span class="ctxnote">(placeholder)</span></h2><p class="ctxnote" style="max-width:400px">This screen stands in for the rest of Keystone. The Inbox follows you from here: the <b>badge on your account block</b> (bottom-left) shows what needs you — nothing blocking is lost while you work.</p><button class="btn outline" style="margin-top:14px" onclick="go(\'#/inbox/needs\')">'+icon('tray')+'Open Inbox ('+pendingCount()+' need action)</button></div></div>'}
+
+/* ============ inbox: feed row ============ */
+function rowActions(i){
+ if(i.cls==='act'&&i.state==='pending'){const d=DECISIONS[i.type]||[];
+  return d.map(a=>'<button class="btn sm '+(a[2]==='success'?'success':a[2]==='primary'?'primary':'outline')+'" onclick="event.stopPropagation();decide(\''+i.id+'\',\''+a[0]+'\',\''+a[1]+'\')">'+a[0]+'</button>').join('')}
+ if(i.type==='alert'&&i.state==='unread')return '<button class="btn sm outline" onclick="event.stopPropagation();ackAlert(\''+i.id+'\')">Acknowledge</button><button class="btn sm ghost" onclick="event.stopPropagation();openCtx(\''+i.id+'\')">View</button>';
+ return '<button class="btn sm ghost" onclick="event.stopPropagation();openCtx(\''+i.id+'\')">View</button>'}
+function feedRow(i){
+ const cls=['frow'];if(i.cls==='act'){cls.push('act');if(i.state!=='pending')cls.push(i.state==='expired'?'expired':'resolved')}
+ if(i.cls==='info'&&i.state==='read')cls.push('read');if(S.sel===i.id)cls.push('sel');
+ const state=i.cls==='act'?'<span class="chip '+(i.state==='pending'?'pending':i.state==='expired'?'expired':i.state)+'">'+(i.state==='pending'?'pending':i.state==='expired'?'expired · missed':i.state+(i.outcomeBy==='you'?' by you':''))+'</span>':'';
+ const sev=(i.sev&&(i.type==='alert'||i.type==='approval'||i.type==='run_failed'))?'<span class="sev '+i.sev+'" title="'+i.sev+'"></span>':'';
+ const unread=(i.cls==='info'&&i.state==='unread')?'<span class="unread-dot" title="unread"></span>':'';
+ return '<div class="'+cls.join(' ')+'" data-id="'+i.id+'" onclick="selectItem(\''+i.id+'\')"><div class="ficon">'+icon(TYPEICON[i.type]||'box')+'</div><div class="fbody"><div class="ft">'+unread+sev+esc(i.title)+'</div>'+
+ '<div class="fm">'+esc(i.proj)+' · '+esc(i.ent)+' · '+esc(i.actor)+' · '+i.t+' '+state+(i.due&&i.state==='pending'?'<span class="due">'+icon('clock','width:11px;height:11px')+esc(i.due)+'</span>':'')+'</div>'+
+ '<div class="facts">'+rowActions(i)+(i.cls==='info'?'<button class="iconbtn" style="width:24px;height:24px" title="mark read/unread" onclick="event.stopPropagation();toggleRead(\''+i.id+'\')">'+icon('readC')+'</button>':'')+'</div></div></div>'}
+
+/* ============ inbox: detail pane ============ */
+function detail(){const i=S.sel?byId(S.sel):null;
+ if(!i)return '<div class="emptyd"><div style="text-align:center">'+icon('tray','width:28px;height:28px;opacity:.4')+'<p style="margin-top:8px">Select an item to read it here.<br>Decisions happen in place — deep-links for depth.</p></div></div>';
+ const d=DECISIONS[i.type]||[];const pending=i.cls==='act'&&i.state==='pending';
+ const chip=i.cls==='act'?'<span class="chip '+(i.state==='pending'?'pending':i.state==='expired'?'expired':i.state)+'">'+(i.state==='pending'?'pending':i.state==='expired'?'expired · missed':i.state)+'</span>':'<span class="badge">'+(i.state==='unread'?'unread':'read')+'</span>';
+ return '<div class="detail"><div class="dh"><span class="badge">'+esc(i.type.replace(/_/g,' '))+'</span>'+chip+(i.sev?'<span class="sev '+i.sev+'"></span><span class="ctxnote">'+i.sev+'</span>':'')+'</div>'+
+ '<h2>'+esc(i.title)+'</h2>'+
+ '<div class="meta"><span>'+esc(i.proj)+' ▸ '+esc(i.ent)+'</span>·<span>'+esc(i.actor)+'</span>·<span>'+i.t+'</span></div>'+
+ (pending&&i.due?'<div class="dnote">'+icon('clock')+' '+esc(i.due)+' — unacted items expire and are marked missed, never silently done.</div>':'')+
+ (i.multi&&pending?'<div class="dnote">'+icon('users')+' Offered to several approvers — the first decision resolves everyone\'s copy.</div>':'')+
+ '<div class="ctx">'+(i.ctx||[]).map(r=>'<div class="krow"><b>'+esc(r[0])+'</b><span>'+r[1]+'</span></div>').join('')+(i.quote?'<div class="quote">'+esc(i.quote)+'</div>':'')+'</div>'+
+ (i.state!=='pending'&&i.cls==='act'&&i.state!=='expired'?'<div class="outcome">'+icon('check')+esc(i.state[0].toUpperCase()+i.state.slice(1))+(i.outcomeBy?' by '+esc(i.outcomeBy):'')+' · just now</div>':'')+
+ '<div class="dactions">'+
+ (pending?d.map(a=>'<button class="btn '+(a[2]==='success'?'success':a[2]==='destructive'?'destructive':a[2]==='primary'?'primary':'outline')+'" onclick="decide(\''+i.id+'\',\''+a[0]+'\',\''+a[1]+'\')">'+(a[0]==='Open'?icon('external'):icon('check'))+a[0]+'</button>').join(''):'')+
+ (i.type==='alert'&&i.state==='unread'?'<button class="btn primary" onclick="ackAlert(\''+i.id+'\')">'+icon('bell')+'Acknowledge</button>':'')+
+ '<button class="btn ghost" onclick="openCtx(\''+i.id+'\')">'+icon('external')+'Open in context</button>'+
+ (i.cls==='info'?'<button class="btn ghost" onclick="toggleRead(\''+i.id+'\')">'+icon('readC')+'Mark '+(i.state==='unread'?'read':'unread')+'</button>':'')+
+ (!pending&&!i.archived?'<button class="btn ghost" onclick="archiveIt(\''+i.id+'\')">'+icon('archive')+'Archive</button>':'')+
+ '</div>'+
+ (pending?'<p class="ctxnote">This is an actionable item: reading it changes nothing — only the decision above (or expiry) clears it. No dismiss, no archive while pending.</p>':'')+
+ '</div>'}
+
+/* ============ inbox screen ============ */
+function inboxScreen(){
+ if(!SEEN.inbox){SEEN.inbox=1;setTimeout(render,460);const sk=Array.from({length:7}).map(()=>'<div class="sk-row" style="border-bottom:1px solid var(--border)"><span class="sk" style="width:30px;height:30px;border-radius:7px"></span><span style="flex:1"><span class="sk" style="width:70%;height:13px"></span><br><span class="sk" style="width:45%;height:10px;margin-top:6px"></span></span></div>').join('');return '<div class="split"><div class="feed">'+sk+'</div><div class="reading"><div class="emptyd"></div></div></div>'}
+ const list=visible();
+ let feed;
+ if(!list.length){
+  const msg=S.seg==='needs'?['Nothing needs you right now','The queue is clear — decisions land here the moment something blocks.']:S.seg==='archived'?['Nothing archived','Archived informational items and resolved tasks end up here.']:S.seg==='unread'?['No unread items','You\'re fully caught up on the feed.']:['You\'re all caught up','New activity from all your projects lands here.'];
+  feed='<div class="empty">'+icon('tray')+'<b>'+msg[0]+'</b><span style="font-size:12.5px;max-width:300px">'+msg[1]+'</span></div>'}
+ else feed=(S.seg==='all'&&S.hint?'<div class="hintbar">'+icon('tray')+'Your Inbox collects approvals, invites, alerts, and run updates from every project you\'re in.<button class="iconbtn" style="margin-left:auto;width:22px;height:22px" onclick="S.hint=false;render()">'+icon('x')+'</button></div>':'')+list.map(feedRow).join('');
+ return '<div class="split"><div class="feed">'+feed+'</div><div class="reading">'+detail()+'</div></div>'}
+function inboxHeader(){const segs=[['needs','Needs action'],['all','All'],['unread','Unread'],['archived','Archived']];
+ const i=S.sel?byId(S.sel):null;
+ return '<div class="crumb">'+icon('tray')+'<span class="cur">Inbox</span>'+(i?'<span class="sep">▸</span><a style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.title)+'</a>':'')+'</div>'+
+ '<div class="tabs">'+segs.map(s=>'<button class="tab'+(S.seg===s[0]?' on':'')+'" onclick="go(\'#/inbox/'+s[0]+'\')">'+s[1]+(s[0]==='needs'&&pendingCount()?'<span class="cnt">'+pendingCount()+'</span>':'')+'</button>').join('')+'</div>'+
+ '<div class="hdr-actions">'+
+ '<select class="inp" onchange="S.type=this.value;render()">'+[['all','All types'],['approval','Approvals'],['alert','Alerts'],['invite','Invites'],['access_request','Access requests'],['comments','Comments'],['runs','Runs'],['system','System']].map(o=>'<option value="'+o[0]+'"'+(S.type===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+ '<select class="inp" onchange="S.proj=this.value;render()">'+[['all','All projects'],['acme-support','acme-support'],['internal-tools','internal-tools'],['churn-radar','churn-radar'],['acme-org','acme-org']].map(o=>'<option value="'+o[0]+'"'+(S.proj===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+ '<button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button>'+
+ '<button class="btn outline sm" onclick="markAll()">'+icon('readC')+'Mark all read</button></div>'}
+
+/* ============ command palette ============ */
+function openCmdk(){S.ksel=0;const items=[
+ {g:'Go to',n:'Needs action',ic:'shieldCheck',fn:"go('#/inbox/needs')"},{g:'Go to',n:'All',ic:'tray',fn:"go('#/inbox/all')"},{g:'Go to',n:'Unread',ic:'readC',fn:"go('#/inbox/unread')"},{g:'Go to',n:'Archived',ic:'archive',fn:"go('#/inbox/archived')"},{g:'Go to',n:'Back to Build',ic:'braces',fn:"go('#/build')"},
+ {g:'Do',n:'Mark all read (informational)',ic:'readC',fn:'markAll()'},{g:'Do',n:'Toggle light / dark',ic:'sun',fn:"document.documentElement.classList.toggle('dark');render()"}]
+ .concat(ITEMS.filter(x=>!x.archived).slice(0,8).map(x=>({g:'Items',n:x.title,ic:TYPEICON[x.type],fn:"go('#/inbox/all');S.sel='"+x.id+"';render()"})));
+ window._K=items;
+ document.getElementById('overlays').innerHTML='<div class="scrim" onclick="if(event.target===this)closeDlg()"><div class="cmdk"><div class="cin">'+icon('search')+'<input id="ck-in" placeholder="Search the inbox…" oninput="drawK(this.value)" autocomplete="off"><kbd>esc</kbd></div><div class="list" id="ck-list"></div><div class="cfoot"><span><kbd>↑↓</kbd> navigate</span><span><kbd>↵</kbd> select</span><span><kbd>esc</kbd> close</span></div></div></div>';
+ drawK('');document.getElementById('ck-in').focus()}
+function kf(q){return window._K.filter(i=>!q||i.n.toLowerCase().includes(q.toLowerCase()))}
+function drawK(q){let g='';const l=kf(q);S.ksel=Math.min(S.ksel,Math.max(0,l.length-1));
+ document.getElementById('ck-list').innerHTML=l.map((i,x)=>{const gl=i.g!==g?'<div class="glabel">'+i.g+'</div>':'';g=i.g;return gl+'<div class="crow'+(x===S.ksel?' sel':'')+'" onclick="execK('+x+')">'+icon(i.ic)+'<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.n)+'</span></div>'}).join('')||'<div class="glabel">No matches</div>'}
+function execK(x){const q=document.getElementById('ck-in').value;const it=kf(q)[x];if(!it)return;closeDlg();try{eval(it.fn)}catch(e){}}
+function closeDlg(){document.getElementById('overlays').innerHTML=''}
+document.addEventListener('keydown',e=>{
+ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCmdk();return}
+ const ck=document.getElementById('ck-in');
+ if(ck){const q=ck.value,n=kf(q).length;
+  if(e.key==='ArrowDown'){e.preventDefault();S.ksel=Math.min(n-1,S.ksel+1);drawK(q)}
+  if(e.key==='ArrowUp'){e.preventDefault();S.ksel=Math.max(0,S.ksel-1);drawK(q)}
+  if(e.key==='Enter'){e.preventDefault();execK(S.ksel)}
+  if(e.key==='Escape')closeDlg();return}
+ if(route().scr==='inbox'&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();const l=visible();if(!l.length)return;
+  let idx=l.findIndex(i=>i.id===S.sel);idx=e.key==='ArrowDown'?Math.min(l.length-1,idx+1):Math.max(0,idx<0?0:idx-1);selectItem(l[idx].id)}
+ if(e.key==='Escape'){closeDlg();closeMenus()}});
+
+/* ============ root render ============ */
+function render(){const r=route();let hdr,body;
+ if(r.scr==='inbox'){S.seg=r.seg;hdr=inboxHeader();body=inboxScreen()}
+ else{hdr='<div class="crumb">'+icon('braces')+'<span class="cur">Build ▸ Prompts</span><span class="ctxnote" style="margin-left:6px">placeholder screen</span></div><div class="hdr-actions"><button class="iconbtn" onclick="openCmdk()">'+icon('search')+'</button></div>';body=buildScreen()}
+ document.getElementById('app').innerHTML=sidebar(r.scr)+'<div class="main"><header class="header">'+hdr+'</header><div class="content">'+body+'</div></div>';
+ if(S.pulse){S.pulse=false;const b=document.querySelector('.acct-badge');if(b){requestAnimationFrame(()=>b.classList.add('pulse'))}}
+ if(S.flash){const f=document.querySelector('.frow[data-id="'+S.flash+'"]');S.flash=null;if(f)requestAnimationFrame(()=>f.classList.add('flash'))}}
+render();
+</script>
+</body>
+</html>

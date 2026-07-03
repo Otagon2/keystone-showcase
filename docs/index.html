@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Keystone — Prototypes</title>
+<style>
+:root{
+  --background:#020817; --card:#0b1220; --foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
+  --primary:#f8fafc; --ring:#94a3b8;
+  --prompts:#8b5cf6; --inbox:#f59e0b; --platform:#22d3ee; --org:#4ade80;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;min-height:100vh;padding:56px 24px 80px}
+.wrap{max-width:900px;margin:0 auto}
+.mark{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:14px;color:var(--muted-foreground);letter-spacing:.02em}
+.mark .glyph{width:26px;height:26px;border-radius:7px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800}
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:22px 0 8px}
+.lede{font-size:15px;color:var(--muted-foreground);max-width:620px;line-height:1.6}
+.note{margin-top:14px;display:inline-flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:6px;padding:7px 11px;background:var(--card)}
+.note b{color:var(--foreground);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px}
+@media (max-width:680px){.grid{grid-template-columns:1fr}}
+.cardlink{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .16s,transform .08s,box-shadow .16s;position:relative;overflow:hidden}
+.cardlink:hover{border-color:var(--input);transform:translateY(-2px);box-shadow:0 12px 30px -12px rgba(0,0,0,.7)}
+.cardlink::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.cardlink .tag{font-family:var(--mono);font-size:11px;color:var(--muted-foreground);letter-spacing:.04em}
+.cardlink h2{font-size:18px;font-weight:650;margin:8px 0 6px;display:flex;align-items:center;gap:9px}
+.dot{width:9px;height:9px;border-radius:99px;background:var(--accent);flex:none}
+.cardlink p{font-size:13px;color:var(--muted-foreground);line-height:1.55}
+.cardlink .open{margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);display:inline-flex;align-items:center;gap:6px}
+.p1{--accent:var(--prompts)} .p2{--accent:var(--org)} .p3{--accent:var(--inbox)} .p4{--accent:var(--platform)}
+footer{margin-top:44px;font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);border-top:1px solid var(--border);padding-top:18px;line-height:1.9}
+footer a{color:var(--muted-foreground)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="mark"><span class="glyph">K</span>keystone<span style="opacity:.5">/ prototypes</span></div>
+  <h1>Keystone — design prototypes</h1>
+  <p class="lede">Clickable, self-contained mock-ups for four Keystone surfaces, built on shadcn/ui (New York) in a dark developer-console theme. No backend — every interaction is mocked. Dark by default; a light toggle lives in each account menu.</p>
+  <div class="note">🔒 <span>Internal client work · unlisted preview.</span> Mock data only — nothing here talks to a real system.</div>
+
+  <div class="grid">
+    <a class="cardlink p1" href="prompts.html">
+      <div class="tag">ISSUE #1</div>
+      <h2><span class="dot"></span>Prompt Management</h2>
+      <p>Write → try → batch → compare → compress → govern, without leaving the surface. Streaming runs, drag-to-reorder segments, LLMLingua compression with token economics.</p>
+      <div class="open">Open prototype →</div>
+    </a>
+    <a class="cardlink p2" href="org-admin.html">
+      <div class="tag">ISSUE #2</div>
+      <h2><span class="dot"></span>Organization Admin</h2>
+      <p>Org-scope governance: members &amp; roles, projects, write-once secrets, model connections, billing with a budget gate, API keys, and an audit lens.</p>
+      <div class="open">Open prototype →</div>
+    </a>
+    <a class="cardlink p3" href="inbox.html">
+      <div class="tag">ISSUE #3</div>
+      <h2><span class="dot"></span>Inbox</h2>
+      <p>A cross-project feed + task queue where notifications clear by reading and tasks clear only by acting. Deciding animates an item out of the queue.</p>
+      <div class="open">Open prototype →</div>
+    </a>
+    <a class="cardlink p4" href="platform.html">
+      <div class="tag">ISSUE #4</div>
+      <h2><span class="dot"></span>System Admin</h2>
+      <p>The platform control plane — provision orgs, and the audited “Enter-org” assume-role that lets an operator govern a tenant without reading its data.</p>
+      <div class="open">Open prototype →</div>
+    </a>
+  </div>
+
+  <footer>
+    shadcn/ui New York · lucide icons · dark + light · one interaction rule · ⌘K everywhere · mock, no backend<br>
+    Tip — press <b style="color:var(--foreground)">⌘K</b> (or Ctrl-K) inside any prototype for the command palette.
+  </footer>
+</div>
+</body>
+</html>

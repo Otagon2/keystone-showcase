@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone — Platform (System Admin)</title>
+<style>
+/* ============ shadcn New York token system (shared with all Keystone prototypes) ============ */
+:root{
+  --background:#ffffff; --foreground:#020817; --card:#ffffff;
+  --primary:#0f172a; --primary-foreground:#f8fafc;
+  --secondary:#f1f5f9; --secondary-foreground:#0f172a;
+  --muted:#f1f5f9; --muted-foreground:#5b6472;
+  --accent:#f1f5f9; --accent-foreground:#0f172a;
+  --destructive:#dc2626; --destructive-foreground:#f8fafc;
+  --border:#e2e8f0; --input:#7e889c; --ring:#0f172a;
+  --success:#15803d; --warning:#b45309; --running:#2563eb;
+  --radius:8px;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+  --shadow-md:0 4px 12px -2px rgba(2,8,23,.12);
+  --shadow-lg:0 12px 32px -8px rgba(2,8,23,.24);
+}
+.dark{
+  --background:#020817; --foreground:#f8fafc; --card:#0b1220;
+  --primary:#f8fafc; --primary-foreground:#0f172a;
+  --secondary:#16202f; --secondary-foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5;
+  --accent:#1a2436; --accent-foreground:#f8fafc;
+  --destructive:#f87171; --destructive-foreground:#0f172a;
+  --border:#1e293b; --input:#475569; --ring:#94a3b8;
+  --success:#4ade80; --warning:#fbbf24; --running:#60a5fa;
+  --shadow-md:0 4px 12px -2px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 32px -8px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);font-size:14px;line-height:1.5;background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px}
+input,select{font:inherit;color:inherit}
+::placeholder{color:var(--muted-foreground);opacity:.7}
+svg.ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+kbd{font-family:var(--mono);font-size:11px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--muted-foreground)}
+.ctxnote{font-size:12px;color:var(--muted-foreground)}
+
+/* ============ shells ============ */
+#app{display:flex;height:100vh;overflow:hidden;flex-direction:column}
+.frame{display:flex;flex:1;min-height:0}
+/* shadcn: Sidebar (operator variant — no project shell) */
+.sidebar{width:240px;flex:none;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border)}
+.sb-brand{padding:16px 14px;border-bottom:1px solid var(--border)}
+.sb-brand b{font-size:14px;letter-spacing:.02em;display:flex;gap:8px;align-items:center}
+.sb-brand span{display:block;font-size:11px;color:var(--muted-foreground);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;margin-left:24px}
+.sb-nav{flex:1;padding:10px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:6px;color:var(--muted-foreground);font-size:13px;font-weight:500}
+.nav-item:hover{background:var(--accent);color:var(--foreground)}
+.nav-item.on{background:var(--secondary);color:var(--foreground)}
+.sb-foot{border-top:1px solid var(--border);padding:10px}
+.acct{display:flex;align-items:center;gap:10px;width:100%;padding:6px;border-radius:var(--radius)}
+.acct:hover{background:var(--accent)}
+.avatar{width:28px;height:28px;flex:none;border-radius:999px;background:var(--secondary);border:1px solid var(--border);display:grid;place-items:center;font-size:11px;font-weight:700}
+.acct-info{flex:1;text-align:left;min-width:0}
+.acct-info b{display:block;font-size:13px;line-height:1.2}
+.acct-info span{font-size:11px;color:var(--muted-foreground)}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.header{flex:none;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--card)}
+.crumb{display:flex;align-items:center;gap:6px;font-size:13.5px}
+.crumb a{color:var(--muted-foreground);cursor:pointer}
+.crumb a:hover{color:var(--foreground)}
+.crumb .sep{color:var(--muted-foreground);opacity:.5}
+.crumb .cur{font-weight:600}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.content{flex:1;overflow:auto}
+
+/* operator cross-tenant banner */
+.opbanner{flex:none;display:flex;align-items:center;gap:10px;padding:9px 20px;background:color-mix(in srgb,var(--warning) 16%,var(--background));border-bottom:1px solid color-mix(in srgb,var(--warning) 45%,transparent);color:var(--warning);font-size:13px;font-weight:600}
+.opbanner .btn{margin-left:auto}
+
+/* ============ Buttons (shadcn: Button) ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:33px;padding:0 13px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--primary-foreground)}
+.btn.primary:hover{opacity:.9}
+.btn.outline{border-color:var(--input);background:transparent}
+.btn.outline:hover{background:var(--accent)}
+.btn.ghost:hover{background:var(--accent)}
+.btn.destructive{background:var(--destructive);color:var(--destructive-foreground)}
+.btn.destructive:disabled,.btn.primary:disabled{opacity:.45;cursor:not-allowed}
+.btn.warn{border:1px solid color-mix(in srgb,var(--warning) 55%,transparent);color:var(--warning)}
+.btn.sm{height:27px;padding:0 9px;font-size:12px}
+.iconbtn{display:grid;place-items:center;width:30px;height:30px;border-radius:6px;color:var(--muted-foreground)}
+.iconbtn:hover{background:var(--accent);color:var(--foreground)}
+
+/* ============ Badges (shadcn: Badge) ============ */
+/* v2 — shadcn New York fidelity: badges are rounded-md, not pills */
+.badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;background:transparent;white-space:nowrap}
+.badge i{width:6px;height:6px;border-radius:99px;background:currentColor}
+.badge.active{color:var(--success);border-color:color-mix(in srgb,var(--success) 45%,transparent)}
+.badge.pending_setup{color:var(--warning);border-color:color-mix(in srgb,var(--warning) 45%,transparent)}
+.badge.suspended{color:var(--muted-foreground);border-color:var(--border)}
+.badge.pending_delete{color:var(--destructive);border-color:color-mix(in srgb,var(--destructive) 45%,transparent)}
+.badge.neutral{color:var(--muted-foreground);border-color:var(--border)}
+.badge.op{color:var(--warning);border-color:color-mix(in srgb,var(--warning) 45%,transparent)}
+.flag{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--warning);font-weight:600}
+
+/* ============ Table (shadcn: Table) ============ */
+.wrap{padding:20px 24px;max-width:1160px}
+.table{width:100%;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)}
+.thead{display:flex;align-items:center;background:var(--muted);border-bottom:1px solid var(--border)}
+.th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);padding:9px 12px;font-weight:600}
+.trow{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer}
+.trow:hover{background:var(--accent)}
+.trow:last-child{border-bottom:none}
+.td{padding:11px 12px;font-size:13px;min-width:0;display:flex;align-items:center;gap:7px}
+.empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:64px 20px;color:var(--muted-foreground);text-align:center}
+.empty svg.ic{width:32px;height:32px;opacity:.5}
+/* shadcn: Card */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card h4{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:10px;font-weight:600}
+.krow{display:flex;gap:10px;padding:5px 0;font-size:13px}
+.krow b{width:150px;flex:none;color:var(--muted-foreground);font-weight:500;font-size:12px}
+.notecard{border:1px dashed var(--input);border-radius:var(--radius);padding:12px 14px;font-size:12.5px;color:var(--muted-foreground);display:flex;gap:9px;margin-bottom:14px}
+.dcard{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.dcard.red{border-color:color-mix(in srgb,var(--destructive) 55%,transparent)}
+.dcard .info{flex:1}
+.dcard b{font-size:13.5px}
+.dcard p{font-size:12.5px;color:var(--muted-foreground)}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px}
+.stat .k{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted-foreground)}
+.stat .v{font-family:var(--mono);font-size:20px;font-weight:600;margin-top:3px}
+
+/* ============ Forms / inputs (shadcn: Input, Select) ============ */
+.inp{width:100%;height:34px;padding:0 10px;border-radius:6px;border:1px solid var(--input);background:var(--background);font-size:13px}
+.inp:focus{outline:2px solid var(--ring);outline-offset:-1px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12.5px;font-weight:500;margin-bottom:5px;color:var(--muted-foreground)}
+select.inp{appearance:auto}
+.regionchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--input);border-radius:6px;padding:3px 11px;font-size:12px;cursor:pointer;margin:0 6px 6px 0}
+.regionchip.on{background:var(--secondary);border-color:var(--ring);font-weight:600}
+
+/* ============ Filter bar / audit ============ */
+.fbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.arow{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;font-size:12.5px}
+.arow:hover{background:var(--accent)}
+.arow:last-child{border-bottom:none}
+.arow.ophl{background:color-mix(in srgb,var(--warning) 6%,transparent)}
+.arow.ophl:hover{background:color-mix(in srgb,var(--warning) 11%,transparent)}
+.acell{padding:9px 12px;min-width:0;display:flex;gap:7px;align-items:center}
+.actn{font-family:var(--mono);font-size:11.5px}
+
+/* ============ Menus / dialogs / cmdk / toasts ============ */
+.menu{position:fixed;z-index:300;min-width:210px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:5px;font-size:13px}
+.menu .mi{display:flex;align-items:center;gap:9px;width:100%;padding:7px 9px;border-radius:5px;text-align:left}
+.menu .mi:hover{background:var(--accent)}
+.menu .mi.danger{color:var(--destructive)}
+.menu .mi:disabled{opacity:.45;cursor:not-allowed}
+.menu .msep{height:1px;background:var(--border);margin:5px 4px}
+.menu .mnote{font-size:10.5px;color:var(--muted-foreground);padding:0 9px 5px 34px}
+.scrim{position:fixed;inset:0;z-index:400;background:rgba(2,8,23,.6);display:flex;align-items:flex-start;justify-content:center;padding-top:10vh}
+.dialog{width:470px;max-width:92vw;max-height:82vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);padding:22px}
+.dialog h3{font-size:16px;margin-bottom:4px}
+.dialog .sub{font-size:13px;color:var(--muted-foreground);margin-bottom:16px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.cmdk{width:560px;max-width:92vw;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
+.cmdk .cin{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.cmdk input{flex:1;background:none;border:none;outline:none;font-size:14px}
+.cmdk .list{max-height:44vh;overflow-y:auto;padding:7px}
+.cmdk .glabel{font-size:11px;color:var(--muted-foreground);padding:7px 10px 3px;font-weight:600}
+.cmdk .crow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer}
+.cmdk .crow:hover,.cmdk .crow.sel{background:var(--accent)}
+.cmdk .cfoot{display:flex;gap:14px;padding:9px 15px;border-top:1px solid var(--border);font-size:11px;color:var(--muted-foreground)}
+#toasts{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:11px 14px;font-size:13px;animation:tin .18s ease-out;max-width:400px}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ============ login ============ */
+.login{flex:1;display:grid;place-items:center}
+.loginbox{width:360px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:26px;box-shadow:var(--shadow-lg)}
+.loginbox h2{font-size:16px;display:flex;gap:9px;align-items:center;margin-bottom:4px}
+.loginbox .sub{font-size:12.5px;color:var(--muted-foreground);margin-bottom:16px}
+/* shadcn: Tabs for entered-org nav */
+.tabs{display:inline-flex;background:var(--muted);border-radius:var(--radius);padding:3px;gap:2px}
+.tab{height:28px;padding:0 13px;border-radius:6px;font-size:13px;font-weight:500;color:var(--muted-foreground)}
+.tab.on{background:var(--background);color:var(--foreground);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.member{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.member:last-child{border-bottom:none}
+/* ============ design polish: elevation + motion ============ */
+:root{--ease:cubic-bezier(.16,.84,.44,1);--dur:.17s;
+ --elev-1:0 1px 2px rgba(15,23,42,.05),0 1px 1px rgba(15,23,42,.04);
+ --shadow-md:0 2px 6px rgba(15,23,42,.08),0 10px 24px -8px rgba(15,23,42,.18);
+ --shadow-lg:0 8px 18px rgba(15,23,42,.12),0 28px 56px -16px rgba(15,23,42,.32)}
+.dark{--elev-1:0 1px 2px rgba(0,0,0,.35);
+ --shadow-md:0 2px 8px rgba(0,0,0,.46),0 14px 30px -8px rgba(0,0,0,.62);
+ --shadow-lg:0 10px 22px rgba(0,0,0,.55),0 36px 68px -18px rgba(0,0,0,.74)}
+@keyframes ov-fade{from{opacity:0}to{opacity:1}}
+@keyframes ov-dlg{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes ov-menu{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes banner{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:none}}
+@keyframes rowflash{0%{background:color-mix(in srgb,var(--warning) 22%,transparent)}100%{background:transparent}}
+.btn,.iconbtn{transition:background var(--dur),color var(--dur),border-color var(--dur),box-shadow var(--dur),transform .07s}
+.btn:active,.iconbtn:active{transform:translateY(1px)}
+.btn.primary{box-shadow:0 1px 2px rgba(2,8,23,.22)}
+.trow,.arow,.nav-item,.mi,.crow,.tab,.member,.regionchip{transition:background var(--dur),color var(--dur),border-color var(--dur)}
+.trow:hover{box-shadow:inset 2px 0 0 var(--muted-foreground)}
+.card,.dcard,.stat,.notecard,.loginbox{box-shadow:var(--elev-1)}
+.scrim{animation:ov-fade .16s ease-out}
+.dialog{animation:ov-dlg .2s var(--ease)}
+.cmdk{animation:ov-dlg .18s var(--ease)}
+.menu{animation:ov-menu .14s var(--ease);transform-origin:bottom}
+.opbanner{animation:banner .3s var(--ease)}
+.arow.flash{animation:rowflash 1.2s ease-out}
+::selection{background:color-mix(in srgb,var(--ring) 32%,transparent)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--input);border-radius:7px;border:3px solid var(--background);background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--muted-foreground)}
+::-webkit-scrollbar-track{background:transparent}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,var(--muted) 25%,var(--accent) 40%,var(--muted) 60%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;border-radius:6px;height:12px;display:inline-block}
+.sk-row{display:flex;align-items:center;gap:14px;padding:13px 12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="overlays"></div>
+<div id="toasts"></div>
+<script>
+'use strict';
+/* ============ icons ============ */
+const ICONS={
+search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+chevD:'<polyline points="6 9 12 15 18 9"/>',
+check:'<polyline points="4 12 10 18 20 6"/>',
+x:'<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
+more:'<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="22"/>',
+building:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-4.5-4.7"/>',
+sliders:'<line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="7" cy="18" r="2"/>',
+file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+shieldCheck:'<path d="M12 22s8-3 8-10V5l-8-3-8 3v7c0 7 8 10 8 10z"/><polyline points="9 11.5 11.5 14 15.5 9"/>',
+alertT:'<path d="M10.3 3.8L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><circle cx="12" cy="16.6" r=".6" fill="currentColor" stroke="none"/>',
+key:'<circle cx="7.5" cy="15.5" r="4.5"/><path d="M11 12L21 2"/><path d="M17 6l3 3"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+external:'<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+download:'<path d="M12 4v12"/><polyline points="6 10 12 16 18 10"/><path d="M4 20h16"/>',
+mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 7 12 13 22 7"/>',
+clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+trash:'<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/>',
+pause:'<line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/>',
+play:'<polygon points="7 4 20 12 7 20 7 4"/>',
+undo:'<path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/>',
+userPlus:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>'};
+function icon(n,s){return '<svg class="ic" viewBox="0 0 24 24"'+(s?' style="'+s+'"':'')+'>'+(ICONS[n]||ICONS.box)+'</svg>'}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(m,ic){const t=document.createElement('div');t.className='toast';t.innerHTML=icon(ic||'check')+esc(m);document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),3400)}
+
+/* ============ data ============ */
+let ORGS=[
+ {id:'acme',name:'acme',domain:'acme.com',status:'active',members:42,projects:7,created:'Jan 12, 2026',activity:'2m ago',admin:'zaki@acme.com'},
+ {id:'northwind',name:'northwind',domain:'northwind.com',status:'active',members:3,projects:3,created:'Mar 3, 2026',activity:'3d ago',admin:'(none — last admin left)',noAdmin:true},
+ {id:'initech',name:'initech',domain:'initech.io',status:'pending_setup',members:0,projects:0,created:'Jul 1, 2026',activity:'—',admin:'priya@initech.io'},
+ {id:'globex',name:'globex',domain:'globex.co',status:'suspended',members:17,projects:5,created:'Sep 20, 2025',activity:'3w ago',admin:'kim@globex.co',note:'Suspended Jun 12 — non-payment hold'},
+ {id:'umbrella',name:'umbrella',domain:'umbrella.health',status:'pending_delete',members:11,projects:4,created:'Jun 2, 2025',activity:'6w ago',admin:'ada@umbrella.health',restoreBy:'Jul 28, 2026'},
+ {id:'stark-labs',name:'stark-labs',domain:'stark.dev',status:'active',members:23,projects:9,created:'Nov 2, 2025',activity:'1h ago',admin:'pepper@stark.dev'},
+ {id:'wayne-corp',name:'wayne-corp',domain:'wayne.co',status:'active',members:15,projects:4,created:'Feb 8, 2026',activity:'yesterday',admin:'lucius@wayne.co'},
+ {id:'hooli',name:'hooli',domain:'hooli.xyz',status:'active',members:51,projects:12,created:'Aug 15, 2025',activity:'4h ago',admin:'jared@hooli.xyz'}];
+const NW_MEMBERS=[{n:'Ben Okafor',e:'ben@northwind.com',role:'member'},{n:'Rosa Ibarra',e:'rosa@northwind.com',role:'member'},{n:'Tomas Lind',e:'tomas@northwind.com',role:'member'}];
+const NW_PROJECTS=[{n:'logistics-copilot',owner:'Ben Okafor',members:3},{n:'invoice-triage',owner:'Rosa Ibarra',members:2},{n:'fleet-alerts',owner:'Ben Okafor',members:3}];
+let AUDIT=[
+ {t:'Jul 2, 14:12',actor:'operator',action:'operator.left_org',target:'northwind',scope:'platform',detail:'Governance session ended · duration 6m'},
+ {t:'Jul 2, 14:08',actor:'operator',action:'member.promoted',target:'northwind / ben@northwind.com',scope:'org (as admin)',detail:'role: member → org_admin'},
+ {t:'Jul 2, 14:06',actor:'operator',action:'operator.entered_org',target:'northwind',scope:'platform',detail:'Re-authenticated · reason: restore lost admin'},
+ {t:'Jul 1, 09:30',actor:'operator',action:'org.created',target:'initech',scope:'platform',detail:'domain: initech.io'},
+ {t:'Jul 1, 09:30',actor:'operator',action:'admin.seeded',target:'initech / priya@initech.io',scope:'platform',detail:'first-admin invite sent'},
+ {t:'Jun 28, 16:44',actor:'operator',action:'org.deleted',target:'umbrella',scope:'platform',detail:'soft delete · recoverable until Jul 28, 2026'},
+ {t:'Jun 28, 16:40',actor:'operator',action:'org.suspended',target:'umbrella',scope:'platform',detail:'members: sign-in blocked · endpoints paused'},
+ {t:'Jun 12, 11:02',actor:'operator',action:'org.suspended',target:'globex',scope:'platform',detail:'reason: non-payment hold'},
+ {t:'Jun 4, 10:15',actor:'operator',action:'settings.updated',target:'platform',scope:'platform',detail:'available_regions: +eu-central'},
+ {t:'May 30, 08:21',actor:'priya@northwind.com',action:'admin.first_login',target:'northwind',scope:'org',detail:'org: pending_setup → active'},
+ {t:'May 29, 17:50',actor:'operator',action:'org.created',target:'northwind',scope:'platform',detail:'domain: northwind.com'},
+ {t:'May 29, 17:50',actor:'operator',action:'admin.seeded',target:'northwind / priya@northwind.com',scope:'platform',detail:'first-admin invite sent'}];
+const PLATFORM={name:'Keystone (esberi production)',regions:['us-east','eu-central'],allRegions:['us-east','us-west','eu-central','ap-south'],operator:'operator@esberi.com'};
+function appendAudit(action,target,detail,scope){AUDIT.unshift({t:'just now',actor:'operator',action,target,detail,scope:scope||'platform'});S.flashAudit=true}
+const byId=id=>ORGS.find(o=>o.id===id);
+
+/* ============ state & routes ============ */
+const S={auth:false,mfa:false,entered:null,etab:'overview',q:'',opOnly:false,aq:'',act:'all',ksel:0};
+const SEEN={};
+function route(){const h=location.hash||'#/login';
+ let m=h.match(/^#\/org\/([\w-]+)/);if(m)return{scr:'orgdetail',id:m[1]};
+ m=h.match(/^#\/entered\/([\w-]+)\/(overview|members|projects)/);if(m)return{scr:'entered',id:m[1],tab:m[2]};
+ if(h.startsWith('#/settings'))return{scr:'settings'};
+ if(h.startsWith('#/audit'))return{scr:'audit'};
+ if(h.startsWith('#/orgs'))return{scr:'orgs'};
+ return{scr:'login'}}
+function go(h){location.hash=h}
+window.addEventListener('hashchange',render);
+
+/* ============ shell ============ */
+function sidebar(r){
+ if(S.entered){const o=byId(S.entered);
+  return '<aside class="sidebar"><div class="sb-brand"><b>'+icon('building')+esc(o.name)+'</b><span>Organization admin</span></div>'+
+  '<nav class="sb-nav">'+[['overview','Overview','box'],['members','Members','users'],['projects','Projects','file']].map(t=>'<button class="nav-item'+(r.tab===t[0]?' on':'')+'" onclick="go(\'#/entered/'+o.id+'/'+t[0]+'\')">'+icon(t[2])+t[1]+'</button>').join('')+
+  '<div style="margin-top:14px;padding:0 8px"><p class="ctxnote">You are here via an audited assume-role. Governance only — no prompts, flows, or secrets.</p></div></nav>'+
+  '<div class="sb-foot"><button class="btn warn" style="width:100%" onclick="leaveOrg()">'+icon('undo')+'Leave '+esc(o.name)+'</button></div></aside>'}
+ const items=[['orgs','Organizations','building'],['settings','Platform Settings','sliders'],['audit','Platform Audit','file']];
+ return '<aside class="sidebar"><div class="sb-brand"><b>'+icon('box')+'KEYSTONE</b><span>Platform</span></div>'+
+ '<nav class="sb-nav">'+items.map(t=>'<button class="nav-item'+(r.scr===t[0]||(r.scr==='orgdetail'&&t[0]==='orgs')?' on':'')+'" onclick="go(\'#/'+t[0]+'\')">'+icon(t[2])+t[1]+'</button>').join('')+'</nav>'+
+ '<div class="sb-foot"><button class="acct" onclick="opMenu(event)"><span class="avatar">OP</span><span class="acct-info"><b>Operator</b><span>'+PLATFORM.operator+'</span></span>'+icon('chevD')+'</button></div></aside>'}
+function opMenu(e){e.stopPropagation();closeMenus();const m=document.createElement('div');m.className='menu';
+ m.innerHTML='<div class="mnote" style="padding:6px 9px">Identity is defined in deployment configuration — read-only here.</div><button class="mi" onclick="closeMenus();document.documentElement.classList.toggle(\'dark\');render()">'+icon(document.documentElement.classList.contains('dark')?'sun':'moon')+'Toggle light / dark</button><div class="msep"></div><button class="mi" onclick="closeMenus();S.auth=false;S.entered=null;go(\'#/login\');toast(\'Signed out — session ended\',\'lock\')">'+icon('x')+'Sign out</button>';
+ document.body.appendChild(m);const r=e.currentTarget.getBoundingClientRect();m.style.left=r.left+'px';m.style.top=(r.top-100)+'px'}
+function closeMenus(){document.querySelectorAll('.menu').forEach(m=>m.remove())}
+document.addEventListener('click',()=>closeMenus());
+function banner(){if(!S.entered)return '';const o=byId(S.entered);
+ return '<div class="opbanner">'+icon('alertT')+'Acting as administrator in '+esc(o.name)+' — governance session, audited. Every action is written to Platform Audit.<button class="btn sm outline" onclick="leaveOrg()">Leave org</button></div>'}
+
+/* ============ login ============ */
+function loginScreen(){
+ if(!S.mfa)return '<div class="login"><div class="loginbox"><h2>'+icon('box')+'Keystone Platform</h2><p class="sub">Operator sign-in. The operator identity is defined in deployment configuration — there is no self-serve account here.</p>'+
+ '<div class="field"><label>Email</label><input class="inp" id="l-e" value="operator@esberi.com"></div><div class="field"><label>Password</label><input class="inp" type="password" id="l-p" placeholder="••••••••••"></div>'+
+ '<button class="btn primary" style="width:100%" onclick="S.mfa=true;render()">'+icon('lock')+'Continue</button></div></div>';
+ return '<div class="login"><div class="loginbox"><h2>'+icon('shieldCheck')+'Multi-factor check</h2><p class="sub">Enter the 6-digit code from your authenticator. Destructive and cross-tenant actions will re-prompt even mid-session.</p>'+
+ '<div class="field"><label>Code</label><input class="inp mono" id="l-m" placeholder="000 000" style="letter-spacing:.2em;text-align:center"></div>'+
+ '<button class="btn primary" style="width:100%" onclick="S.auth=true;go(\'#/orgs\');toast(\'Signed in as platform operator\',\'shieldCheck\')">'+icon('check')+'Verify &amp; sign in</button></div></div>'}
+
+/* ============ organizations ============ */
+const STLABEL={active:'active',pending_setup:'pending setup',suspended:'suspended',pending_delete:'pending delete'};
+function orgsScreen(){
+ if(!SEEN.orgs&&!S.q){SEEN.orgs=1;setTimeout(render,460);return '<div class="wrap"><div class="statgrid">'+Array.from({length:4}).map(()=>'<div class="stat"><span class="sk" style="width:60%;height:10px"></span><br><span class="sk" style="width:36px;height:20px;margin-top:8px"></span></div>').join('')+'</div><div class="table">'+Array.from({length:6}).map(()=>'<div class="sk-row" style="border-bottom:1px solid var(--border);justify-content:space-between"><span class="sk" style="width:120px;height:14px"></span><span class="sk" style="width:120px"></span><span class="sk" style="width:50px"></span><span class="sk" style="width:50px"></span><span class="sk" style="width:90px"></span><span class="sk" style="width:80px"></span></div>').join('')+'</div></div>'}
+ const list=ORGS.filter(o=>!S.q||o.name.includes(S.q.toLowerCase())||o.domain.includes(S.q.toLowerCase()));
+ const W={n:'flex:1.1;min-width:150px',d:'width:150px',m:'width:86px',p:'width:82px',s:'width:130px',c:'width:110px',a:'width:100px',x:'width:44px'};
+ let rows;
+ if(!ORGS.length)rows='<div class="empty">'+icon('building')+'<div><b>Create your first organization</b><br><span style="font-size:12.5px">Every deployment begins here: create the org, seed its first admin, hand it over.</span></div><button class="btn primary" onclick="createDlg()">'+icon('plus')+'Create org</button></div>';
+ else if(!list.length)rows='<div class="empty">'+icon('search')+'<b>No orgs match "'+esc(S.q)+'"</b></div>';
+ else rows=list.map(o=>'<div class="trow" onclick="go(\'#/org/'+o.id+'\')">'+
+  '<div class="td" style="'+W.n+'"><b>'+esc(o.name)+'</b>'+(o.noAdmin?'<span class="flag">'+icon('alertT','width:12px;height:12px')+'no reachable admin</span>':'')+'</div>'+
+  '<div class="td mono" style="'+W.d+';font-size:12px">'+esc(o.domain)+'</div>'+
+  '<div class="td mono" style="'+W.m+'">'+o.members+'</div><div class="td mono" style="'+W.p+'">'+o.projects+'</div>'+
+  '<div class="td" style="'+W.s+'"><span class="badge '+o.status+'"><i></i>'+STLABEL[o.status]+'</span></div>'+
+  '<div class="td ctxnote" style="'+W.c+'">'+o.created+'</div><div class="td ctxnote" style="'+W.a+'">'+o.activity+'</div>'+
+  '<div class="td" style="'+W.x+'"><button class="iconbtn" onclick="event.stopPropagation();orgMenu(event,\''+o.id+'\')">'+icon('more')+'</button></div></div>').join('');
+ const stats='<div class="statgrid"><div class="stat"><div class="k">Organizations</div><div class="v">'+ORGS.length+'</div></div><div class="stat"><div class="k">Active</div><div class="v">'+ORGS.filter(o=>o.status==='active').length+'</div></div><div class="stat"><div class="k">Pending setup</div><div class="v">'+ORGS.filter(o=>o.status==='pending_setup').length+'</div></div><div class="stat"><div class="k">Suspended / deleting</div><div class="v">'+ORGS.filter(o=>o.status==='suspended'||o.status==='pending_delete').length+'</div></div></div>';
+ return '<div class="wrap">'+stats+'<div class="table"><div class="thead"><div class="th" style="'+W.n+'">Name</div><div class="th" style="'+W.d+'">Email domain</div><div class="th" style="'+W.m+'">Members</div><div class="th" style="'+W.p+'">Projects</div><div class="th" style="'+W.s+'">Status</div><div class="th" style="'+W.c+'">Created</div><div class="th" style="'+W.a+'">Activity</div><div class="th" style="'+W.x+'"></div></div>'+rows+'</div>'+
+ '<p class="ctxnote" style="margin-top:10px">Metadata only at this altitude — an org\'s prompts, flows, and secrets are tenant data and are never listed here.</p></div>'}
+function orgMenu(e,id){const o=byId(id);const del=o.status==='suspended';
+ openMenu(e,'<button class="mi" onclick="closeMenus();go(\'#/org/'+id+'\')">'+icon('eye')+'Open</button>'+
+ '<button class="mi" onclick="closeMenus();enterDlg(\''+id+'\')">'+icon('shieldCheck')+'Enter org <span class="ctxnote" style="margin-left:auto">re-auth</span></button>'+
+ (o.status==='pending_setup'?'<button class="mi" onclick="closeMenus();resend(\''+id+'\')">'+icon('mail')+'Resend first-admin invite</button>':'')+
+ '<div class="msep"></div>'+
+ (o.status==='suspended'?'<button class="mi" onclick="closeMenus();reactivateDlg(\''+id+'\')">'+icon('play')+'Reactivate</button>':o.status!=='pending_delete'?'<button class="mi" onclick="closeMenus();suspendDlg(\''+id+'\')">'+icon('pause')+'Suspend</button>':'')+
+ (o.status==='pending_delete'?'<button class="mi" onclick="closeMenus();restoreDlg(\''+id+'\')">'+icon('undo')+'Restore</button>':'')+
+ '<div class="msep"></div>'+
+ '<button class="mi danger" '+(del?'onclick="closeMenus();deleteDlg(\''+id+'\')"':'disabled')+'>'+icon('trash')+'Delete org</button>'+(del?'':'<div class="mnote">suspend first — a live org can\'t be deleted</div>'))}
+function resend(id){const o=byId(id);appendAudit('admin.invite_resent',o.name+' / '+o.admin,'first-admin invite resent');toast('Invite resent to '+o.admin,'mail');render()}
+
+/* ============ org detail ============ */
+function orgDetail(id){const o=byId(id);if(!o)return '<div class="wrap"><div class="empty"><b>Org not found</b></div></div>';
+ let stateCard='';
+ if(o.status==='pending_setup')stateCard='<div class="card" style="border-color:color-mix(in srgb,var(--warning) 45%,transparent)"><h4>Pending setup</h4><p style="font-size:13px">Waiting for <b class="mono">'+esc(o.admin)+'</b> to accept the invite and set a password. The org activates on their first login — it is never live without a reachable admin.</p><div class="dlg-foot" style="justify-content:flex-start"><button class="btn outline sm" onclick="resend(\''+id+'\')">'+icon('mail')+'Resend invite</button></div></div>';
+ if(o.status==='pending_delete')stateCard='<div class="card" style="border-color:color-mix(in srgb,var(--destructive) 50%,transparent)"><h4 style="color:var(--destructive)">Pending delete</h4><p style="font-size:13px">Soft-deleted. Recoverable until <b>'+o.restoreBy+'</b>, then permanently purged.</p><div class="dlg-foot" style="justify-content:flex-start"><button class="btn outline sm" onclick="restoreDlg(\''+id+'\')">'+icon('undo')+'Restore</button></div></div>';
+ if(o.status==='suspended')stateCard='<div class="card"><h4>Suspended</h4><p style="font-size:13px">'+esc(o.note||'Members can\'t sign in; endpoints paused; data retained.')+'</p></div>';
+ if(o.noAdmin)stateCard+='<div class="card" style="border-color:color-mix(in srgb,var(--warning) 45%,transparent)"><h4 style="color:var(--warning)">No reachable admin</h4><p style="font-size:13px">The last org_admin left without promoting a backup. Enter the org (audited) and promote a member — that is the recovery path.</p></div>';
+ return '<div class="wrap" style="max-width:760px">'+stateCard+
+ '<div class="card"><h4>Organization</h4>'+[['Name',o.name],['Email domain',o.domain],['Status','<span class="badge '+o.status+'"><i></i>'+STLABEL[o.status]+'</span>'],['Members',o.members+' (rollup)'],['Projects',o.projects+' (rollup)'],['First admin',esc(o.admin)],['Created',o.created],['Last activity',o.activity]].map(r=>'<div class="krow"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('')+'</div>'+
+ '<div class="notecard">'+icon('lock')+'Contents are tenant data — enter the org (audited) to govern it; contents are never shown here.</div>'+
+ '<div class="dlg-foot" style="justify-content:flex-start"><button class="btn warn" onclick="enterDlg(\''+id+'\')">'+icon('shieldCheck')+'Enter org (audited)</button>'+
+ (o.status==='suspended'?'<button class="btn outline" onclick="reactivateDlg(\''+id+'\')">'+icon('play')+'Reactivate</button><button class="btn destructive" onclick="deleteDlg(\''+id+'\')">'+icon('trash')+'Delete org</button>':o.status==='active'?'<button class="btn outline" onclick="suspendDlg(\''+id+'\')">'+icon('pause')+'Suspend</button>':'')+'</div></div>'}
+
+/* ============ lifecycle dialogs ============ */
+function openDialog(html){document.getElementById('overlays').innerHTML='<div class="scrim" onclick="if(event.target===this)closeDlg()"><div class="dialog" role="dialog">'+html+'</div></div>'}
+function closeDlg(){document.getElementById('overlays').innerHTML=''}
+function createDlg(){openDialog('<h3>Create organization</h3><p class="sub">Setting the domain and seeding the first admin are operator-only powers. The org starts in pending-setup until that admin\'s first login.</p>'+
+ '<div class="field"><label>Organization name</label><input class="inp" id="c-n" placeholder="northwind"></div>'+
+ '<div class="field"><label>Email domain</label><input class="inp" id="c-d" placeholder="northwind.com"></div>'+
+ '<div class="field"><label>First admin email (seeded org_admin)</label><input class="inp" id="c-a" placeholder="priya@northwind.com"></div>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doCreate()">Create &amp; send invite</button></div>')}
+function doCreate(){const n=(document.getElementById('c-n').value||'new-org').toLowerCase().replace(/\s+/g,'-');const d=document.getElementById('c-d').value||n+'.com';const a=document.getElementById('c-a').value||'admin@'+d;
+ ORGS.unshift({id:n,name:n,domain:d,status:'pending_setup',members:0,projects:0,created:'just now',activity:'—',admin:a});
+ appendAudit('org.created',n,'domain: '+d);appendAudit('admin.seeded',n+' / '+a,'first-admin invite sent');
+ closeDlg();render();toast('Created '+n+' (pending setup) — invite sent to '+a,'mail')}
+function suspendDlg(id){const o=byId(id);openDialog('<h3>Suspend '+esc(o.name)+'?</h3><p class="sub">Members can\'t sign in and running endpoints pause. Data is retained; you can reactivate anytime.</p><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doLifecycle(\''+id+'\',\'suspended\',\'org.suspended\',\'members: sign-in blocked · endpoints paused\')">Suspend</button></div>')}
+function reactivateDlg(id){const o=byId(id);openDialog('<h3>Reactivate '+esc(o.name)+'?</h3><p class="sub">Members regain sign-in; endpoints resume.</p><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doLifecycle(\''+id+'\',\'active\',\'org.reactivated\',\'sign-in restored\')">Reactivate</button></div>')}
+function restoreDlg(id){const o=byId(id);openDialog('<h3>Restore '+esc(o.name)+'?</h3><p class="sub">Returns the org to <b>suspended</b> (it was soft-deleted; recoverable until '+o.restoreBy+').</p><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doLifecycle(\''+id+'\',\'suspended\',\'org.restored\',\'recovered from pending-delete\')">Restore</button></div>')}
+function doLifecycle(id,st,act,detail){const o=byId(id);o.status=st;if(st==='suspended'&&act==='org.restored')o.restoreBy=null;appendAudit(act,o.name,detail);closeDlg();render();toast(o.name+' → '+STLABEL[st],act==='org.suspended'?'pause':'check')}
+function deleteDlg(id){const o=byId(id);if(o.status!=='suspended'){toast('A live org can\'t be deleted — suspend it first','alertT');return}
+ openDialog('<h3 style="color:var(--destructive)">Delete '+esc(o.name)+'</h3><p class="sub">Step 1 of 2 — re-authenticate. Destructive actions re-prompt even mid-session.</p>'+
+ '<div class="field"><label>Operator password</label><input class="inp" type="password" id="d-p" placeholder="••••••••••"></div>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="deleteStep2(\''+id+'\')">Continue</button></div>')}
+function deleteStep2(id){const o=byId(id);
+ openDialog('<h3 style="color:var(--destructive)">Delete '+esc(o.name)+'</h3><p class="sub">Suspends into deletion: <b>'+esc(o.name)+'</b>, its <b>'+o.projects+' projects</b>, and all data enter a <b>30-day recovery window</b>, then are permanently purged. Recoverable until <b>Aug 2, 2026</b>.</p>'+
+ '<div class="field"><label>Type <b class="mono">'+esc(o.name)+'</b> to confirm</label><input class="inp" id="d-n" autocomplete="off" oninput="document.getElementById(\'d-go\').disabled=this.value!==\''+esc(o.name)+'\'"></div>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn destructive" id="d-go" disabled onclick="doDelete(\''+id+'\')">Delete (soft, 30-day window)</button></div>')}
+function doDelete(id){const o=byId(id);o.status='pending_delete';o.restoreBy='Aug 2, 2026';appendAudit('org.deleted',o.name,'soft delete · recoverable until Aug 2, 2026');closeDlg();go('#/orgs');toast(o.name+' → pending delete (recoverable 30 days)','trash')}
+
+/* ============ enter org (assume-role) ============ */
+function enterDlg(id){const o=byId(id);
+ openDialog('<h3>Enter '+esc(o.name)+'</h3><p class="sub">Step 1 of 2 — re-authenticate. Cross-tenant access always re-prompts.</p>'+
+ '<div class="field"><label>Operator password</label><input class="inp" type="password" placeholder="••••••••••"></div><div class="field"><label>MFA code</label><input class="inp mono" placeholder="000 000"></div>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="enterStep2(\''+id+'\')">Continue</button></div>')}
+function enterStep2(id){const o=byId(id);
+ openDialog('<h3>'+icon('shieldCheck')+' You\'ll act as an administrator in '+esc(o.name)+'</h3><p class="sub">This session is audited. Governance only: members and projects — never prompts, flows, or raw secrets. The org\'s admins are notified.</p>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn warn" onclick="doEnter(\''+id+'\')">'+icon('shieldCheck')+'Enter (audited)</button></div>')}
+function doEnter(id){S.entered=id;appendAudit('operator.entered_org',byId(id).name,'Re-authenticated · assume org_admin');closeDlg();go('#/entered/'+id+'/overview');toast('Entered '+byId(id).name+' — session is being audited','shieldCheck')}
+function leaveOrg(){const o=byId(S.entered);appendAudit('operator.left_org',o.name,'Governance session ended');S.entered=null;go('#/orgs');toast('Left '+o.name+' — audit trail written','undo')}
+
+/* ============ entered org (Organization Admin, governance only) ============ */
+function enteredScreen(r){const o=byId(r.id);
+ if(r.tab==='overview')return '<div class="wrap" style="max-width:720px">'+
+  (o.noAdmin?'<div class="card" style="border-color:color-mix(in srgb,var(--warning) 45%,transparent)"><h4 style="color:var(--warning)">Recovery needed</h4><p style="font-size:13px">This org has no reachable admin. Promote a member to org_admin under Members, then leave.</p></div>':'')+
+  '<div class="card"><h4>Organization</h4>'+[['Name',o.name],['Domain',o.domain],['Status','<span class="badge '+o.status+'"><i></i>'+STLABEL[o.status]+'</span>'],['Members',''+o.members],['Projects',''+o.projects]].map(x=>'<div class="krow"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'+
+  '<div class="notecard">'+icon('lock')+'No authoring: this surface governs members and projects only. Prompts, flows, and secrets stay invisible — secrets are write-once, mask-forever, operator included.</div></div>';
+ if(r.tab==='members')return '<div class="wrap" style="max-width:760px"><div class="table">'+NW_MEMBERS.map((m,i)=>'<div class="member"><span class="avatar">'+m.n.split(' ').map(x=>x[0]).join('')+'</span><span style="flex:1"><b style="font-size:13px">'+esc(m.n)+'</b><br><span class="ctxnote">'+esc(m.e)+'</span></span>'+(m.role==='org_admin'?'<span class="badge active"><i></i>org_admin</span>':'<span class="badge neutral"><i></i>member</span><button class="btn sm outline" onclick="promote('+i+')">'+icon('shieldCheck')+'Promote to org_admin</button>')+'<button class="iconbtn" onclick="memMenu(event,'+i+')">'+icon('more')+'</button></div>').join('')+'</div>'+
+  '<div class="dlg-foot" style="justify-content:flex-start"><button class="btn outline sm" onclick="inviteMember()">'+icon('userPlus')+'Invite member (domain-bound: @'+esc(o.domain)+')</button></div></div>';
+ return '<div class="wrap" style="max-width:760px"><div class="table">'+NW_PROJECTS.map((p,i)=>'<div class="member">'+icon('file')+'<span style="flex:1"><b style="font-size:13px">'+esc(p.n)+'</b><br><span class="ctxnote">owner '+esc(p.owner)+' · '+p.members+' members</span></span><button class="btn sm outline" onclick="transferP('+i+')">Transfer owner</button></div>').join('')+'</div>'+
+ '<p class="ctxnote" style="margin-top:10px">Project contents (prompts, flows, runs) are not accessible from this governance view.</p></div>'}
+function promote(i){const m=NW_MEMBERS[i];m.role='org_admin';const o=byId(S.entered);o.noAdmin=false;o.admin=m.e;
+ appendAudit('member.promoted',o.name+' / '+m.e,'role: member → org_admin','org (as admin)');render();
+ toast(m.n+' is now org_admin — '+o.name+' has a reachable admin again. You can leave.','shieldCheck')}
+function memMenu(e,i){openMenu(e,'<button class="mi danger" onclick="closeMenus();toast(\'Removed (mock) — audited\',\'trash\')">'+icon('trash')+'Remove member</button>')}
+function inviteMember(){const o=byId(S.entered);appendAudit('member.invited',o.name,'domain-bound invite','org (as admin)');toast('Invite sent (must be @'+o.domain+')','userPlus')}
+function transferP(i){const o=byId(S.entered);appendAudit('project.transferred',o.name+' / '+NW_PROJECTS[i].n,'owner change','org (as admin)');toast('Ownership transferred — audited','check')}
+
+/* ============ settings ============ */
+function settingsScreen(){return '<div class="wrap" style="max-width:640px"><div class="card"><h4>Platform</h4>'+
+ '<div class="field"><label>Platform name</label><input class="inp" id="s-n" value="'+esc(PLATFORM.name)+'"></div>'+
+ '<div class="field"><label>Available regions (org defaults)</label><div>'+PLATFORM.allRegions.map(r=>'<span class="regionchip'+(PLATFORM.regions.includes(r)?' on':'')+'" onclick="toggleRegion(\''+r+'\')">'+icon('globe','width:12px;height:12px')+r+'</span>').join('')+'</div></div></div>'+
+ '<div class="card"><h4>Operator identity</h4><div class="krow"><b>Email</b><span class="mono">'+PLATFORM.operator+'</span></div><p class="ctxnote" style="margin-top:6px">'+icon('lock','width:12px;height:12px')+' Defined in deployment configuration; change it there. No password field here — the credential lives in config.</p></div>'+
+ '<div class="dlg-foot" style="justify-content:flex-start"><button class="btn primary" onclick="saveSettings()">Save changes</button></div></div>'}
+function toggleRegion(r){const i=PLATFORM.regions.indexOf(r);i>=0?PLATFORM.regions.splice(i,1):PLATFORM.regions.push(r);render()}
+function saveSettings(){PLATFORM.name=document.getElementById('s-n').value;appendAudit('settings.updated','platform','regions: '+PLATFORM.regions.join(', '));toast('Settings saved — audited','check');render()}
+
+/* ============ audit ============ */
+function auditScreen(){
+ const list=AUDIT.filter(a=>(!S.opOnly||a.action.startsWith('operator.')||a.scope.includes('as admin'))&&(S.act==='all'||a.action.startsWith(S.act))&&(!S.aq||JSON.stringify(a).toLowerCase().includes(S.aq.toLowerCase())));
+ return '<div class="wrap"><div class="fbar">'+
+ '<input class="inp" style="width:220px" placeholder="Search events…" value="'+esc(S.aq)+'" oninput="S.aq=this.value;render()">'+
+ '<select class="inp" style="width:auto" onchange="S.act=this.value;render()">'+[['all','All actions'],['org.','org.*'],['admin.','admin.*'],['operator.','operator.*'],['member.','member.*'],['settings.','settings.*']].map(o=>'<option value="'+o[0]+'"'+(S.act===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>'+
+ '<button class="btn '+(S.opOnly?'warn':'outline')+' sm" onclick="S.opOnly=!S.opOnly;render()">'+icon('shieldCheck')+'Operator activity'+(S.opOnly?' ✓':'')+'</button>'+
+ '<span class="ctxnote">the "prove isolation" view — every cross-tenant crossing is here</span></div>'+
+ '<div class="table">'+list.map((a,i)=>{const op=a.action.startsWith('operator.')||a.scope.includes('as admin');
+ return '<div class="arow'+(op?' ophl':'')+'" onclick="eventDlg('+AUDIT.indexOf(a)+')"><div class="acell ctxnote" style="width:110px">'+a.t+'</div><div class="acell" style="width:120px">'+(op?'<span class="badge op"><i></i>operator</span>':esc(a.actor.split('@')[0]))+'</div><div class="acell actn" style="width:190px">'+esc(a.action)+'</div><div class="acell" style="flex:1"><b style="font-size:12.5px">'+esc(a.target)+'</b></div><div class="acell ctxnote" style="width:130px">'+esc(a.scope)+'</div></div>'}).join('')+'</div>'+
+ '<p class="ctxnote" style="margin-top:10px">Read-only. Export delivers exactly the filtered view.</p></div>'}
+function eventDlg(i){const a=AUDIT[i];openDialog('<h3 class="mono" style="font-size:14px">'+esc(a.action)+'</h3><p class="sub">'+a.t+' · '+esc(a.actor)+'</p>'+
+ '<div class="card" style="margin:0 0 4px">'+[['Target',esc(a.target)],['Scope',esc(a.scope)],['Detail',esc(a.detail)]].map(r=>'<div class="krow"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>').join('')+'</div>'+
+ '<p class="ctxnote">Audit events are immutable — no create, edit, or delete.</p><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Close</button></div>')}
+
+/* ============ menus / cmdk ============ */
+function openMenu(e,html){e.stopPropagation();closeMenus();const m=document.createElement('div');m.className='menu';m.innerHTML=html;document.body.appendChild(m);
+ const x=Math.min(e.clientX||100,innerWidth-m.offsetWidth-16);const y=Math.min(e.clientY||100,innerHeight-m.offsetHeight-10);
+ m.style.left=Math.max(8,x)+'px';m.style.top=Math.max(8,y)+'px'}
+function openCmdk(){S.ksel=0;const items=[
+ {g:'Go to',n:'Organizations',ic:'building',fn:"go('#/orgs')"},{g:'Go to',n:'Platform Settings',ic:'sliders',fn:"go('#/settings')"},{g:'Go to',n:'Platform Audit',ic:'file',fn:"go('#/audit')"}]
+ .concat(ORGS.map(o=>({g:'Organizations',n:o.name+' · '+STLABEL[o.status],ic:'building',fn:"go('#/org/"+o.id+"')"})))
+ .concat([{g:'Do',n:'Create org',ic:'plus',fn:'createDlg()'},{g:'Do',n:'Operator activity (audit filter)',ic:'shieldCheck',fn:"S.opOnly=true;go('#/audit')"},{g:'Do',n:'Simulate fresh deployment (empty state)',ic:'box',fn:"ORGS=[];go('#/orgs');toast('Fresh deployment — this is day zero','box')"},{g:'Do',n:'Toggle light / dark',ic:'sun',fn:"document.documentElement.classList.toggle('dark');render()"}]);
+ window._K=items;
+ document.getElementById('overlays').innerHTML='<div class="scrim" onclick="if(event.target===this)closeDlg()"><div class="cmdk"><div class="cin">'+icon('search')+'<input id="ck-in" placeholder="Search platform…" oninput="drawK(this.value)" autocomplete="off"><kbd>esc</kbd></div><div class="list" id="ck-list"></div><div class="cfoot"><span><kbd>↑↓</kbd> navigate</span><span><kbd>↵</kbd> select</span><span><kbd>esc</kbd> close</span></div></div></div>';
+ drawK('');document.getElementById('ck-in').focus()}
+function kf(q){return window._K.filter(i=>!q||i.n.toLowerCase().includes(q.toLowerCase()))}
+function drawK(q){let g='';const l=kf(q);S.ksel=Math.min(S.ksel,Math.max(0,l.length-1));
+ document.getElementById('ck-list').innerHTML=l.map((i,x)=>{const gl=i.g!==g?'<div class="glabel">'+i.g+'</div>':'';g=i.g;return gl+'<div class="crow'+(x===S.ksel?' sel':'')+'" onclick="execK('+x+')">'+icon(i.ic)+esc(i.n)+'</div>'}).join('')||'<div class="glabel">No matches</div>'}
+function execK(x){const q=document.getElementById('ck-in').value;const it=kf(q)[x];if(!it)return;closeDlg();try{eval(it.fn)}catch(e){}}
+document.addEventListener('keydown',e=>{
+ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'&&S.auth){e.preventDefault();openCmdk();return}
+ const ck=document.getElementById('ck-in');
+ if(ck){const q=ck.value,n=kf(q).length;
+  if(e.key==='ArrowDown'){e.preventDefault();S.ksel=Math.min(n-1,S.ksel+1);drawK(q)}
+  if(e.key==='ArrowUp'){e.preventDefault();S.ksel=Math.max(0,S.ksel-1);drawK(q)}
+  if(e.key==='Enter'){e.preventDefault();execK(S.ksel)}}
+ if(e.key==='Escape'){closeDlg();closeMenus()}});
+
+/* ============ root ============ */
+function render(){const r=route();
+ if(!S.auth||r.scr==='login'){document.getElementById('app').innerHTML='<div class="frame">'+loginScreen()+'</div>';return}
+ let hdr,body;
+ if(S.entered&&r.scr==='entered'){const o=byId(r.id);
+  hdr='<div class="crumb"><a onclick="leaveOrg()">Platform</a><span class="sep">▸</span><span class="cur">'+esc(o.name)+'</span><span class="sep">▸</span><span class="cur" style="text-transform:capitalize">'+r.tab+'</span></div><div class="hdr-actions"><div class="tabs">'+['overview','members','projects'].map(t=>'<button class="tab'+(r.tab===t?' on':'')+'" onclick="go(\'#/entered/'+o.id+'/'+t+'\')" style="text-transform:capitalize">'+t+'</button>').join('')+'</div></div>';
+  body=enteredScreen(r)}
+ else{S.entered=null;
+  const titles={orgs:'Organizations',orgdetail:'Organizations',settings:'Platform Settings',audit:'Platform Audit'};
+  const t=titles[r.scr]||'Organizations';
+  hdr='<div class="crumb"><a onclick="go(\'#/orgs\')">Platform</a><span class="sep">▸</span><span class="cur">'+t+(r.scr==='orgdetail'?' ▸ '+esc((byId(r.id)||{}).name||''):'')+'</span></div><div class="hdr-actions">'+
+  (r.scr==='orgs'?'<input class="inp" style="width:190px" placeholder="Search orgs…" value="'+esc(S.q)+'" oninput="S.q=this.value;render()"><button class="btn primary sm" onclick="createDlg()">'+icon('plus')+'Create org</button>':'')+
+  (r.scr==='audit'?'<button class="btn outline sm" onclick="toast(\'Exported the filtered view (CSV, mock)\',\'download\')">'+icon('download')+'Export</button>':'')+
+  '<button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button></div>';
+  body=r.scr==='orgdetail'?orgDetail(r.id):r.scr==='settings'?settingsScreen():r.scr==='audit'?auditScreen():orgsScreen()}
+ document.getElementById('app').innerHTML=banner()+'<div class="frame">'+sidebar(r)+'<div class="main"><header class="header">'+hdr+'</header><div class="content">'+body+'</div></div></div>';
+ if(S.flashAudit){S.flashAudit=false;if(r.scr==='audit'){const a=document.querySelector('.arow');if(a)requestAnimationFrame(()=>a.classList.add('flash'))}}}
+render();
+</script>
+</body>
+</html>

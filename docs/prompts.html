@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone — Prompts</title>
+<style>
+/* v2 — shadcn New York fidelity pass */
+/* ============ shadcn New York token system (from Keystone-Admin-Prototype) ============ */
+:root{
+  --background:#ffffff; --foreground:#020817; --card:#ffffff; --card-foreground:#020817;
+  --primary:#0f172a; --primary-foreground:#f8fafc;
+  --secondary:#f1f5f9; --secondary-foreground:#0f172a;
+  --muted:#f1f5f9; --muted-foreground:#5b6472;
+  --accent:#f1f5f9; --accent-foreground:#0f172a;
+  --destructive:#dc2626; --destructive-foreground:#f8fafc;
+  --border:#e2e8f0; --input:#7e889c; --ring:#0f172a;
+  --success:#15803d; --warning:#b45309; --running:#2563eb;
+  --env-prod:#15803d; --env-stag:#b45309; --env-dev:#2563eb; --env-draft:#64748b;
+  --radius:8px;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+  --shadow-md:0 4px 12px -2px rgba(2,8,23,.12);
+  --shadow-lg:0 12px 32px -8px rgba(2,8,23,.24);
+}
+.dark{
+  --background:#020817; --foreground:#f8fafc; --card:#0b1220; --card-foreground:#f8fafc;
+  --primary:#f8fafc; --primary-foreground:#0f172a;
+  --secondary:#16202f; --secondary-foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5;
+  --accent:#1a2436; --accent-foreground:#f8fafc;
+  --destructive:#f87171; --destructive-foreground:#0f172a;
+  --border:#1e293b; --input:#475569; --ring:#94a3b8;
+  --success:#4ade80; --warning:#fbbf24; --running:#60a5fa;
+  --env-prod:#4ade80; --env-stag:#fbbf24; --env-dev:#60a5fa; --env-draft:#94a3b8;
+  --shadow-md:0 4px 12px -2px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 32px -8px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);font-size:14px;line-height:1.5;background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--ring);outline-offset:2px;border-radius:4px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input,textarea,select{font:inherit;color:inherit}
+::placeholder{color:var(--muted-foreground);opacity:.7}
+svg.ic{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+kbd{font-family:var(--mono);font-size:11px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--muted-foreground)}
+
+/* ============ App shell ============ */
+#app{display:flex;height:100vh;overflow:hidden}
+/* shadcn: Sidebar */
+.sidebar{width:240px;flex:none;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--border);transition:width .15s}
+.sidebar.rail{width:56px}
+.sidebar.rail .sb-label,.sidebar.rail .proj-name,.sidebar.rail .acct-info,.sidebar.rail .nav-txt{display:none}
+.sb-top{padding:12px;border-bottom:1px solid var(--border)}
+.proj-btn{display:flex;align-items:center;gap:8px;width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--background)}
+.proj-btn:hover{background:var(--accent)}
+.proj-logo{width:22px;height:22px;flex:none;border-radius:6px;background:var(--primary);color:var(--primary-foreground);display:grid;place-items:center;font-size:11px;font-weight:700}
+.proj-name{flex:1;text-align:left;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px}
+.sb-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);padding:12px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;border-radius:6px;color:var(--muted-foreground);font-size:13px;font-weight:500}
+.nav-item:hover{background:var(--accent);color:var(--foreground)}
+.nav-item.on{background:var(--secondary);color:var(--foreground)}
+.sb-foot{border-top:1px solid var(--border);padding:10px}
+.acct{display:flex;align-items:center;gap:10px;width:100%;padding:6px;border-radius:6px}
+.acct:hover{background:var(--accent)}
+/* shadcn: Avatar */
+.avatar{width:28px;height:28px;flex:none;border-radius:999px;background:var(--secondary);border:1px solid var(--border);display:grid;place-items:center;font-size:11px;font-weight:700}
+.acct-info{flex:1;text-align:left;min-width:0}
+.acct-info b{display:block;font-size:13px;line-height:1.2}
+.acct-info span{font-size:11px;color:var(--muted-foreground)}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.header{flex:none;display:flex;align-items:center;gap:12px;height:56px;padding:0 20px;border-bottom:1px solid var(--border);background:var(--card);overflow-x:auto;overflow-y:hidden}
+.header>*{flex-shrink:0}
+.header .hdr-actions{flex-shrink:0}
+/* shadcn: Breadcrumb */
+.crumb{display:flex;align-items:center;gap:6px;font-size:13.5px;min-width:0}
+.crumb a{color:var(--muted-foreground);text-decoration:none;cursor:pointer}
+.crumb a:hover{color:var(--foreground)}
+.crumb .sep{color:var(--muted-foreground);opacity:.5}
+.crumb .cur{font-weight:600;white-space:nowrap}
+.hdr-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.content{flex:1;overflow:auto;overflow-x:hidden;position:relative}
+
+/* ============ Buttons (shadcn: Button) ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:34px;padding:0 13px;border-radius:6px;font-size:13px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--primary-foreground)}
+.btn.primary:hover{opacity:.9}
+.btn.outline{border-color:var(--input);background:transparent}
+.btn.outline:hover{background:var(--accent)}
+.btn.ghost:hover{background:var(--accent)}
+.btn.destructive{background:var(--destructive);color:var(--destructive-foreground)}
+.btn.destructive:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{height:28px;padding:0 9px;font-size:12.5px}
+.btn.icon{width:34px;padding:0}
+.btn.icon.sm{width:28px}
+.iconbtn{display:grid;place-items:center;width:30px;height:30px;border-radius:6px;color:var(--muted-foreground)}
+.iconbtn:hover{background:var(--accent);color:var(--foreground)}
+.iconbtn.on{background:var(--secondary);color:var(--foreground)}
+.toolbar{display:flex;align-items:center;gap:2px}
+.toolbar .div{width:1px;height:18px;background:var(--border);margin:0 6px}
+
+/* ============ Badges & pills ============ */
+/* shadcn: Badge */
+.badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:6px;font-size:11.5px;font-weight:600;background:var(--secondary);color:var(--secondary-foreground);white-space:nowrap}
+.badge .dot{width:6px;height:6px;border-radius:99px;background:currentColor}
+.badge.outline{background:transparent;border:1px solid var(--border);color:var(--muted-foreground)}
+.envb{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;background:transparent;white-space:nowrap}
+.envb i{width:6px;height:6px;border-radius:99px;background:currentColor}
+.envb.production{color:var(--env-prod);border-color:color-mix(in srgb,var(--env-prod) 45%,transparent)}
+.envb.staging{color:var(--env-stag);border-color:color-mix(in srgb,var(--env-stag) 45%,transparent)}
+.envb.dev{color:var(--env-dev);border-color:color-mix(in srgb,var(--env-dev) 45%,transparent)}
+.envb.draft{color:var(--env-draft);border-color:color-mix(in srgb,var(--env-draft) 45%,transparent)}
+.tagpill{display:inline-flex;align-items:center;height:19px;padding:0 7px;border-radius:5px;font-size:11px;font-family:var(--mono);background:var(--muted);color:var(--muted-foreground);border:1px solid var(--border);white-space:nowrap}
+.statdot{width:8px;height:8px;border-radius:99px;flex:none}
+.statdot.ok{background:var(--success)} .statdot.err{background:var(--destructive)} .statdot.run{background:var(--running)} .statdot.none{background:var(--muted-foreground);opacity:.4}
+
+/* ============ Table (shadcn: Table) ============ */
+.tablewrap{padding:20px 24px}
+.table{width:100%;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)}
+.thead{display:flex;align-items:center;background:var(--muted);border-bottom:1px solid var(--border)}
+.th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);padding:9px 12px;font-weight:500}
+.trow{display:flex;align-items:center;border-bottom:1px solid var(--border);cursor:pointer;position:relative}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--accent)}
+.td{padding:11px 12px;font-size:13px;min-width:0;display:flex;align-items:center;gap:6px}
+.rowrun{position:absolute;right:44px;top:50%;transform:translateY(-50%);display:none}
+.trow:hover .rowrun{display:inline-flex}
+.empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:64px 20px;color:var(--muted-foreground);text-align:center}
+.empty svg.ic{width:32px;height:32px;opacity:.5}
+
+/* ============ Menus (shadcn: DropdownMenu) ============ */
+.menu{position:fixed;z-index:300;min-width:190px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:5px;font-size:13px}
+.menu .mi{display:flex;align-items:center;gap:9px;width:100%;padding:7px 9px;border-radius:6px;text-align:left}
+.menu .mi:hover{background:var(--accent)}
+.menu .mi.danger{color:var(--destructive)}
+.menu .msep{height:1px;background:var(--border);margin:5px 4px}
+.menu .mlabel{font-size:11px;color:var(--muted-foreground);padding:4px 9px}
+
+/* ============ Dialogs (shadcn: Dialog) ============ */
+.scrim{position:fixed;inset:0;z-index:400;background:rgba(2,8,23,.6);display:none;align-items:flex-start;justify-content:center;padding-top:9vh}
+.scrim.show{display:flex}
+.dialog{width:480px;max-width:92vw;max-height:82vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);padding:22px}
+.dialog.wide{width:840px}
+.dialog h3{font-size:16px;margin-bottom:4px}
+.dialog .sub{font-size:13px;color:var(--muted-foreground);margin-bottom:16px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+/* shadcn: Input */
+.inp{width:100%;height:34px;padding:0 10px;border-radius:6px;border:1px solid var(--input);background:var(--background);font-size:13px}
+.inp:focus,textarea:focus{outline:2px solid var(--ring);outline-offset:-1px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12.5px;font-weight:500;margin-bottom:5px;color:var(--muted-foreground)}
+select.inp{appearance:auto}
+
+/* ============ Tabs (shadcn: Tabs) ============ */
+.tabs{display:inline-flex;background:var(--muted);border-radius:var(--radius);padding:3px;gap:2px}
+.tab{height:28px;padding:0 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--muted-foreground)}
+.tab:hover{color:var(--foreground)}
+.tab.on{background:var(--background);color:var(--foreground);box-shadow:0 1px 2px rgba(0,0,0,.18)}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.seg button{height:28px;padding:0 12px;font-size:12.5px;color:var(--muted-foreground);border-right:1px solid var(--border)}
+.seg button:last-child{border-right:none}
+.seg button.on{background:var(--secondary);color:var(--foreground);font-weight:600}
+
+/* ============ Editor layout ============ */
+.editor{display:flex;height:100%;min-height:0}
+.canvas{flex:1;overflow-y:auto;padding:22px 26px;min-width:0}
+.inspector{width:320px;flex:none;overflow-y:auto;border-left:1px solid var(--border);background:var(--card);padding:16px}
+/* shadcn: Card */
+.card{background:var(--background);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.card h4{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:10px;font-weight:600}
+.port{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;font-size:12.5px}
+.port .mono{color:var(--running)}
+.port .pk{margin-left:auto;font-size:10.5px;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.05em}
+/* shadcn: ToggleGroup */
+.tgl{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.tgl button{flex:1;height:30px;font-size:12.5px;color:var(--muted-foreground);border-right:1px solid var(--border)}
+.tgl button:last-child{border-right:none}
+.tgl button.on{background:var(--secondary);color:var(--foreground);font-weight:600}
+.budgetbar{height:6px;border-radius:99px;background:var(--muted);overflow:hidden;margin:8px 0 6px}
+.budgetbar i{display:block;height:100%;border-radius:99px;background:var(--running)}
+
+/* message segments */
+.seg-msg{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);margin-bottom:12px;overflow:hidden}
+.seg-h{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--muted);border-bottom:1px solid var(--border)}
+.rolechip{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:2px 8px;border-radius:5px}
+.rolechip.system{background:color-mix(in srgb,var(--warning) 16%,transparent);color:var(--warning)}
+.rolechip.user{background:color-mix(in srgb,var(--running) 16%,transparent);color:var(--running)}
+.rolechip.assistant{background:color-mix(in srgb,var(--success) 16%,transparent);color:var(--success)}
+.seg-h .hint{font-size:11px;color:var(--muted-foreground)}
+.seg-h .iconbtn{margin-left:auto;width:24px;height:24px}
+/* highlighted editor: transparent textarea over rendered backdrop */
+.hl{position:relative;font-family:var(--mono);font-size:13px;line-height:1.6}
+.hl .bd,.hl textarea{padding:12px 14px;white-space:pre-wrap;word-wrap:break-word;width:100%;border:none;background:transparent;font:inherit;line-height:inherit;min-height:64px}
+.hl .bd{position:absolute;inset:0;pointer-events:none;color:var(--foreground)}
+.hl textarea{position:relative;resize:vertical;display:block;color:transparent;caret-color:var(--foreground);outline:none}
+.hl .var{color:var(--running);font-weight:600}
+.hl .refc{color:var(--success);background:color-mix(in srgb,var(--success) 14%,transparent);border-radius:4px;padding:0 3px;font-weight:600}
+.hl .refc.miss{color:var(--destructive);background:color-mix(in srgb,var(--destructive) 14%,transparent)}
+.phchip{display:flex;align-items:center;gap:9px;border:1px dashed var(--input);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;background:var(--muted);font-family:var(--mono);font-size:12.5px}
+.phchip b{color:var(--running)}
+.addrow{display:flex;gap:8px;margin-top:6px}
+
+/* quick run panel */
+.qr{position:absolute;top:0;right:0;bottom:0;width:380px;background:var(--card);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);padding:16px;overflow-y:auto;transform:translateX(105%);transition:transform .18s;z-index:60}
+.qr.show{transform:none}
+.qr h3{font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.qr .out{border:1px dashed var(--input);border-radius:var(--radius);min-height:110px;padding:12px;font-size:13px;color:var(--muted-foreground);background:var(--background)}
+.qr .out.filled{color:var(--foreground);border-style:solid;font-family:var(--mono);font-size:12.5px;white-space:pre-wrap}
+.metrics{display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);margin-top:8px}
+.attach{display:flex;gap:6px;align-items:center;border:1px dashed var(--input);border-radius:6px;padding:8px;font-size:12px;color:var(--muted-foreground)}
+.attach .chip{display:inline-flex;gap:5px;align-items:center;background:var(--muted);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11.5px;color:var(--foreground)}
+
+/* ============ Run mode ============ */
+.runwrap{padding:20px 24px}
+.resulttable{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)}
+.rrow{display:flex;align-items:center;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer}
+.rrow:hover{background:var(--accent)}
+.rrow:last-child{border-bottom:none}
+.rcell{padding:9px 12px;min-width:0;display:flex;align-items:center;gap:8px}
+.outprev{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:12px}
+.cmp{display:grid;gap:14px;margin-top:14px}
+.cmpcol{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);overflow:hidden}
+.cmpcol .ch{padding:10px 12px;border-bottom:1px solid var(--border);background:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cmpcell{padding:12px;border-bottom:1px solid var(--border);font-size:12.5px;font-family:var(--mono);white-space:pre-wrap}
+.cmpcell:last-child{border-bottom:none}
+.win{border:1px solid var(--success);color:var(--success);border-radius:5px;font-size:11px;padding:1px 7px;display:inline-flex;gap:4px;align-items:center}
+.diffadd{background:color-mix(in srgb,var(--success) 22%,transparent);border-radius:3px}
+.diffdel{background:color-mix(in srgb,var(--destructive) 22%,transparent);text-decoration:line-through;border-radius:3px}
+.timeline{margin-top:8px}
+.tl{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:7px;font-family:var(--mono)}
+.tl .bar{height:8px;border-radius:4px;background:var(--running);opacity:.85}
+.tl .nm{width:150px;color:var(--muted-foreground);flex:none}
+
+/* ============ Compress ============ */
+.methods{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.mcard{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:14px;cursor:pointer}
+.mcard:hover{border-color:var(--input)}
+.mcard.on{border-color:var(--ring);outline:1px solid var(--ring)}
+.mcard b{display:flex;gap:8px;align-items:center;font-size:13.5px;margin-bottom:5px}
+.mcard p{font-size:12px;color:var(--muted-foreground)}
+.stats{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);margin-bottom:12px}
+.stat{flex:1;padding:11px 14px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .k{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted-foreground)}
+.stat .v{font-family:var(--mono);font-size:16px;font-weight:600;margin-top:2px}
+.stat .v.good{color:var(--success)}
+.cprev{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:16px;font-family:var(--mono);font-size:13px;line-height:1.7;white-space:pre-wrap}
+.cprev .cut{color:var(--muted-foreground);opacity:.55;text-decoration:line-through}
+.cprev .keepvar{color:var(--running);font-weight:700;background:color-mix(in srgb,var(--running) 12%,transparent);border-radius:3px;padding:0 2px}
+.cprev .keepref{color:var(--success);font-weight:700;background:color-mix(in srgb,var(--success) 12%,transparent);border-radius:3px;padding:0 2px}
+/* slider */
+input[type=range]{width:100%;accent-color:var(--primary)}
+
+/* ============ Manage ============ */
+.managewrap{padding:22px 26px;max-width:880px}
+.msec{margin-bottom:22px}
+.msec>h3{font-size:14px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.vrow{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+.vrow:last-child{border-bottom:none}
+.member{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.member:last-child{border-bottom:none}
+.dcard{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.dcard.red{border-color:color-mix(in srgb,var(--destructive) 55%,transparent)}
+.dcard .info{flex:1}
+.dcard b{font-size:13.5px}
+.dcard p{font-size:12.5px;color:var(--muted-foreground)}
+
+/* ============ Command palette (shadcn: Command) ============ */
+.cmdk{width:600px;max-width:92vw;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden}
+.cmdk .cin{display:flex;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.cmdk input{flex:1;background:none;border:none;outline:none;font-size:14px}
+.cmdk .list{max-height:46vh;overflow-y:auto;padding:7px}
+.cmdk .glabel{font-size:11px;color:var(--muted-foreground);padding:7px 10px 3px;font-weight:600}
+.cmdk .crow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;font-size:13px;cursor:pointer}
+.cmdk .crow:hover,.cmdk .crow.sel{background:var(--accent)}
+.cmdk .crow .cat{margin-left:auto;font-size:11px;color:var(--muted-foreground)}
+.cmdk .cfoot{display:flex;gap:14px;padding:9px 15px;border-top:1px solid var(--border);font-size:11px;color:var(--muted-foreground)}
+
+/* ============ Toasts (shadcn: Sonner) ============ */
+#toasts{position:fixed;bottom:18px;right:18px;z-index:500;display:flex;flex-direction:column;gap:8px}
+.toast{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:11px 14px;font-size:13px;animation:tin .18s ease-out}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.spin{animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.exportpre{background:var(--muted);border:1px solid var(--border);border-radius:6px;padding:12px;font-family:var(--mono);font-size:11.5px;max-height:260px;overflow:auto;white-space:pre}
+.ctxnote{font-size:12px;color:var(--muted-foreground)}
+/* ============ design polish: elevation + motion ============ */
+:root{--ease:cubic-bezier(.16,.84,.44,1);--dur:.17s;
+ --elev-1:0 1px 2px rgba(15,23,42,.05),0 1px 1px rgba(15,23,42,.04);
+ --shadow-md:0 2px 6px rgba(15,23,42,.08),0 10px 24px -8px rgba(15,23,42,.18);
+ --shadow-lg:0 8px 18px rgba(15,23,42,.12),0 28px 56px -16px rgba(15,23,42,.32)}
+.dark{--elev-1:0 1px 2px rgba(0,0,0,.35);
+ --shadow-md:0 2px 8px rgba(0,0,0,.46),0 14px 30px -8px rgba(0,0,0,.62);
+ --shadow-lg:0 10px 22px rgba(0,0,0,.55),0 36px 68px -18px rgba(0,0,0,.74)}
+@keyframes ov-fade{from{opacity:0}to{opacity:1}}
+@keyframes ov-dlg{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes ov-menu{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes blinkc{50%{opacity:0}}
+@keyframes flashrow{0%{background:color-mix(in srgb,var(--running) 20%,transparent)}100%{background:transparent}}
+.btn,.iconbtn{transition:background var(--dur),color var(--dur),border-color var(--dur),box-shadow var(--dur),transform .07s}
+.btn:active,.iconbtn:active{transform:translateY(1px)}
+.btn.primary{box-shadow:0 1px 2px rgba(2,8,23,.22)}
+.trow,.rrow,.nav-item,.mi,.crow,.tab,.member,.vrow,.port,.mcard,.ctrl{transition:background var(--dur),color var(--dur),border-color var(--dur),box-shadow var(--dur)}
+.trow:hover{box-shadow:inset 2px 0 0 var(--muted-foreground)}
+.card,.seg-msg,.dcard,.resulttable,.mcard,.table,.stats,.cmpcol,.cprev{box-shadow:var(--elev-1)}
+.scrim{animation:ov-fade .16s ease-out}
+.dialog{animation:ov-dlg .2s var(--ease)}
+.cmdk{animation:ov-dlg .18s var(--ease)}
+.menu{animation:ov-menu .14s var(--ease);transform-origin:top}
+.seg-msg,.phchip{transition:box-shadow var(--dur),border-color var(--dur),opacity .15s}
+.seg-h[draggable]{cursor:grab}.seg-h[draggable]:active{cursor:grabbing}
+.dragging{opacity:.4}
+.seg-msg.dragover,.phchip.dragover{border-color:var(--ring);box-shadow:0 -3px 0 -1px var(--ring)}
+.out.streaming::after{content:'▋';color:var(--running);margin-left:1px;animation:blinkc 1s step-end infinite}
+.flash{animation:flashrow 1s ease-out}
+::selection{background:color-mix(in srgb,var(--ring) 32%,transparent)}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-thumb{background:var(--input);border-radius:7px;border:3px solid var(--background);background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:var(--muted-foreground)}
+::-webkit-scrollbar-track{background:transparent}
+.header::-webkit-scrollbar{height:0}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,var(--muted) 25%,var(--accent) 40%,var(--muted) 60%);background-size:200% 100%;animation:shimmer 1.3s ease-in-out infinite;border-radius:6px;height:12px;display:inline-block}
+.sk-row{display:flex;align-items:center;gap:14px;padding:13px 12px}
+.toast-act{margin-left:4px;font-weight:600;color:var(--running);padding:2px 9px;border-radius:5px;border:1px solid transparent}
+.toast-act:hover{background:var(--accent);border-color:var(--border)}
+.cmp-tally{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--success);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="overlays"></div>
+<div id="toasts"></div>
+<script>
+'use strict';
+/* ================= icons (lucide-style, inline) ================= */
+const ICONS={
+search:'<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>',
+plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+chevD:'<polyline points="6 9 12 15 18 9"/>',
+chevR:'<polyline points="9 6 15 12 9 18"/>',
+chevL:'<polyline points="15 6 9 12 15 18"/>',
+play:'<polygon points="7 4 20 12 7 20 7 4"/>',
+stop:'<rect x="6" y="6" width="12" height="12" rx="1"/>',
+copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+edit:'<path d="M17 3l4 4L8 20l-5 1 1-5z"/>',
+tag:'<path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="8" cy="8" r="1.5"/>',
+upload:'<path d="M12 16V4"/><polyline points="6 10 12 4 18 10"/><path d="M4 20h16"/>',
+download:'<path d="M12 4v12"/><polyline points="6 10 12 16 18 10"/><path d="M4 20h16"/>',
+archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/><path d="M10 13h4"/>',
+trash:'<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/>',
+more:'<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+terminal:'<polyline points="4 6 10 12 4 18"/><line x1="12" y1="18" x2="20" y2="18"/>',
+braces:'<path d="M8 3c-2 0-3 1-3 3v3c0 1-1 2-2 2 1 0 2 1 2 2v4c0 2 1 3 3 3"/><path d="M16 3c2 0 3 1 3 3v3c0 1 1 2 2 2-1 0-2 1-2 2v4c0 2-1 3-3 3"/>',
+msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+type:'<polyline points="4 7 4 4 20 4 20 7"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="9" y1="20" x2="15" y2="20"/>',
+undo:'<path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7"/>',
+redo:'<path d="M21 7v6h-6"/><path d="M21 13a9 9 0 1 1-3-7.7"/>',
+shrink:'<polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>',
+zap:'<polygon points="13 2 3 14 11 14 10 22 21 9 13 9 13 2"/>',
+eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+clock:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',
+check:'<polyline points="4 12 10 18 20 6"/>',
+x:'<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
+activity:'<polyline points="3 12 7 12 10 5 14 19 17 12 21 12"/>',
+sliders:'<line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="7" cy="18" r="2"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M22 19c0-2.5-2-4.5-4.5-4.7"/>',
+db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+flask:'<path d="M10 2v6L4 19a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3L14 8V2"/><line x1="8" y1="2" x2="16" y2="2"/>',
+sparkles:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.9 2.6L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.4z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>',
+moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+layers:'<polygon points="12 2 22 8 12 14 2 8 12 2"/><polyline points="2 13 12 19 22 13"/>',
+cols:'<rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/>',
+scan:'<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/>',
+save:'<path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+sort:'<path d="M7 4v16"/><polyline points="4 17 7 20 10 17"/><path d="M17 20V4"/><polyline points="14 7 17 4 20 7"/>',
+panel:'<rect x="3" y="4" width="18" height="16" rx="2"/><line x1="15" y1="4" x2="15" y2="20"/>',
+rows:'<line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>',
+grip:'<circle cx="9" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="9" cy="18" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="18" r="1.3" fill="currentColor" stroke="none"/>',
+send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>'};
+function icon(n,cls){return '<svg class="ic'+(cls?' '+cls:'')+'" viewBox="0 0 24 24">'+(ICONS[n]||ICONS.file)+'</svg>'}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ================= data ================= */
+const MODELS=[
+ {id:'claude-sonnet-4-6',provider:'Anthropic',ctx:200000,inP:3,outP:15,vision:true},
+ {id:'claude-haiku-4-5',provider:'Anthropic',ctx:200000,inP:0.8,outP:4,vision:true},
+ {id:'gpt-4.1',provider:'OpenAI',ctx:1000000,inP:2,outP:8,vision:true},
+ {id:'gpt-4.1-mini',provider:'OpenAI',ctx:1000000,inP:0.4,outP:1.6,vision:true},
+ {id:'llama3 · ollama (local)',provider:'Local',ctx:8192,inP:0,outP:0,vision:false}];
+const DATASETS=[{name:'helpdesk-tickets-2026-06',rows:50},{name:'tone-samples',rows:24}];
+const MEMBERS=[{n:'Amaan K',e:'amaan@esberi.com',role:'Owner'},{n:'Maya Chen',e:'maya@acme.com',role:'Editor'},{n:'Dana Ortiz',e:'dana@acme.com',role:'Editor'}];
+const TBASE=[['I was charged twice for the June invoice','billing'],['Cannot sign in after the password reset email','technical'],['Please close my account permanently','account'],['Where can I download last quarter invoices?','billing'],['App crashes when I upload a CSV over 10 MB','technical'],['Update the billing email to finance@northline.com','billing'],['Two-factor codes never arrive on my phone','technical'],['Upgrade my workspace to the Team plan','account'],['Requesting a refund for duplicate charge #8841','billing'],['Any plans for a dark mode in the mobile app?','other']];
+const TICKETS=[];for(let i=0;i<50;i++){const b=TBASE[i%10];TICKETS.push({text:b[0]+' (ticket #'+(1040+i)+')',cat:b[1]})}
+const SYS12='You are a support assistant for Acme Corp. Follow the shared safety rules at all times. [[ref:safety-guidelines]] Be precise and never invent ticket details.';
+const USR12='Classify the intent of this message: {{message}} — into exactly one of: billing, technical, account, or other. Reply with only the category name.';
+const USR11='Classify the intent of this message: {{message}} — billing, technical, account, or other.';
+const TONE8='You are an expert customer-communication editor for the Acme support team. Rewrite the following message in a {{tone}} tone, keeping the meaning, the facts, and any ticket numbers exactly the same. Always make sure to preserve product names, dates, and monetary amounts precisely as they were written. Do not add new information, do not remove important details, and keep the reply reasonably concise so that customers are able to read it quickly and easily. [[ref:safety-guidelines]]\n\nMessage to rewrite: {{message}}';
+const PROMPTS=[
+ {id:'support-triage',name:'support-triage',kind:'chat',desc:'Triage classifier for Acme help-desk tickets',labels:['team:support','pii'],version:12,env:'production',lastRun:{s:'ok',t:'2m ago'},runs:412,archived:false,output:'Message',model:'claude-sonnet-4-6',temp:0.2,maxTok:256,
+  messages:[{role:'system',text:SYS12},{ph:'chat_history'},{role:'user',text:USR12}],
+  versions:[{v:12,tag:'production',when:'2m ago',author:'Maya Chen',note:'Tightened category instruction; reply with category only',tpl:SYS12+'\n\n'+USR12},
+            {v:11,tag:null,when:'2d ago',author:'Maya Chen',note:'Original classification wording',tpl:SYS12+'\n\n'+USR11},
+            {v:10,tag:'staging',when:'5d ago',author:'Amaan K',note:'Added safety-guidelines reference',tpl:SYS12.replace(' [[ref:safety-guidelines]]','')+'\n\n'+USR11},
+            {v:9,tag:null,when:'1w ago',author:'Maya Chen',note:'Added chat_history placeholder',tpl:'You are a support assistant for Acme Corp.\n\n'+USR11},
+            {v:8,tag:'dev',when:'2w ago',author:'Maya Chen',note:'System persona rewrite',tpl:'You are a helpful assistant.\n\n'+USR11},
+            {v:7,tag:null,when:'3w ago',author:'Amaan K',note:'Initial import from playground',tpl:'Classify: {{message}}'}]},
+ {id:'tone-rewriter',name:'tone-rewriter',kind:'text',desc:'Rewrites draft replies in a requested tone',labels:['team:support','tone'],version:8,env:'staging',lastRun:{s:'ok',t:'1h ago'},runs:96,archived:false,output:'Text',model:'gpt-4.1-mini',temp:0.7,maxTok:512,body:TONE8,
+  versions:[{v:8,tag:'staging',when:'1h ago',author:'Maya Chen',note:'Guard rails for amounts and dates',tpl:TONE8},
+            {v:7,tag:null,when:'1d ago',author:'Maya Chen',note:'Added conciseness instruction',tpl:TONE8.replace(' quickly and easily','')},
+            {v:6,tag:'dev',when:'4d ago',author:'Amaan K',note:'First tone matrix draft',tpl:'Rewrite the following message in a {{tone}} tone: {{message}}'}]},
+ {id:'safety-guidelines',name:'safety-guidelines',kind:'text',desc:'Shared safety rules referenced by other prompts',labels:['compliance'],version:4,env:'production',lastRun:{s:null,t:'—'},runs:3,archived:false,output:'Text',model:'claude-haiku-4-5',temp:0,maxTok:256,
+  body:'Safety rules: never reveal customer PII, never promise refunds above $500 without approval, always de-escalate abusive language, and hand off legal threats to a human agent.',
+  versions:[{v:4,tag:'production',when:'3w ago',author:'Amaan K',note:'Legal handoff rule',tpl:'Safety rules: never reveal customer PII, never promise refunds above $500 without approval, always de-escalate abusive language, and hand off legal threats to a human agent.'},
+            {v:3,tag:null,when:'5w ago',author:'Amaan K',note:'Refund cap added',tpl:'Safety rules: never reveal customer PII, always de-escalate abusive language.'}]},
+ {id:'escalation-detector',name:'escalation-detector',kind:'chat',desc:'Flags tickets that need human escalation',labels:['experimental'],version:2,env:'dev',lastRun:{s:'err',t:'3d ago'},runs:17,archived:false,output:'JSON',model:'claude-haiku-4-5',temp:0,maxTok:256,evaluator:true,
+  messages:[{role:'system',text:'You review support tickets and output an escalation decision as strict JSON. Scrub PII first. [[ref:pii-scrubber]]'},{role:'user',text:'Ticket: {{ticket}}\nReturn {"escalate": true|false, "reason": string}.'}],
+  versions:[{v:2,tag:'dev',when:'3d ago',author:'Dana Ortiz',note:'JSON output contract',tpl:'You review support tickets and output an escalation decision as strict JSON. Scrub PII first. [[ref:pii-scrubber]]\n\nTicket: {{ticket}}'},
+            {v:1,tag:null,when:'1w ago',author:'Dana Ortiz',note:'Initial draft',tpl:'Should this ticket escalate? {{ticket}}'}]},
+ {id:'onboarding-writer',name:'onboarding-writer',kind:'text',desc:'Drafts onboarding emails for new workspaces',labels:[],version:1,env:'draft',lastRun:{s:null,t:'never'},runs:0,archived:false,output:'Text',model:'claude-sonnet-4-6',temp:0.8,maxTok:1024,
+  body:'Write a warm onboarding email for {{customer_name}} who just created a workspace named {{workspace}}.',
+  versions:[{v:1,tag:'draft',when:'just now',author:'Amaan K',note:'Created',tpl:'Write a warm onboarding email for {{customer_name}} who just created a workspace named {{workspace}}.'}]},
+ {id:'ticket-summarizer',name:'ticket-summarizer',kind:'text',desc:'Summarizes long ticket threads (retired)',labels:['team:support'],version:6,env:'staging',lastRun:{s:'ok',t:'3w ago'},runs:230,archived:true,output:'Text',model:'gpt-4.1-mini',temp:0.3,maxTok:512,
+  body:'Summarize this ticket thread in three bullet points: {{thread}}',
+  versions:[{v:6,tag:'staging',when:'3w ago',author:'Maya Chen',note:'Bullet format',tpl:'Summarize this ticket thread in three bullet points: {{thread}}'}]}];
+const RUNS=[{id:'r412',label:'#412 · batch · v12 · 50 rows · 2m ago',prompt:'support-triage'},{id:'r398',label:'#398 · compare v11 vs v12 · 2h ago',prompt:'support-triage'},{id:'r377',label:'#377 · single · v8 · 1h ago',prompt:'tone-rewriter'}];
+
+/* ================= state ================= */
+const S={sort:'updated',showArchived:false,rail:false,qr:false,qrRun:null,runMode:'single',viewV:null,recent:[],
+ batch:{inputs:TICKETS.slice(0,5).map(t=>t.text),results:[],running:false,loadedAll:false},
+ cmp:{cols:[{ver:11,model:'claude-sonnet-4-6'},{ver:12,model:'claude-sonnet-4-6'}],ran:false,diff:false,wins:{}},
+ compress:null,timers:[],ksel:0,undoStack:[],redoStack:[]};
+const byId=id=>PROMPTS.find(p=>p.id===id);
+function route(){const h=location.hash||'#/prompts';const m=h.match(/^#\/p\/([^/]+)\/(edit|run|manage)$/);if(m&&byId(m[1]))return{scr:'editor',id:m[1],mode:m[2]};return{scr:'list'}}
+function go(h){location.hash=h}
+window.addEventListener('hashchange',()=>{S.qr=false;S.viewV=null;S.compress=null;render()});
+
+/* ================= helpers ================= */
+function toast(m,ic,action){const t=document.createElement('div');t.className='toast';t.innerHTML=icon(ic||'check')+'<span>'+esc(m)+'</span>';
+ if(action){const b=document.createElement('button');b.className='toast-act';b.textContent=action.label;b.onclick=()=>{action.fn();t.remove()};t.appendChild(b)}
+ document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),action?5400:2800)}
+const SEEN={};
+function tokEst(s){return Math.max(1,Math.round(String(s).split(/\s+/).filter(Boolean).length*1.33))}
+function money(n){return '$'+(n<0.01?n.toFixed(4):n.toFixed(2))}
+function tpl(p){return p.kind==='chat'?p.messages.map(m=>m.ph?('«placeholder: '+m.ph+'»'):m.text).join('\n\n'):p.body}
+function vars(p){const set=new Set();(tpl(p).match(/\{\{\s*([\w.]+)\s*\}\}/g)||[]).forEach(v=>set.add(v.replace(/[{}\s]/g,'')));return [...set]}
+function phs(p){return p.kind==='chat'?p.messages.filter(m=>m.ph).map(m=>m.ph):[]}
+function refs(p){const out=[];(tpl(p).match(/\[\[ref:([\w-]+)\]\]/g)||[]).forEach(r=>{const n=r.slice(6,-2);out.push({name:n,ok:!!byId(n)})});return out}
+function hl(s){let h=esc(s);h=h.replace(/\[\[ref:([\w-]+)\]\]/g,(m,n)=>'<span class="refc'+(byId(n)?'':' miss')+'">'+n+(byId(n)?'':' · missing')+'</span>');h=h.replace(/\{\{\s*[\w.]+\s*\}\}/g,m=>'<span class="var">'+m+'</span>');return h+'\n'}
+function envBadge(e){return e?'<span class="envb '+e+'"><i></i>'+e+'</span>':'<span class="ctxnote">—</span>'}
+function highestEnv(p){const order=['production','staging','dev','draft'];for(const e of order){if(p.versions.some(v=>v.tag===e))return e}return null}
+function model(id){return MODELS.find(m=>m.id===id)||MODELS[0]}
+function classify(text){const t=text.toLowerCase();if(/invoice|charge|refund|billing|download/.test(t))return 'billing';if(/sign in|crash|csv|two-factor|password|codes/.test(t))return 'technical';if(/account|plan|upgrade|close/.test(t))return 'account';return 'other'}
+function diffWords(a,b){const A=a.split(/\s+/),B=b.split(/\s+/);const n=A.length,m=B.length;const dp=Array.from({length:n+1},()=>new Array(m+1).fill(0));for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=A[i]===B[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);let i=0,j=0;const out=[];while(i<n&&j<m){if(A[i]===B[j]){out.push(esc(A[i]));i++;j++}else if(dp[i+1][j]>=dp[i][j+1]){out.push('<span class="diffdel">'+esc(A[i])+'</span>');i++}else{out.push('<span class="diffadd">'+esc(B[j])+'</span>');j++}}while(i<n)out.push('<span class="diffdel">'+esc(A[i++])+'</span>');while(j<m)out.push('<span class="diffadd">'+esc(B[j++])+'</span>');return out.join(' ')}
+
+/* ================= shell ================= */
+function sidebar(r){
+ const nav=(ic,label,on,cb)=>'<button class="nav-item'+(on?' on':'')+'" onclick="'+cb+'">'+icon(ic)+'<span class="nav-txt">'+label+'</span></button>';
+ return '<aside class="sidebar'+(S.rail?' rail':'')+'"><div class="sb-top"><button class="proj-btn" onclick="projMenu(event)"><span class="proj-logo">A</span><span class="proj-name">acme-support</span>'+icon('chevD')+'</button></div>'+
+ '<nav class="sb-nav"><div class="sb-label">Build</div>'+nav('layers','Flows',false,'oos()')+nav('braces','Prompts',true,"go('#/prompts')")+
+ '<div class="sb-label">Evaluate</div>'+nav('flask','Experiments',false,'oos()')+nav('db','Datasets',false,'oos()')+
+ '<div class="sb-label">Operate</div>'+nav('clock','Schedules',false,'oos()')+
+ '<div class="sb-label">Observe</div>'+nav('activity','Runs',false,'oos()')+
+ '<div class="sb-label">Manage</div>'+nav('users','Members',false,'oos()')+nav('sliders','Settings',false,'oos()')+'</nav>'+
+ '<div class="sb-foot"><button class="acct" onclick="acctMenu(event)"><span class="avatar">AK</span><span class="acct-info"><b>Amaan K</b><span>Builder</span></span>'+icon('chevD')+'</button></div></aside>'}
+function oos(){toast('That surface is outside this prototype — Prompts only','file')}
+function projMenu(e){openMenu(e,'<div class="mlabel">Switch project</div><button class="mi" onclick="closeMenus();toast(\'Switched to acme-support\')">'+icon('check')+'acme-support</button><button class="mi" onclick="closeMenus();toast(\'This mock stays in acme-support\')">'+icon('box')+'internal-tools</button>')}
+function acctMenu(e){openMenu(e,'<div class="mlabel">amaan@esberi.com</div><button class="mi" onclick="toggleTheme();closeMenus()">'+icon(document.documentElement.classList.contains('dark')?'sun':'moon')+'Toggle light / dark</button><button class="mi" onclick="toggleRail();closeMenus()">'+icon('panel')+'Collapse sidebar</button><div class="msep"></div><button class="mi" onclick="closeMenus();toast(\'Signed out (mock)\')">'+icon('x')+'Sign out</button>')}
+function toggleTheme(){document.documentElement.classList.toggle('dark');toast('Theme switched','sun')}
+function toggleRail(){S.rail=!S.rail;render()}
+
+/* ================= list screen ================= */
+function sortPrompts(list){const l=[...list];if(S.sort==='name')l.sort((a,b)=>a.name.localeCompare(b.name));if(S.sort==='runs')l.sort((a,b)=>b.runs-a.runs);return l}
+function listScreen(){
+ if(!SEEN.list){SEEN.list=1;setTimeout(render,460);return '<div class="tablewrap"><div class="table">'+Array.from({length:6}).map(()=>'<div class="sk-row" style="border-bottom:1px solid var(--border);justify-content:space-between"><span class="sk" style="width:170px;height:14px"></span><span class="sk" style="width:60px"></span><span class="sk" style="width:150px"></span><span class="sk" style="width:36px"></span><span class="sk" style="width:96px"></span><span class="sk" style="width:70px"></span><span class="sk" style="width:30px"></span></div>').join('')+'</div></div>'}
+ const list=sortPrompts(PROMPTS.filter(p=>p.archived===S.showArchived));
+ const W={name:'flex:1.4;min-width:170px',kind:'width:86px',lab:'width:210px',ver:'width:64px',env:'width:118px',lr:'width:118px',runs:'width:58px',dots:'width:44px'};
+ let rows;
+ if(!list.length){rows='<div class="empty">'+icon('braces')+'<div><b>'+(S.showArchived?'No archived prompts':'No prompts yet')+'</b><br><span style="font-size:12.5px">'+(S.showArchived?'Archived prompts appear here.':'Write, run, and govern prompts in one place.')+'</span></div>'+(S.showArchived?'':'<button class="btn primary" onclick="newMenu(event)">'+icon('plus')+'New prompt</button>')+'</div>'}
+ else rows=list.map(p=>{
+  const labs=p.labels.slice(0,2).map(l=>'<span class="tagpill">'+esc(l)+'</span>').join('')+(p.labels.length>2?'<span class="tagpill">+'+(p.labels.length-2)+'</span>':'');
+  return '<div class="trow" onclick="openPrompt(\''+p.id+'\')">'+
+  '<div class="td" style="'+W.name+'"><b>'+esc(p.name)+'</b></div>'+
+  '<div class="td" style="'+W.kind+'"><span class="badge outline">'+icon(p.kind==='chat'?'msg':'type')+p.kind+'</span></div>'+
+  '<div class="td" style="'+W.lab+'">'+(labs||'<span class="ctxnote">—</span>')+'</div>'+
+  '<div class="td mono" style="'+W.ver+'">v'+p.version+'</div>'+
+  '<div class="td" style="'+W.env+'">'+envBadge(highestEnv(p))+'</div>'+
+  '<div class="td" style="'+W.lr+'"><span class="statdot '+(p.lastRun.s==='ok'?'ok':p.lastRun.s==='err'?'err':'none')+'"></span><span class="ctxnote">'+p.lastRun.t+'</span></div>'+
+  '<div class="td mono" style="'+W.runs+'">'+p.runs+'</div>'+
+  '<button class="btn sm outline rowrun" onclick="event.stopPropagation();go(\'#/p/'+p.id+'/run\')">'+icon('play')+'Run</button>'+
+  '<div class="td" style="'+W.dots+'"><button class="iconbtn" onclick="event.stopPropagation();rowMenu(event,\''+p.id+'\')">'+icon('more')+'</button></div></div>'}).join('');
+ return '<div class="tablewrap"><div class="table"><div class="thead">'+
+ '<div class="th" style="'+W.name+'">Name</div><div class="th" style="'+W.kind+'">Kind</div><div class="th" style="'+W.lab+'">Labels</div><div class="th" style="'+W.ver+'">Version</div><div class="th" style="'+W.env+'">Env</div><div class="th" style="'+W.lr+'">Last run</div><div class="th" style="'+W.runs+'">Runs</div><div class="th" style="'+W.dots+'"></div></div>'+rows+'</div>'+
+ (S.showArchived?'<p class="ctxnote" style="margin-top:10px">Viewing archived prompts. <a style="cursor:pointer;color:var(--running)" onclick="S.showArchived=false;render()">Back to active</a></p>':'')+'</div>'}
+function listHeader(){return '<div class="hdr-actions">'+
+ '<button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button>'+
+ '<button class="btn outline sm" onclick="sortMenu(event)">'+icon('sort')+'Sort</button>'+
+ '<button class="btn ghost sm" onclick="S.showArchived=!S.showArchived;render()">'+icon('archive')+(S.showArchived?'Active':'Archived')+'</button>'+
+ '<button class="btn primary sm" onclick="newMenu(event)">'+icon('plus')+'New '+icon('chevD')+'</button></div>'}
+function sortMenu(e){openMenu(e,['updated','name','runs'].map(s=>'<button class="mi" onclick="S.sort=\''+s+'\';closeMenus();render()">'+(S.sort===s?icon('check'):'<span style="width:16px"></span>')+'Sort by '+s+'</button>').join(''))}
+function newMenu(e){openMenu(e,'<button class="mi" onclick="newPrompt(\'chat\')">'+icon('msg')+'Chat prompt <span class="cat">assistant</span></button><button class="mi" onclick="newPrompt(\'text\')">'+icon('type')+'Text prompt <span class="cat">one-shot</span></button>')}
+function newPrompt(kind){closeMenus();const n='untitled-'+kind+'-'+(PROMPTS.length+1);const p={id:n,name:n,kind,desc:'',labels:[],version:1,env:'draft',lastRun:{s:null,t:'never'},runs:0,archived:false,output:kind==='chat'?'Message':'Text',model:'claude-sonnet-4-6',temp:0.5,maxTok:512,versions:[{v:1,tag:'draft',when:'just now',author:'Amaan K',note:'Created',tpl:''}]};
+ if(kind==='chat')p.messages=[{role:'system',text:'You are a helpful assistant for Acme Corp.'},{role:'user',text:'{{input}}'}];else p.body='Do something useful with {{input}}.';
+ p.versions[0].tpl=tpl(p);PROMPTS.unshift(p);toast('Created '+n+' (v1 · draft)','plus');go('#/p/'+n+'/edit')}
+function openPrompt(id){S.recent=[id,...S.recent.filter(r=>r!==id)].slice(0,3);go('#/p/'+id+'/edit')}
+function rowMenu(e,id){const p=byId(id);openMenu(e,
+ '<button class="mi" onclick="closeMenus();openPrompt(\''+id+'\')">'+icon('eye')+'Open</button>'+
+ '<button class="mi" onclick="closeMenus();go(\'#/p/'+id+'/run\')">'+icon('play')+'Run</button><div class="msep"></div>'+
+ '<button class="mi" onclick="closeMenus();dupPrompt(\''+id+'\')">'+icon('copy')+'Duplicate</button>'+
+ '<button class="mi" onclick="closeMenus();renameDlg(\''+id+'\')">'+icon('edit')+'Rename</button>'+
+ '<button class="mi" onclick="closeMenus();labelsDlg(\''+id+'\')">'+icon('tag')+'Edit labels</button><div class="msep"></div>'+
+ '<button class="mi" onclick="closeMenus();promoteDlg(\''+id+'\')">'+icon('upload')+'Promote</button>'+
+ '<button class="mi" onclick="closeMenus();exportDlg(\''+id+'\')">'+icon('download')+'Export</button><div class="msep"></div>'+
+ '<button class="mi" onclick="closeMenus();archiveDlg(\''+id+'\')">'+icon('archive')+(p.archived?'Unarchive':'Archive')+'</button>'+
+ '<button class="mi danger" onclick="closeMenus();deleteDlg(\''+id+'\')">'+icon('trash')+'Delete</button>')}
+function dupPrompt(id){const p=byId(id);const c=JSON.parse(JSON.stringify(p));c.id=p.id+'-copy';c.name=p.name+'-copy';c.version=1;c.env='draft';c.runs=0;c.lastRun={s:null,t:'never'};c.versions=[{v:1,tag:'draft',when:'just now',author:'Amaan K',note:'Duplicated from '+p.name+' v'+p.version,tpl:tpl(p)}];PROMPTS.unshift(c);render();toast('Duplicated as '+c.name,'copy')}
+
+/* ================= editor shell ================= */
+function editorHeader(p,mode){
+ const vopts=p.versions.map(v=>'<option value="'+v.v+'"'+((S.viewV||p.version)===v.v?' selected':'')+'>v'+v.v+(v.tag?' · '+v.tag:'')+'</option>').join('');
+ const tools={edit:'<button class="iconbtn" title="Kind: '+p.kind+'" onclick="toast(\'Kind is fixed at creation — duplicate to convert\',\'file\')">'+icon(p.kind==='chat'?'msg':'type')+'</button><button class="iconbtn" title="Preview assembled prompt" onclick="previewDlg()">'+icon('eye')+'</button><button class="iconbtn'+(S.compress?' on':'')+'" title="Compress" onclick="toggleCompress()">'+icon('shrink')+'</button><span class="div"></span><button class="iconbtn" title="Undo" onclick="doUndo()">'+icon('undo')+'</button><button class="iconbtn" title="Redo" onclick="doRedo()">'+icon('redo')+'</button><span class="div"></span><button class="iconbtn'+(S.qr?' on':'')+'" title="Quick run (⌘↵)" onclick="toggleQr()">'+icon('zap')+'</button><span class="div"></span><button class="iconbtn" title="Import" onclick="importDlg()">'+icon('upload')+'</button><button class="iconbtn" title="Export" onclick="exportDlg(\''+p.id+'\')">'+icon('download')+'</button><span class="div"></span><button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button>',
+ run:'<button class="btn primary sm" onclick="runNow()">'+icon('play')+'Run</button><button class="btn outline sm" onclick="stopRun()">'+icon('stop')+'Stop</button><span class="div"></span><span class="seg">'+['single','batch','compare'].map(m=>'<button class="'+(S.runMode===m?'on':'')+'" onclick="S.runMode=\''+m+'\';render()">'+m[0].toUpperCase()+m.slice(1)+'</button>').join('')+'</span><span class="div"></span><button class="iconbtn" title="Add input" onclick="addInput()">'+icon('plus')+'</button><button class="iconbtn" title="Add variant column" onclick="addVariant()">'+icon('cols')+'</button><button class="iconbtn" title="Load inputs" onclick="loadMenu(event)">'+icon('db')+'</button><span class="div"></span><button class="iconbtn" title="Capture all" onclick="captureAll()">'+icon('save')+'</button><span class="div"></span><button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button>',
+ manage:'<button class="iconbtn" title="Import" onclick="importDlg()">'+icon('upload')+'</button><button class="iconbtn" title="Export" onclick="exportDlg(\''+p.id+'\')">'+icon('download')+'</button><span class="div"></span><button class="iconbtn" title="Search (⌘K)" onclick="openCmdk()">'+icon('search')+'</button>'};
+ const runsel=mode==='run'?'<select class="inp" style="width:auto;height:28px;font-size:12px" onchange="toast(\'Loaded saved run \'+this.value,\'clock\')"><option>Past runs…</option>'+RUNS.filter(r=>r.prompt===p.id).map(r=>'<option>'+esc(r.label)+'</option>').join('')+'</select>':'';
+ return '<div class="crumb"><a onclick="go(\'#/prompts\')">Prompts</a><span class="sep">▸</span><span class="cur" id="pname" ondblclick="inlineRename(\''+p.id+'\')" title="Double-click to rename">'+esc(p.name)+'</span></div>'+
+ envBadge(highestEnv(p))+
+ '<select class="inp" style="width:auto;height:28px;font-size:12px" onchange="viewVersion(this.value)">'+vopts+'</select>'+runsel+
+ '<div class="hdr-actions"><div class="toolbar">'+tools[mode]+'</div><span class="div" style="width:1px;height:18px;background:var(--border);margin:0 4px"></span>'+
+ '<div class="tabs">'+['edit','run','manage'].map(m=>'<button class="tab'+(m===mode?' on':'')+'" onclick="go(\'#/p/'+p.id+'/'+m+'\')">'+m[0].toUpperCase()+m.slice(1)+'</button>').join('')+'</div></div>'}
+function viewVersion(v){const r=route();const p=byId(r.id);v=+v;S.viewV=v===p.version?null:v;if(S.viewV)toast('Viewing v'+v+' (read-only) — restore it from Manage ▸ Versions','clock');render()}
+function inlineRename(id){const el=document.getElementById('pname');const p=byId(id);el.outerHTML='<input class="inp" id="pname" style="width:190px;height:26px" value="'+esc(p.name)+'" onkeydown="if(event.key===\'Enter\')this.blur()" onblur="commitRename(\''+id+'\',this.value)">';document.getElementById('pname').focus()}
+function commitRename(id,val){const p=byId(id);if(val&&val!==p.name){p.name=val.trim().replace(/\s+/g,'-').toLowerCase();toast('Renamed to '+p.name,'edit')}render()}
+
+/* ================= edit mode ================= */
+function editScreen(p){
+ if(S.compress)return compressScreen(p);
+ const ro=S.viewV!==null;const vv=ro?p.versions.find(v=>v.v===S.viewV):null;
+ let canvas='';
+ if(ro){canvas='<div class="card" style="border-color:var(--warning)"><b style="font-size:13px">Viewing v'+vv.v+' (read-only)</b><p class="ctxnote">'+esc(vv.note)+' · '+vv.when+' · '+esc(vv.author)+'</p></div><div class="seg-msg"><div class="hl"><div class="bd">'+hl(vv.tpl)+'</div><textarea readonly rows="10">'+esc(vv.tpl)+'</textarea></div></div>'}
+ else if(p.kind==='chat'){
+  canvas=p.messages.map((m,i)=>{
+   if(m.ph)return '<div class="phchip" data-seg draggable="true" oncontextmenu="segMenu(event,'+i+')" ondragstart="segDragStart(event,'+i+')" ondragover="segDragOver(event,'+i+')" ondrop="segDrop(event,'+i+')" ondragend="segDragEnd()">'+icon('rows')+'<span>placeholder · <b>'+esc(m.ph)+'</b> — injects a whole conversation at run time</span><button class="iconbtn" style="margin-left:auto" onclick="segMenu(event,'+i+')">'+icon('more')+'</button></div>';
+   return '<div class="seg-msg" data-seg oncontextmenu="segMenu(event,'+i+')" ondragover="segDragOver(event,'+i+')" ondrop="segDrop(event,'+i+')"><div class="seg-h" draggable="true" ondragstart="segDragStart(event,'+i+')" ondragend="segDragEnd()">'+icon('grip')+'<span class="rolechip '+m.role+'">'+m.role+'</span><span class="hint">'+(m.role==='system'?'standing orders':m.role==='user'?'the request':'example reply')+'</span><button class="iconbtn" onclick="segMenu(event,'+i+')">'+icon('more')+'</button></div>'+
+   '<div class="hl"><div class="bd" id="bd'+i+'">'+hl(m.text)+'</div><textarea id="ta'+i+'" rows="'+Math.max(2,Math.ceil(m.text.length/70))+'" spellcheck="false" oninput="segInput('+i+',this)" onfocus="snapUndo()" onblur="segBlur('+i+',this)">'+esc(m.text)+'</textarea></div></div>'}).join('')+
+  '<div class="addrow"><button class="btn outline sm" onclick="addMsg()">'+icon('plus')+'Add message</button><button class="btn outline sm" onclick="addPh()">'+icon('rows')+'Add placeholder</button></div>';
+ }else{
+  canvas='<div class="seg-msg" oncontextmenu="segMenu(event,0)"><div class="seg-h"><span class="rolechip system">template</span><span class="hint">single instruction block — {{variables}} become inputs</span></div>'+
+  '<div class="hl"><div class="bd" id="bd0">'+hl(p.body)+'</div><textarea id="ta0" rows="'+Math.max(6,Math.ceil(p.body.length/70))+'" spellcheck="false" oninput="segInput(0,this)" onfocus="snapUndo()" onblur="segBlur(0,this)">'+esc(p.body)+'</textarea></div></div>';
+ }
+ return '<div class="editor"><div class="canvas">'+canvas+'</div><div class="inspector">'+inspector(p)+'</div>'+qrPanel(p)+'</div>'}
+function inspector(p){
+ const m=model(p.model);const t=tokEst(tpl(p));const pct=Math.min(100,Math.round(t/m.ctx*1000)/10);const cost=t/1e6*m.inP;
+ return '<div class="card"><h4>Output</h4><div class="tgl">'+['Message','Text','JSON'].map(o=>'<button class="'+(p.output===o?'on':'')+'" onclick="setOutput(\''+o+'\')">'+o+'</button>').join('')+'</div><p class="ctxnote" style="margin-top:8px">What this prompt returns to the flow that calls it.</p></div>'+
+ '<div class="card"><h4>Inputs</h4><div id="insp-inputs">'+inputsHtml(p)+'</div></div>'+
+ '<div class="card"><h4>References</h4>'+(refs(p).length?refs(p).map(r=>'<div class="port"><span class="statdot '+(r.ok?'ok':'err')+'"></span><span class="mono" style="color:'+(r.ok?'var(--success)':'var(--destructive)')+'">'+esc(r.name)+'</span><span class="pk">'+(r.ok?'found':'missing')+'</span></div>').join(''):'<p class="ctxnote">No references. Type [[ref:name]] or use ⌘K ▸ Insert reference.</p>')+'</div>'+
+ '<div class="card"><h4>Token budget</h4><select class="inp" onchange="setModel(this.value)">'+MODELS.map(x=>'<option'+(x.id===p.model?' selected':'')+'>'+x.id+'</option>').join('')+'</select><div id="insp-budget"><div class="budgetbar"><i style="width:'+Math.max(2,pct)+'%"></i></div><div class="metrics"><span>'+t+' tok</span><span>'+pct+'% of '+(m.ctx/1000)+'k ctx</span><span>~'+money(cost)+' / run</span></div></div></div>'}
+function inputsHtml(p){const v=vars(p),ph=phs(p);if(!v.length&&!ph.length)return '<p class="ctxnote">No inputs yet — type {{a_variable}} in the prompt and it appears here automatically.</p>';
+ return v.map(x=>'<div class="port">'+icon('braces')+'<span class="mono">{{'+esc(x)+'}}</span><span class="pk">string</span></div>').join('')+ph.map(x=>'<div class="port">'+icon('rows')+'<span class="mono">'+esc(x)+'</span><span class="pk">messages</span></div>').join('')}
+function setOutput(o){const p=byId(route().id);p.output=o;render();toast('Output type → '+o)}
+function setModel(id){const p=byId(route().id);p.model=id;render()}
+function segInput(i,ta){const p=byId(route().id);const val=ta.value;if(p.kind==='chat')p.messages[i].text=val;else p.body=val;
+ const bd=document.getElementById('bd'+i);if(bd)bd.innerHTML=hl(val);
+ const ii=document.getElementById('insp-inputs');if(ii)ii.innerHTML=inputsHtml(p);
+ const m=model(p.model);const t=tokEst(tpl(p));const pct=Math.min(100,Math.round(t/m.ctx*1000)/10);const ib=document.getElementById('insp-budget');
+ if(ib)ib.innerHTML='<div class="budgetbar"><i style="width:'+Math.max(2,pct)+'%"></i></div><div class="metrics"><span>'+t+' tok</span><span>'+pct+'% of '+(m.ctx/1000)+'k ctx</span><span>~'+money(t/1e6*m.inP)+' / run</span></div>'}
+function segBlur(i,ta){const p=byId(route().id);const last=p.versions[0];if(tpl(p)!==last.tpl){p.version++;p.versions.unshift({v:p.version,tag:null,when:'just now',author:'Amaan K',note:'Edited in canvas',tpl:tpl(p)});toast('Saved as v'+p.version+' — every save is a version','save');const hdr=document.querySelector('.header');if(hdr)render()}}
+function snapUndo(){const p=byId(route().id);S.undoStack.push(JSON.stringify(p.kind==='chat'?p.messages:p.body));if(S.undoStack.length>30)S.undoStack.shift()}
+function doUndo(){const p=byId(route().id);if(!S.undoStack.length)return toast('Nothing to undo','undo');S.redoStack.push(JSON.stringify(p.kind==='chat'?p.messages:p.body));const s=JSON.parse(S.undoStack.pop());if(p.kind==='chat')p.messages=s;else p.body=s;render();toast('Undid last change','undo')}
+function doRedo(){const p=byId(route().id);if(!S.redoStack.length)return toast('Nothing to redo','redo');S.undoStack.push(JSON.stringify(p.kind==='chat'?p.messages:p.body));const s=JSON.parse(S.redoStack.pop());if(p.kind==='chat')p.messages=s;else p.body=s;render();toast('Redid change','redo')}
+function addMsg(){const p=byId(route().id);snapUndo();p.messages.push({role:'user',text:''});render();const tas=document.querySelectorAll('.canvas textarea');if(tas.length)tas[tas.length-1].focus()}
+let DRAG={from:null};
+function segDragStart(e,i){DRAG.from=i;e.dataTransfer.effectAllowed='move';const el=e.target.closest('.seg-msg,.phchip');if(el)el.classList.add('dragging')}
+function segDragOver(e,i){if(DRAG.from===null)return;e.preventDefault();document.querySelectorAll('.dragover').forEach(x=>x.classList.remove('dragover'));const el=e.target.closest('.seg-msg,.phchip');if(el&&i!==DRAG.from)el.classList.add('dragover')}
+function segDrop(e,i){e.preventDefault();const p=byId(route().id);if(DRAG.from===null||p.kind!=='chat'){DRAG.from=null;return}if(DRAG.from!==i){snapUndo();const[m]=p.messages.splice(DRAG.from,1);p.messages.splice(i,0,m)}DRAG.from=null;render()}
+function segDragEnd(){DRAG.from=null;document.querySelectorAll('.dragging,.dragover').forEach(x=>x.classList.remove('dragging','dragover'))}
+function streamInto(el,text,cb){el.classList.add('streaming');el.textContent='';const n=Math.max(2,Math.round(text.length/36));let i=0;const step=()=>{if(i>=text.length){el.classList.remove('streaming');cb&&cb()}else{i=Math.min(text.length,i+n);el.textContent=text.slice(0,i);S.timers.push(setTimeout(step,26))}};step()}
+function animateCounts(){document.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count,pre=el.dataset.pre||'',suf=el.dataset.suf||'';let s=0;const N=16;const t=()=>{s++;el.textContent=pre+Math.round(to*Math.min(1,s/N)).toLocaleString()+suf;if(s<N)S.timers.push(setTimeout(t,16))};t()})}
+function addPh(){const p=byId(route().id);snapUndo();p.messages.push({ph:'chat_history'});render();toast('Placeholder added — it injects a conversation at run time','rows')}
+function segMenu(e,i){e.preventDefault();e.stopPropagation();const p=byId(route().id);const isPh=p.kind==='chat'&&p.messages[i]&&p.messages[i].ph;
+ openMenu(e,'<button class="mi" onclick="mvSeg('+i+',-1)">'+icon('chevD')+'Move up</button><button class="mi" onclick="mvSeg('+i+',1)">'+icon('chevD')+'Move down</button><button class="mi" onclick="dupSeg('+i+')">'+icon('copy')+'Duplicate</button><button class="mi" onclick="cpSeg('+i+')">'+icon('copy')+'Copy text</button><div class="msep"></div><button class="mi" onclick="insRefMenu(event,'+i+')">'+icon('braces')+'Insert reference…</button><button class="mi" onclick="convSeg('+i+')">'+icon('rows')+(isPh?'Convert to message':'Convert to placeholder')+'</button><div class="msep"></div><button class="mi danger" onclick="delSeg('+i+')">'+icon('trash')+'Delete</button>')}
+function mvSeg(i,d){closeMenus();const p=byId(route().id);if(p.kind!=='chat')return;const j=i+d;if(j<0||j>=p.messages.length)return;snapUndo();[p.messages[i],p.messages[j]]=[p.messages[j],p.messages[i]];render()}
+function dupSeg(i){closeMenus();const p=byId(route().id);if(p.kind!=='chat')return;snapUndo();p.messages.splice(i,0,JSON.parse(JSON.stringify(p.messages[i])));render()}
+function cpSeg(i){closeMenus();toast('Copied to clipboard','copy')}
+function delSeg(i){closeMenus();const p=byId(route().id);if(p.kind!=='chat')return;snapUndo();p.messages.splice(i,1);render()}
+function convSeg(i){closeMenus();const p=byId(route().id);if(p.kind!=='chat')return;snapUndo();const m=p.messages[i];p.messages[i]=m.ph?{role:'user',text:''}:{ph:'chat_history'};render()}
+function insRefMenu(e,i){closeMenus();openMenu(e,PROMPTS.filter(x=>x.id!==route().id&&!x.archived).map(x=>'<button class="mi" onclick="insRef('+i+',\''+x.id+'\')">'+icon('braces')+esc(x.name)+'</button>').join(''))}
+function insRef(i,id){closeMenus();const p=byId(route().id);snapUndo();if(p.kind==='chat'){if(p.messages[i]&&!p.messages[i].ph)p.messages[i].text+=' [[ref:'+id+']]'}else p.body+=' [[ref:'+id+']]';render();toast('Reference to '+id+' inserted','braces')}
+function previewDlg(){const p=byId(route().id);let t=tpl(p);refs(p).forEach(r=>{if(r.ok)t=t.split('[[ref:'+r.name+']]').join('« '+byId(r.name).body+' »')});
+ openDialog('<h3>Preview — assembled prompt</h3><p class="sub">References resolved · variables left as slots</p><div class="exportpre" style="white-space:pre-wrap">'+hl(t)+'</div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Close</button></div>')}
+
+/* ================= quick run ================= */
+function qrPanel(p){const m=model(p.model);const vlist=vars(p),plist=phs(p);
+ const fields=vlist.map(v=>'<div class="field"><label>{{'+esc(v)+'}}</label><input class="inp qr-in" data-v="'+esc(v)+'" placeholder="value for '+esc(v)+'"></div>').join('')+plist.map(v=>'<div class="field"><label>'+esc(v)+' (one message per line)</label><textarea class="inp qr-in" data-v="'+esc(v)+'" style="height:56px;padding:6px 10px" placeholder="user: my invoice is wrong&#10;assistant: happy to help"></textarea></div>').join('');
+ return '<div class="qr'+(S.qr?' show':'')+'"><h3>'+icon('zap')+'Quick run <span class="ctxnote" style="margin-left:auto;font-weight:400">v'+p.version+'</span><button class="iconbtn" onclick="toggleQr()">'+icon('x')+'</button></h3>'+
+ '<div class="field"><label>Model</label><select class="inp" id="qr-model" onchange="setModel(this.value)">'+MODELS.map(x=>'<option'+(x.id===p.model?' selected':'')+'>'+x.id+'</option>').join('')+'</select></div>'+
+ '<div class="field"><label>Temperature · <span class="mono" id="qr-tv">'+p.temp+'</span></label><input type="range" min="0" max="1" step="0.05" value="'+p.temp+'" oninput="document.getElementById(\'qr-tv\').textContent=this.value"></div>'+
+ '<div class="field"><label>Max length</label><input class="inp" value="'+p.maxTok+'" id="qr-max"></div>'+fields+
+ '<div class="field"><label>Attachments '+(m.vision?'':'(not supported by '+esc(p.model)+')')+'</label><div class="attach" '+(m.vision?'onclick="addAttach(this)" style="cursor:pointer"':'style="opacity:.5"')+'>'+icon('upload')+'<span id="qr-att">Drop an image / PDF here'+(m.vision?' or click to add':'')+'</span></div></div>'+
+ '<button class="btn primary" style="width:100%" id="qr-go" onclick="runQuick()">'+icon('play')+'Run</button>'+
+ '<div style="margin-top:12px"><div class="out" id="qr-out">Run to preview. This run is temporary — Capture it to keep it.</div><div class="metrics" id="qr-met"></div></div>'+
+ '<button class="btn outline sm" style="width:100%;margin-top:10px" onclick="captureQr()">'+icon('save')+'Capture</button></div>'}
+function toggleQr(){S.qr=!S.qr;render()}
+function addAttach(el){document.getElementById('qr-att').innerHTML='<span class="chip">'+icon('file')+'screenshot.png · 210 KB</span>';toast('Attachment added (mock)','file')}
+function mockOut(p,vals){if(p.id==='support-triage')return classify(vals.message||'');
+ if(p.id==='tone-rewriter')return 'Hi there! Thanks so much for reaching out — '+(vals.message||'your message')+' We are on it and will follow up shortly. (rewritten in a '+(vals.tone||'friendly')+' tone)';
+ if(p.id==='escalation-detector')return '{"escalate": false, "reason": "routine request, no risk signals"}';
+ if(p.output==='JSON')return '{"result": "ok"}';return 'Mock output for '+p.name+' with inputs '+JSON.stringify(vals)}
+function runQuick(){const p=byId(route().id);const out=document.getElementById('qr-out');const vals={};document.querySelectorAll('.qr-in').forEach(i=>vals[i.dataset.v]=i.value);
+ out.className='out';out.innerHTML=icon('clock','spin')+' Running on '+esc(p.model)+'…';const met0=document.getElementById('qr-met');if(met0)met0.innerHTML='';
+ S.timers.push(setTimeout(()=>{const o=mockOut(p,vals);S.qrRun={vals,o};out.className='out filled';
+ streamInto(out,o,()=>{const ti=tokEst(tpl(p))+tokEst(Object.values(vals).join(' ')),to=tokEst(o);const m=model(p.model);
+ document.getElementById('qr-met').innerHTML='<span>'+ti+' in · '+to+' out tok</span><span>'+money((ti*m.inP+to*m.outP)/1e6)+'</span><span>0.9s</span>';
+ p.runs++;p.lastRun={s:'ok',t:'just now'};toast('Quick run finished — temporary until captured','zap')})},650))}
+function captureQr(){if(!S.qrRun)return toast('Nothing to capture yet — run first','save');const p=byId(route().id);RUNS.unshift({id:'r'+(400+RUNS.length),label:'#'+(412+RUNS.length)+' · quick · v'+p.version+' · just now',prompt:p.id});toast('Captured — it now appears under past runs','save')}
+
+/* ================= run mode ================= */
+function runScreen(p){
+ if(S.runMode==='single')return singleRun(p);
+ if(S.runMode==='batch')return batchRun(p);
+ return compareRun(p)}
+function singleRun(p){const vlist=vars(p),plist=phs(p);
+ return '<div class="runwrap" style="max-width:720px"><div class="card"><h4>Inputs</h4>'+vlist.map(v=>'<div class="field"><label>{{'+esc(v)+'}}</label><input class="inp sr-in" data-v="'+esc(v)+'" placeholder="value for '+esc(v)+'"></div>').join('')+plist.map(v=>'<div class="field"><label>'+esc(v)+'</label><textarea class="inp sr-in" data-v="'+esc(v)+'" style="height:56px;padding:6px 10px"></textarea></div>').join('')+
+ '<button class="btn primary" onclick="doSingle()">'+icon('play')+'Run v'+p.version+' on '+esc(p.model)+'</button></div>'+
+ '<div class="card"><h4>Output</h4><div class="out" id="sr-out" style="border:1px dashed var(--input);border-radius:8px;min-height:90px;padding:12px;font-size:13px;color:var(--muted-foreground)">Fill the inputs and run.</div><div class="metrics" id="sr-met"></div></div></div>'}
+function doSingle(){const p=byId(route().id);const vals={};document.querySelectorAll('.sr-in').forEach(i=>vals[i.dataset.v]=i.value);const out=document.getElementById('sr-out');out.innerHTML=icon('clock','spin')+' Running…';
+ S.timers.push(setTimeout(()=>{const o=mockOut(p,vals);out.style.color='var(--foreground)';out.style.fontFamily='var(--mono)';
+ streamInto(out,o,()=>{const m=model(p.model);const ti=tokEst(tpl(p)),to=tokEst(o);document.getElementById('sr-met').innerHTML='<span>'+ti+' in · '+to+' out tok</span><span>'+money((ti*m.inP+to*m.outP)/1e6)+'</span><span>1.1s</span>';p.runs++;p.lastRun={s:'ok',t:'just now'};toast('Run finished')})},700))}
+function batchRun(p){const B=S.batch;
+ const inputs='<div class="card"><h4>Input sets · '+B.inputs.length+'</h4><div style="max-height:170px;overflow:auto">'+B.inputs.map((t,i)=>'<div class="port"><span class="mono" style="color:var(--muted-foreground)">'+(i+1)+'</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t)+'</span></div>').join('')+'</div><div class="addrow"><button class="btn outline sm" onclick="addInput()">'+icon('plus')+'Add row</button><button class="btn outline sm" onclick="loadMenu(event)">'+icon('db')+'Load from Dataset</button><button class="btn ghost sm" onclick="toast(\'Paste rows (mock)\',\'copy\')">'+icon('copy')+'Paste</button><button class="btn primary sm" style="margin-left:auto" onclick="doBatch()">'+icon('play')+'Run '+B.inputs.length+' inputs</button></div></div>';
+ let table='';
+ if(B.results.length){table='<div class="resulttable">'+B.results.map((r,i)=>'<div class="rrow" onclick="inspectDlg('+i+')"><div class="rcell" style="width:44px"><span class="statdot '+(r.s==='ok'?'ok':r.s==='err'?'err':'run')+'"></span></div><div class="rcell" style="flex:1.1"><span class="outprev" style="color:var(--muted-foreground)">'+esc(r.input)+'</span></div><div class="rcell" style="flex:.6"><span class="outprev"><b>'+esc(r.out||'…')+'</b></span></div><div class="rcell mono" style="width:150px;font-size:11.5px;color:var(--muted-foreground)">'+(r.out?r.tok+' tok · '+money(r.cost)+' · '+r.ms+'ms':'')+'</div><div class="rcell" style="width:40px"><button class="iconbtn" onclick="event.stopPropagation();resMenu(event,'+i+')">'+icon('more')+'</button></div></div>').join('')+'</div><div class="addrow" style="margin-top:10px"><button class="btn outline sm" onclick="captureAll()">'+icon('save')+'Capture all</button><span class="ctxnote" style="align-self:center">'+B.results.filter(r=>r.s==='err').length+' flagged — click any row to inspect</span></div>'}
+ return '<div class="runwrap">'+inputs+table+'</div>'}
+function addInput(){if(route().scr!=='editor')return;S.runMode==='single'?toast('Single mode has one input set — switch to Batch','plus'):0;S.batch.inputs.push(TICKETS[S.batch.inputs.length%50].text);render()}
+function loadMenu(e){openMenu(e,DATASETS.map(d=>'<button class="mi" onclick="loadDs(\''+d.name+'\','+d.rows+')">'+icon('db')+esc(d.name)+' <span class="cat">'+d.rows+' rows</span></button>').join(''))}
+function loadDs(name,rows){closeMenus();S.batch.inputs=TICKETS.slice(0,rows).map(t=>t.text);S.batch.results=[];S.batch.loadedAll=true;S.runMode='batch';render();toast('Loaded '+rows+' rows from '+name,'db')}
+function doBatch(){const p=byId(route().id);const B=S.batch;B.results=B.inputs.map(t=>({input:t,out:null,s:'run'}));render();
+ B.inputs.forEach((t,i)=>{S.timers.push(setTimeout(()=>{const truth=TICKETS.find(x=>x.text===t);const wrong=i===13;const o=wrong?'other':(p.id==='support-triage'?classify(t):mockOut(p,{message:t}));
+ const m=model(p.model);const tok=tokEst(tpl(p))+tokEst(t)+4;B.results[i]={input:t,out:o,s:(truth&&o!==truth.cat)?'err':'ok',tok,cost:(tok*m.inP+6*m.outP)/1e6,ms:640+((i*97)%800)};
+ if(i===B.inputs.length-1){p.runs+=B.inputs.length;p.lastRun={s:'ok',t:'just now'};toast('Batch finished · '+B.results.filter(r=>r.s==='err').length+' flagged','check')}
+ if(route().mode==='run'&&S.runMode==='batch')render()},250+i*90))})}
+function runNow(){S.runMode==='batch'?doBatch():S.runMode==='compare'?doCompare():doSingle()}
+function stopRun(){S.timers.forEach(clearTimeout);S.timers=[];toast('Stopped','stop')}
+function resMenu(e,i){openMenu(e,'<button class="mi" onclick="closeMenus();inspectDlg('+i+')">'+icon('scan')+'Inspect</button><button class="mi" onclick="closeMenus();toast(\'Result captured\',\'save\')">'+icon('save')+'Capture this</button><button class="mi" onclick="closeMenus();toast(\'Added to dataset helpdesk-tickets-2026-06\',\'db\')">'+icon('db')+'Add to Dataset</button><button class="mi" onclick="closeMenus();toast(\'Output copied\',\'copy\')">'+icon('copy')+'Copy output</button><button class="mi" onclick="closeMenus();toast(\'Marked winner\',\'check\')">'+icon('check')+'Mark winner</button>')}
+function inspectDlg(i){const p=byId(route().id);const r=S.batch.results[i]||{input:'(sample)',out:'billing',tok:220,cost:.0011,ms:812};let asm=tpl(p);refs(p).forEach(x=>{if(x.ok)asm=asm.split('[[ref:'+x.name+']]').join(byId(x.name).body)});asm=asm.replace(/\{\{\s*[\w.]+\s*\}\}/g,r.input);
+ const req={model:p.model,temperature:p.temp,max_tokens:p.maxTok,messages:[{role:'system',content:'…'},{role:'user',content:r.input}]};
+ const res={id:'msg_01Xq…',content:r.out,usage:{input_tokens:r.tok,output_tokens:6,cache_read_tokens:118}};
+ openDialog('<h3>Inspect result</h3><p class="sub">'+esc(r.input)+'</p>'+
+ '<div class="tabs" style="margin-bottom:12px"><button class="tab on" onclick="inspTab(this,\'i-asm\')">Assembled prompt</button><button class="tab" onclick="inspTab(this,\'i-req\')">Request</button><button class="tab" onclick="inspTab(this,\'i-res\')">Response</button></div>'+
+ '<div id="i-asm" class="exportpre" style="white-space:pre-wrap">'+esc(asm)+'</div>'+
+ '<div id="i-req" class="exportpre" style="display:none">'+esc(JSON.stringify(req,null,2))+'</div>'+
+ '<div id="i-res" class="exportpre" style="display:none">'+esc(JSON.stringify(res,null,2))+'</div>'+
+ '<div class="stats" style="margin-top:12px"><div class="stat"><div class="k">Input tok</div><div class="v">'+r.tok+'</div></div><div class="stat"><div class="k">Output</div><div class="v">6</div></div><div class="stat"><div class="k">Cached</div><div class="v">118</div></div><div class="stat"><div class="k">Cost</div><div class="v">'+money(r.cost)+'</div></div><div class="stat"><div class="k">Latency</div><div class="v">'+r.ms+'ms</div></div></div>'+
+ '<h4 style="font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted-foreground);margin:8px 0 6px">Timeline</h4><div class="timeline">'+[['assemble template',6],['resolve references',4],['provider request',r.ms-80],['stream + parse',70]].map(s=>'<div class="tl"><span class="nm">'+s[0]+'</span><span class="bar" style="width:'+Math.max(3,s[1]/10)+'%;min-width:3px"></span><span>'+s[1]+'ms</span></div>').join('')+'</div>'+
+ '<div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Close</button></div>','wide')}
+function inspTab(btn,id){document.querySelectorAll('.dialog .tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');['i-asm','i-req','i-res'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none')}
+
+/* ================= compare ================= */
+function addVariant(){if(S.cmp.cols.length>=3)return toast('Compare supports up to 3 variants','cols');const p=byId(route().id);S.cmp.cols.push({ver:p.version,model:p.model});S.runMode='compare';render()}
+function compareRun(p){const C=S.cmp;const inputs=S.batch.inputs.slice(0,8);
+ const cols=C.cols.map((c,ci)=>{
+  const won=inputs.filter((t,ri)=>C.wins[ri+':'+ci]).length;const winTally=(C.ran&&won)?'<span class="cmp-tally">'+icon('check')+won+' winner'+(won>1?'s':'')+'</span>':'';
+  const head='<div class="ch"><select class="inp" style="height:26px;width:auto;font-size:12px" onchange="S.cmp.cols['+ci+'].ver=+this.value;S.cmp.ran=false;render()">'+p.versions.map(v=>'<option value="'+v.v+'"'+(v.v===c.ver?' selected':'')+'>v'+v.v+'</option>').join('')+'</select><select class="inp" style="height:26px;width:auto;font-size:12px" onchange="S.cmp.cols['+ci+'].model=this.value;S.cmp.ran=false;render()">'+MODELS.map(m=>'<option'+(m.id===c.model?' selected':'')+'>'+m.id+'</option>').join('')+'</select>'+(C.cols.length>2?'<button class="iconbtn" onclick="S.cmp.cols.splice('+ci+',1);render()">'+icon('x')+'</button>':'')+winTally+'</div>';
+  const cells=inputs.map((t,ri)=>{
+   if(!C.ran)return '<div class="cmpcell ctxnote">—</div>';
+   const truth=TICKETS.find(x=>x.text===t);const bad=c.ver<12&&(ri===3||ri===6);const o=bad?'other':classify(t);
+   let body=esc(o);if(C.diff&&ci>0){const base=(C.cols[0].ver<12&&(ri===3||ri===6))?'other':classify(t);body=diffWords(base,o)}
+   const key=ri+':'+ci;const won=C.wins[key];
+   return '<div class="cmpcell"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:4px"><span class="ctxnote" style="font-size:10.5px">'+esc(t.slice(0,42))+'…</span><button class="win" style="'+(won?'background:var(--success);color:#08131f':'')+'" onclick="S.cmp.wins[\''+key+'\']=!S.cmp.wins[\''+key+'\'];render()">'+icon('check')+'winner</button></div>'+body+'<div class="metrics"><span>'+(140+ri*3)+' tok</span><span>'+money(0.0009+ri*0.0001)+'</span><span>'+(700+ri*41)+'ms</span></div></div>'}).join('');
+  return '<div class="cmpcol">'+head+cells+'</div>'}).join('');
+ return '<div class="runwrap"><div class="addrow" style="margin-bottom:4px"><label style="display:flex;gap:7px;align-items:center;font-size:12.5px"><input type="checkbox" '+(C.diff?'checked':'')+' onchange="S.cmp.diff=this.checked;render()"> diff vs first column</label><span class="ctxnote" style="align-self:center">running '+inputs.length+' of '+S.batch.inputs.length+' inputs per column</span><button class="btn primary sm" style="margin-left:auto" onclick="doCompare()">'+icon('play')+'Run all columns</button><button class="btn outline sm" onclick="toast(\'Handing off to Evaluate ▸ Experiments (separate feature)\',\'flask\')">'+icon('flask')+'Run as Experiment</button></div><div class="cmp" style="grid-template-columns:repeat('+C.cols.length+',1fr)">'+cols+'</div></div>'}
+function doCompare(){S.cmp.ran=true;render();toast('Compared '+S.cmp.cols.map(c=>'v'+c.ver).join(' vs '),'cols')}
+
+/* ================= compress ================= */
+const STOPW=new Set(['the','a','an','and','or','so','that','very','really','just','quite','rather','please','kindly','always','reasonably','are','able','to','be','it','they','was','were','is','of','in','for','with','as','make','sure']);
+function toggleCompress(){S.compress=S.compress?null:{method:'llmlingua2',target:'rate',rate:60,tok:280,digits:true,done:null};render()}
+function compressScreen(p){const C=S.compress;const src=tpl(p);
+ const methods=[['llmlingua','LLMLingua','Classic budget-driven compression. Balanced quality and shrink.'],['longllmlingua','LongLLMLingua','Question-aware — keeps what matters for a specific question in long context.'],['llmlingua2','LLMLingua-2','Fast task-agnostic distillation. Best default for prompts like this.']];
+ let prev='';let stats='';
+ if(C.done){prev=C.done.parts.map(x=>x.p==='var'?'<span class="keepvar">'+esc(x.t)+'</span>':x.p==='ref'?'<span class="keepref">'+esc(x.t)+'</span>':x.cut?'<span class="cut">'+esc(x.t)+'</span>':esc(x.t)).join(' ');
+  const m=model(p.model);const saved=C.done.before-C.done.after;
+  stats='<div class="stats"><div class="stat"><div class="k">Before</div><div class="v">'+C.done.before+' tok</div></div><div class="stat"><div class="k">After</div><div class="v">'+C.done.after+' tok</div></div><div class="stat"><div class="k">Saved</div><div class="v good" data-count="'+saved+'" data-pre="−" data-suf=" tok">−'+saved+' tok</div></div><div class="stat"><div class="k">Shrink</div><div class="v good" data-count="'+Math.round(saved/C.done.before*100)+'" data-suf="%">'+Math.round(saved/C.done.before*100)+'%</div></div><div class="stat"><div class="k">Cost saved</div><div class="v good">'+money(saved*m.inP/1e6*1000)+' / 1k runs</div></div></div>'}
+ else prev='<span class="ctxnote">Pick a method and target, then press Compress. {{variables}} and references are always protected — never removed.</span>';
+ return '<div class="canvas" style="padding:22px 26px"><div class="addrow" style="margin-bottom:14px"><b style="font-size:15px">'+icon('shrink')+' Compress prompt</b><span class="ctxnote" style="align-self:center">shortens the prompt; meaning kept, slots protected</span></div>'+
+ '<div class="methods">'+methods.map(m=>'<div class="mcard'+(C.method===m[0]?' on':'')+'" onclick="S.compress.method=\''+m[0]+'\';S.compress.done=null;render()"><b>'+icon('shrink')+m[1]+'</b><p>'+m[2]+'</p></div>').join('')+'</div>'+
+ (C.method==='longllmlingua'?'<div class="field" style="max-width:520px"><label>Question (what should the compressed prompt still answer?)</label><input class="inp" id="cq" placeholder="e.g. what tone should the reply use?"></div>':'')+
+ '<div class="card" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><div class="tgl" style="width:260px"><button class="'+(C.target==='rate'?'on':'')+'" onclick="S.compress.target=\'rate\';render()">Keep-rate</button><button class="'+(C.target==='tok'?'on':'')+'" onclick="S.compress.target=\'tok\';render()">Target tokens</button></div>'+
+ (C.target==='rate'?'<div style="flex:1;min-width:220px"><label class="ctxnote">keep ~<b id="crv">'+C.rate+'</b>%</label><input type="range" min="20" max="95" value="'+C.rate+'" oninput="S.compress.rate=+this.value;document.getElementById(\'crv\').textContent=this.value"></div>':'<input class="inp" style="width:130px" value="'+C.tok+'" onchange="S.compress.tok=+this.value">')+
+ '<label style="display:flex;gap:7px;align-items:center;font-size:12.5px"><input type="checkbox" '+(C.digits?'checked':'')+' onchange="S.compress.digits=this.checked"> Preserve digits</label>'+
+ '<button class="btn '+(C.done?'outline':'primary')+'" onclick="doCompress()">'+icon('shrink')+(C.done?'Re-compress':'Compress')+'</button></div>'+stats+
+ '<div class="cprev">'+prev+'</div>'+
+ '<div class="dlg-foot" style="justify-content:flex-start"><button class="btn outline" onclick="toggleCompress()">Cancel</button><button class="btn primary" '+(C.done?'':'disabled')+' onclick="applyCompress()">'+icon('check')+'Apply compression</button></div></div>'}
+function doCompress(){const p=byId(route().id);const C=S.compress;const src=tpl(p);
+ const raw=src.split(/\s+/).filter(Boolean);const parts=raw.map(w=>{if(/^\{\{.*\}\}[.,:]?$/.test(w))return{t:w,p:'var'};if(/^\[\[ref:.*\]\]$/.test(w))return{t:w,p:'ref'};if(C.digits&&/\d/.test(w))return{t:w,p:'num'};return{t:w}});
+ const free=parts.filter(x=>!x.p);const keepGoal=C.target==='rate'?Math.round(raw.length*C.rate/100):Math.min(raw.length,Math.round(C.tok/1.33));
+ let toCut=Math.max(0,raw.length-keepGoal);
+ for(const x of free){if(toCut<=0)break;if(STOPW.has(x.t.toLowerCase().replace(/[^\w]/g,''))){x.cut=true;toCut--}}
+ for(let i=0;i<free.length&&toCut>0;i+=2){if(!free[i].cut){free[i].cut=true;toCut--}}
+ const before=tokEst(src);const after=tokEst(parts.filter(x=>!x.cut).map(x=>x.t).join(' '));
+ C.done={parts,before,after};render();toast('Compressed — review the preview, protected slots untouched','shrink')}
+function applyCompress(){const p=byId(route().id);const C=S.compress;if(!C.done)return;const nt=C.done.parts.filter(x=>!x.cut).map(x=>x.t).join(' ');
+ snapUndo();if(p.kind==='chat'){p.messages=[{role:'system',text:nt}]}else p.body=nt;
+ p.version++;p.versions.unshift({v:p.version,tag:null,when:'just now',author:'Amaan K',note:'Applied '+C.method+' compression (−'+Math.round((C.done.before-C.done.after)/C.done.before*100)+'%)',tpl:nt});
+ S.compress=null;render();toast('Applied as v'+p.version+' — old version kept in history','save')}
+
+/* ================= manage mode ================= */
+function manageScreen(p){
+ const vers='<div class="table">'+p.versions.map(v=>'<div class="vrow"><b class="mono" style="width:44px">v'+v.v+'</b><span style="width:118px">'+envBadge(v.tag)+'</span><span style="flex:1" class="ctxnote">'+esc(v.note)+'</span><span class="ctxnote" style="width:130px">'+v.when+' · '+esc(v.author.split(' ')[0])+'</span><button class="iconbtn" onclick="verMenu(event,\''+p.id+'\','+v.v+')">'+icon('more')+'</button></div>').join('')+'</div>';
+ const acc='<div class="table">'+MEMBERS.map((m,i)=>'<div class="member"><span class="avatar">'+m.n.split(' ').map(x=>x[0]).join('')+'</span><span style="flex:1"><b style="font-size:13px">'+esc(m.n)+'</b><br><span class="ctxnote">'+esc(m.e)+'</span></span><select class="inp" style="width:110px;height:30px" onchange="MEMBERS['+i+'].role=this.value;toast(\''+esc(m.n)+' → \'+this.value)"><option'+(m.role==='Owner'?' selected':'')+'>Owner</option><option'+(m.role==='Editor'?' selected':'')+'>Editor</option></select><button class="iconbtn" onclick="memMenu(event,'+i+')">'+icon('more')+'</button></div>').join('')+'</div><div class="addrow"><button class="btn outline sm" onclick="inviteDlg()">'+icon('plus')+'Invite member</button><span class="ctxnote" style="align-self:center">Roles are project-scoped.</span></div>';
+ return '<div class="managewrap">'+
+ '<div class="msec"><h3>'+icon('file')+'Details</h3><div class="card"><div class="field"><label>Name</label><input class="inp" value="'+esc(p.name)+'" onchange="commitRename(\''+p.id+'\',this.value)"></div><div class="field"><label>Description</label><input class="inp" value="'+esc(p.desc)+'" onchange="byId(\''+p.id+'\').desc=this.value;toast(\'Description saved\')"></div><div class="field"><label>Labels</label><div class="addrow" style="flex-wrap:wrap">'+p.labels.map((l,i)=>'<span class="tagpill">'+esc(l)+' <a style="cursor:pointer;margin-left:4px" onclick="byId(\''+p.id+'\').labels.splice('+i+',1);render()">✕</a></span>').join('')+'<button class="btn ghost sm" onclick="labelsDlg(\''+p.id+'\')">'+icon('tag')+'Manage tags</button></div></div></div></div>'+
+ '<div class="msec"><h3>'+icon('clock')+'Versions</h3>'+vers+'</div>'+
+ (p.evaluator?'<div class="msec"><h3>'+icon('flask')+'Evaluators</h3><div class="card"><b style="font-size:13px">Used as an LLM judge</b><p class="ctxnote">This prompt grades outputs of other prompts in Evaluate ▸ Experiments (escalation-risk rubric).</p></div></div>':'')+
+ '<div class="msec"><h3>'+icon('db')+'Associated datasets</h3><div class="card">'+(p.id==='support-triage'?'<div class="port">'+icon('db')+'<span>helpdesk-tickets-2026-06</span><span class="pk">50 rows · read-only</span></div>':'<p class="ctxnote">No datasets linked yet — capture batch results to create one.</p>')+'</div></div>'+
+ '<div class="msec"><h3>'+icon('users')+'Access</h3>'+acc+'</div>'+
+ '<div class="msec"><h3>'+icon('sliders')+'Settings</h3>'+
+ '<div class="dcard"><div class="info"><b>Archive this prompt</b><p>Hidden from the list; history preserved; restorable anytime.</p></div><button class="btn outline" onclick="archiveDlg(\''+p.id+'\')">'+icon('archive')+(p.archived?'Unarchive':'Archive')+'</button></div>'+
+ '<div class="dcard red"><div class="info"><b>Delete this prompt</b><p>Permanently deletes '+esc(p.name)+' and all its versions. Cannot be undone.</p></div><button class="btn destructive" onclick="deleteDlg(\''+p.id+'\')">'+icon('trash')+'Delete</button></div>'+
+ '<div class="dcard"><div class="info"><b>Optimize with DSPy</b><p>Machine-search better wordings against a metric — opens the Learn feature.</p></div><button class="btn outline" onclick="toast(\'Optimize flow lives in Learn — out of scope for this mock\',\'sparkles\')">'+icon('sparkles')+'Optimize</button></div></div></div>'}
+function verMenu(e,id,v){openMenu(e,'<button class="mi" onclick="closeMenus();diffDlg(\''+id+'\','+v+')">'+icon('cols')+'Diff vs current</button><button class="mi" onclick="closeMenus();restoreVer(\''+id+'\','+v+')">'+icon('undo')+'Restore</button><button class="mi" onclick="closeMenus();promoteDlg(\''+id+'\','+v+')">'+icon('upload')+'Promote</button>')}
+function memMenu(e,i){openMenu(e,'<button class="mi danger" onclick="closeMenus();MEMBERS.splice('+i+',1);render();toast(\'Member removed\')">'+icon('trash')+'Remove</button>')}
+function restoreVer(id,v){const p=byId(id);const old=p.versions.find(x=>x.v===v);p.version++;p.versions.unshift({v:p.version,tag:null,when:'just now',author:'Amaan K',note:'Restored from v'+v,tpl:old.tpl});
+ if(p.kind==='text')p.body=old.tpl.split('\n\n').pop();toast('Restored v'+v+' as v'+p.version+' — nothing was overwritten','undo');render()}
+function diffDlg(id,v){const p=byId(id);const old=p.versions.find(x=>x.v===v);const cur=p.versions[0];
+ openDialog('<h3>Diff — v'+v+' → v'+cur.v+'</h3><p class="sub"><span class="diffdel">removed</span> · <span class="diffadd">added</span></p><div class="exportpre" style="white-space:pre-wrap;line-height:1.7">'+diffWords(old.tpl,cur.tpl)+'</div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Close</button></div>','wide')}
+function inviteDlg(){openDialog('<h3>Invite member</h3><p class="sub">Roles are project-scoped.</p><div class="field"><label>Email</label><input class="inp" id="inv-e" placeholder="name@acme.com"></div><div class="field"><label>Role</label><select class="inp" id="inv-r"><option>Editor</option><option>Owner</option></select></div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doInvite()">Invite</button></div>')}
+function doInvite(){const e=document.getElementById('inv-e').value||'new@acme.com';MEMBERS.push({n:e.split('@')[0],e,role:document.getElementById('inv-r').value});closeDlg();render();toast('Invited '+e,'users')}
+
+/* ================= dialogs ================= */
+function openDialog(html,cls){document.getElementById('overlays').innerHTML='<div class="scrim show" onclick="if(event.target===this)closeDlg()"><div class="dialog '+(cls||'')+'" role="dialog">'+html+'</div></div>'}
+function closeDlg(){document.getElementById('overlays').innerHTML=''}
+function renameDlg(id){const p=byId(id);openDialog('<h3>Rename prompt</h3><p class="sub">Referenced prompts keep working — references bind by id.</p><div class="field"><input class="inp" id="rn" value="'+esc(p.name)+'"></div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="commitRename(\''+id+'\',document.getElementById(\'rn\').value);closeDlg()">Save</button></div>')}
+function labelsDlg(id){const p=byId(id);const rerun=()=>labelsDlg(id);window._lbl=rerun;
+ openDialog('<h3>Edit labels</h3><p class="sub">Free-form organizing tags — unrelated to environments.</p><div class="addrow" style="flex-wrap:wrap;margin-bottom:12px">'+p.labels.map((l,i)=>'<span class="tagpill">'+esc(l)+' <a style="cursor:pointer;margin-left:4px" onclick="byId(\''+id+'\').labels.splice('+i+',1);window._lbl()">✕</a></span>').join('')+'</div><div class="field"><input class="inp" id="lbl-in" placeholder="team:support, pii, experimental… (Enter to add)" onkeydown="if(event.key===\'Enter\'&&this.value){byId(\''+id+'\').labels.push(this.value.trim());window._lbl()}"></div><div class="dlg-foot"><button class="btn primary" onclick="closeDlg();render();toast(\'Labels saved\',\'tag\')">Done</button></div>')}
+function promoteDlg(id,ver){const p=byId(id);const v=ver||p.version;
+ openDialog('<h3>Promote v'+v+'</h3><p class="sub">Moves the environment pointer — promotion is explicit and audited.</p><div class="field"><label>Target environment</label><select class="inp" id="pr-env"><option>dev</option><option>staging</option><option selected>production</option></select></div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doPromote(\''+id+'\','+v+')">Confirm promote</button></div>')}
+function doPromote(id,v){const p=byId(id);const env=document.getElementById('pr-env').value;p.versions.forEach(x=>{if(x.tag===env)x.tag=null});const tv=p.versions.find(x=>x.v===v);if(tv)tv.tag=env;p.env=highestEnv(p);closeDlg();render();toast('v'+v+' promoted to '+env,'upload')}
+function exportDlg(id){const p=byId(id);window._exp=fmt=>{const data={name:p.name,kind:p.kind,version:p.version,labels:p.labels,output:p.output,template:tpl(p)};
+ const y='name: '+p.name+'\nkind: '+p.kind+'\nversion: '+p.version+'\nlabels: ['+p.labels.join(', ')+']\noutput: '+p.output+'\ntemplate: |\n  '+tpl(p).split('\n').join('\n  ');
+ document.getElementById('exp-pre').textContent=fmt==='json'?JSON.stringify(data,null,2):y;
+ document.querySelectorAll('#exp-tgl button').forEach(b=>b.classList.toggle('on',b.dataset.f===fmt))};
+ openDialog('<h3>Export '+esc(p.name)+'</h3><div class="tgl" id="exp-tgl" style="width:180px;margin-bottom:10px"><button class="on" data-f="json" onclick="window._exp(\'json\')">JSON</button><button data-f="yaml" onclick="window._exp(\'yaml\')">YAML</button></div><div class="exportpre" id="exp-pre"></div><div class="dlg-foot"><button class="btn outline" onclick="toast(\'Copied\',\'copy\')">'+icon('copy')+'Copy</button><button class="btn primary" onclick="toast(\'Downloaded\',\'download\')">'+icon('download')+'Download</button></div>');window._exp('json')}
+function importDlg(){openDialog('<h3>Import prompt</h3><p class="sub">Paste JSON or YAML exported from Keystone.</p><div class="field"><textarea class="inp" style="height:120px;padding:8px" placeholder="paste here…"></textarea></div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="closeDlg();toast(\'Imported (mock)\',\'upload\')">Import</button></div>')}
+function archiveDlg(id){const p=byId(id);if(p.archived){p.archived=false;render();toast('Restored '+p.name,'archive');return}
+ openDialog('<h3>Archive '+esc(p.name)+'?</h3><p class="sub">You can restore it later. Flows that pin it keep working.</p><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn primary" onclick="doArchive(\''+id+'\')">Archive</button></div>')}
+function doArchive(id){const p=byId(id);p.archived=true;closeDlg();go('#/prompts');toast('Archived '+p.name,'archive',{label:'Undo',fn:()=>{p.archived=false;render();toast('Restored '+p.name,'archive')}})}
+function deleteDlg(id){const p=byId(id);
+ openDialog('<h3 style="color:var(--destructive)">Delete '+esc(p.name)+'</h3><p class="sub">This permanently deletes <b>'+esc(p.name)+'</b> and all its versions. This cannot be undone.</p><div class="field"><label>Type <b class="mono">'+esc(p.name)+'</b> to confirm</label><input class="inp" id="del-in" autocomplete="off" oninput="document.getElementById(\'del-go\').disabled=this.value!==\''+esc(p.name)+'\'"></div><div class="dlg-foot"><button class="btn outline" onclick="closeDlg()">Cancel</button><button class="btn destructive" id="del-go" disabled onclick="doDelete(\''+id+'\')">Delete forever</button></div>')}
+function doDelete(id){const i=PROMPTS.findIndex(p=>p.id===id);PROMPTS.splice(i,1);closeDlg();go('#/prompts');render();toast('Deleted — audit event retained','trash')}
+function captureAll(){toast('Captured '+(S.batch.results.length||0)+' results as run #'+(413+RUNS.length),'save');RUNS.unshift({id:'x'+RUNS.length,label:'#'+(413+RUNS.length)+' · batch · just now',prompt:route().id})}
+
+/* ================= command palette ================= */
+function openCmdk(){S.ksel=0;const r=route();const items=[];
+ items.push({g:'Go to',n:'Prompts list',ic:'braces',fn:"go('#/prompts')"});
+ PROMPTS.filter(p=>!p.archived).forEach(p=>items.push({g:'Go to',n:p.name,ic:p.kind==='chat'?'msg':'type',cat:'v'+p.version,fn:"openPrompt('"+p.id+"')"}));
+ items.push({g:'Create',n:'New chat prompt',ic:'msg',fn:"newPrompt('chat')"});
+ items.push({g:'Create',n:'New text prompt',ic:'type',fn:"newPrompt('text')"});
+ if(r.scr==='editor'){const id=r.id;
+  [['Run','play',"go('#/p/"+id+"/run')"],['Compress','shrink',"go('#/p/"+id+"/edit');S.compress={method:'llmlingua2',target:'rate',rate:60,tok:280,digits:true,done:null};render()"],['Compare','cols',"S.runMode='compare';go('#/p/"+id+"/run')"],['Promote','upload',"promoteDlg('"+id+"')"],['Version history','clock',"go('#/p/"+id+"/manage')"],['Edit labels','tag',"labelsDlg('"+id+"')"],['Export','download',"exportDlg('"+id+"')"],['Duplicate','copy',"dupPrompt('"+id+"')"],['Archive','archive',"archiveDlg('"+id+"')"],['Optimize','sparkles',"toast('Optimize lives in Learn','sparkles')"]].forEach(d=>items.push({g:'Do',n:d[0],ic:d[1],cat:byId(id).name,fn:d[2]}));
+  PROMPTS.filter(x=>x.id!==id&&!x.archived).forEach(x=>items.push({g:'Insert reference',n:'Insert reference: '+x.name,ic:'braces',fn:"insRef("+(byId(id).kind==='chat'?0:0)+",'"+x.id+"')"}))}
+ S.recent.forEach(id0=>{const p=byId(id0);if(p)items.push({g:'Recent',n:p.name,ic:'clock',cat:'recent',fn:"openPrompt('"+p.id+"')"})});
+ window._KITEMS=items;
+ document.getElementById('overlays').innerHTML='<div class="scrim show" style="padding-top:12vh" onclick="if(event.target===this)closeDlg()"><div class="cmdk"><div class="cin">'+icon('search')+'<input id="ck-in" placeholder="Search prompts, actions, references…" oninput="drawCmdk(this.value)" autocomplete="off"><kbd>esc</kbd></div><div class="list" id="ck-list"></div><div class="cfoot"><span><kbd>↑↓</kbd> navigate</span><span><kbd>↵</kbd> select</span><span><kbd>esc</kbd> close</span></div></div></div>';
+ drawCmdk('');document.getElementById('ck-in').focus()}
+function kfilter(q){return window._KITEMS.filter(i=>!q||i.n.toLowerCase().includes(q.toLowerCase()))}
+function drawCmdk(q){const list=kfilter(q);let g='';S.ksel=Math.min(S.ksel,Math.max(0,list.length-1));
+ document.getElementById('ck-list').innerHTML=list.map((i,idx)=>{const gl=i.g!==g?'<div class="glabel">'+i.g+'</div>':'';g=i.g;
+ return gl+'<div class="crow'+(idx===S.ksel?' sel':'')+'" onclick="execK('+idx+')">'+icon(i.ic)+esc(i.n)+(i.cat?'<span class="cat">'+esc(i.cat)+'</span>':'')+'</div>'}).join('')||'<div class="glabel">No matches</div>'}
+function execK(idx){const q=document.getElementById('ck-in').value;const it=kfilter(q)[idx];if(!it)return;closeDlg();try{eval(it.fn)}catch(e){}}
+document.addEventListener('keydown',e=>{
+ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCmdk();return}
+ if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){const r=route();if(r.scr==='editor'&&r.mode==='edit'){if(!S.qr){S.qr=true;render()}runQuick()}return}
+ const ck=document.getElementById('ck-in');
+ if(ck){const q=ck.value;const n=kfilter(q).length;
+  if(e.key==='ArrowDown'){e.preventDefault();S.ksel=Math.min(n-1,S.ksel+1);drawCmdk(q)}
+  if(e.key==='ArrowUp'){e.preventDefault();S.ksel=Math.max(0,S.ksel-1);drawCmdk(q)}
+  if(e.key==='Enter'){e.preventDefault();execK(S.ksel)}}
+ if(e.key==='Escape'){closeDlg();closeMenus();if(S.qr){S.qr=false;render()}}});
+
+/* ================= menus ================= */
+function openMenu(e,html){e.stopPropagation();closeMenus();const m=document.createElement('div');m.className='menu';m.innerHTML=html;document.body.appendChild(m);
+ const x=Math.min((e.clientX||100),innerWidth-m.offsetWidth-260);const y=Math.min((e.clientY||100),innerHeight-m.offsetHeight-10);
+ m.style.left=Math.max(8,x)+'px';m.style.top=Math.max(8,y)+'px';
+ requestAnimationFrame(()=>{const r=m.getBoundingClientRect();if(r.right>innerWidth-8)m.style.left=(innerWidth-r.width-8)+'px';if(r.bottom>innerHeight-8)m.style.top=(innerHeight-r.height-8)+'px'})}
+function closeMenus(){document.querySelectorAll('.menu').forEach(m=>m.remove())}
+document.addEventListener('click',()=>closeMenus());
+
+/* ================= render root ================= */
+function render(){const r=route();let hdr,body;
+ if(r.scr==='list'){hdr='<div class="crumb">'+icon('braces')+'<span class="cur">Prompts</span><span class="ctxnote" style="margin-left:6px">'+PROMPTS.filter(p=>!p.archived).length+' prompts · acme-support</span></div>'+listHeader();body=listScreen()}
+ else{const p=byId(r.id);hdr=editorHeader(p,r.mode);body=r.mode==='edit'?editScreen(p):r.mode==='run'?runScreen(p):manageScreen(p)}
+ document.getElementById('app').innerHTML=sidebar(r)+'<div class="main"><header class="header">'+hdr+'</header><div class="content">'+body+'</div></div>';animateCounts()}
+render();
+</script>
+</body>
+</html>
