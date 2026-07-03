@@ -113,6 +113,22 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:22px 0 8px}
 .ghbody code{font-family:var(--mono);font-size:11.5px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:#e7c6ff}
 .ghopen{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 11px;transition:background .15s,border-color .15s}
 .ghopen:hover{background:var(--muted);border-color:var(--input)}
+/* copy docs as markdown */
+.docsx{margin-top:16px;border:1px solid var(--border);border-radius:12px;background:var(--card);padding:16px 17px}
+.docsxhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:13px}
+.docsxhead .t{font-size:13.5px;font-weight:650}
+.docsxhead .t span{color:var(--muted-foreground);font-weight:400;font-family:var(--mono);font-size:11px;margin-left:7px}
+.copyall{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--background);background:var(--primary);border:1px solid var(--primary);border-radius:7px;padding:7px 13px;cursor:pointer;transition:opacity .15s,background .15s,color .15s}
+.copyall:hover{opacity:.9}
+.copyall svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.copyall.done{background:#0d1f14;color:#4ade80;border-color:#14532d}
+.docsxgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+@media(max-width:680px){.docsxgrid{grid-template-columns:1fr}}
+.docx{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:6px 8px 6px 11px;background:var(--background)}
+.docx .dn{flex:1;min-width:0;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.docxcopy{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.docxcopy:hover{background:var(--muted);border-color:var(--input)}
+.docxcopy.done{color:#4ade80;border-color:#14532d}
 .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
 .linkchip{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-size:13px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;transition:background .15s,border-color .15s,transform .08s}
 .linkchip:hover{background:var(--muted);border-color:var(--input);transform:translateY(-1px)}
@@ -184,8 +200,16 @@ footer a{color:var(--muted-foreground)}
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Research, the four briefs, the gap analysis, design principles &amp; decisions, and the six-round audit — 14 docs, readable in-browser, plus the design-report PDF.</p>
+    <p>Research, the four briefs, the gap analysis, design principles &amp; decisions, and the six-round audit — 15 docs, readable in-browser, plus the design-report PDF.</p>
   </a>
+
+  <div class="docsx">
+    <div class="docsxhead">
+      <div class="t">Copy the docs as Markdown <span id="docsxN"></span></div>
+      <button class="copyall" id="copyAll" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="lbl">Copy all docs</span></button>
+    </div>
+    <div class="docsxgrid" id="docsxGrid"></div>
+  </div>
 
   <section class="gh">
     <h2>GitHub updates <span class="ghsub">· replies to issues #1–#4</span></h2>
@@ -350,6 +374,50 @@ The clickable base for the design work is live and ready to review — all mock 
   });
  }
  render(current.n);
+})();
+</script>
+<script>
+'use strict';
+/* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
+(function(){
+ const DOCS=[
+  {s:'overview',t:'At a glance'},{s:'readme',t:'README — folder index'},{s:'engagement-report',t:'Engagement report'},
+  {s:'domain-guide',t:'Domain guide + jargon'},{s:'gap-analysis',t:'Gap analysis'},{s:'shadcn-newyork-spec',t:'shadcn New York spec'},
+  {s:'execution-plan',t:'Execution plan'},{s:'audit-notes',t:'Audit notes'},{s:'brief-prompts',t:'#1 Prompt Management'},
+  {s:'brief-org-admin',t:'#2 Organization Admin'},{s:'brief-inbox',t:'#3 Inbox'},{s:'brief-system-admin',t:'#4 System Admin'},
+  {s:'style-contract',t:'Style contract'},{s:'redesign-brief',t:'Redesign brief'},{s:'github-comments',t:'GitHub comment drafts'}
+ ];
+ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+ function cleanMd(src){
+  const L=src.replace(/\r\n?/g,'\n').split('\n');const out=[];let inF=false;
+  for(let i=0;i<L.length;i++){let ln=L[i];const f=/^\s*(```|~~~)/.test(ln);if(f)inF=!inF;
+   if(!inF&&!f)ln=ln.replace(/[ \t]+$/,'');
+   if(!inF&&!f&&/^#{1,6}\s/.test(ln)&&out.length&&out[out.length-1].trim()!=='')out.push('');
+   out.push(ln);
+   if(!inF&&!f&&/^#{1,6}\s/.test(ln)&&L[i+1]!==undefined&&L[i+1].trim()!=='')out.push('');}
+  return out.join('\n').replace(/\n{3,}/g,'\n\n').replace(/\s+$/,'')+'\n';
+ }
+ async function fetchMd(s){const r=await fetch('md/'+s+'.md');if(!r.ok)throw new Error('404 '+s);return cleanMd(await r.text());}
+ async function clip(t){try{await navigator.clipboard.writeText(t);return true;}catch(e){try{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');ta.remove();return true;}catch(e2){return false;}}}
+ function feedback(btn,ok,restore){const l=btn.querySelector('.lbl');l.textContent=ok?'Copied':'Failed';btn.classList.toggle('done',ok);clearTimeout(btn._t);btn._t=setTimeout(()=>{l.textContent=restore;btn.classList.remove('done');},1700);}
+ const nEl=document.getElementById('docsxN');if(nEl)nEl.textContent='· '+DOCS.length+' docs';
+ const grid=document.getElementById('docsxGrid');
+ grid.innerHTML=DOCS.map(d=>'<div class="docx"><span class="dn">'+esc(d.t)+'</span><button class="docxcopy" data-s="'+d.s+'" type="button"><span class="lbl">Copy</span></button></div>').join('');
+ grid.querySelectorAll('.docxcopy').forEach(b=>b.addEventListener('click',async()=>{
+  b.querySelector('.lbl').textContent='…';let ok=false;
+  try{ok=await clip(await fetchMd(b.dataset.s));}catch(e){ok=false;}
+  feedback(b,ok,'Copy');
+ }));
+ const all=document.getElementById('copyAll');
+ all.addEventListener('click',async()=>{
+  all.querySelector('.lbl').textContent='Copying…';let ok=false;
+  try{
+   const parts=await Promise.all(DOCS.map(d=>fetchMd(d.s).catch(()=>'')));
+   const body='# Keystone — Complete Documentation\n\n*Every engagement doc, copied from the showcase. Read them one-by-one at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
+   ok=await clip(body);
+  }catch(e){ok=false;}
+  feedback(all,ok,'Copy all docs');
+ });
 })();
 </script>
 </body>
