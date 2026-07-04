@@ -7,7 +7,7 @@
 <title>Keystone — Day 2 · Walkthrough</title>
 <style>
 :root{
-  --background:#020817; --card:#0b1220; --foreground:#f8fafc;
+  --background:#000000; --card:#0b1220; --foreground:#f8fafc;
   --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
   --primary:#f8fafc; --ring:#94a3b8;
   --prompts:#8b5cf6; --inbox:#f59e0b; --platform:#22d3ee; --org:#4ade80; --pass:#4ade80; --fail:#f87171;
@@ -15,9 +15,24 @@
   --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;line-height:1.6}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;line-height:1.6;filter:grayscale(1)}
+a{color:#cbd5e1}
 a{color:#a78bfa;text-decoration:none}
 .wrap{max-width:960px;margin:0 auto;padding:0 24px}
+/* shared top nav */
+.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px clamp(14px,4vw,28px);background:rgba(2,8,23,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topnav .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--foreground);text-decoration:none;flex:none}
+.topnav .brand .g{width:23px;height:23px;border-radius:7px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800;font-family:var(--sans);font-size:12px}
+.topnav .brand .sub{color:var(--muted-foreground);font-weight:400}
+.topnav .navlinks{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.topnav a.nl{font-size:13px;font-weight:550;color:var(--muted-foreground);text-decoration:none;padding:7px 11px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+.topnav a.nl:hover{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.on{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.docs{color:#5eead4}
+.topnav a.nl.docs:hover,.topnav a.nl.docs.on{color:#99f6e4;background:rgba(45,212,191,.12)}
+.topnav a.nl.proto{color:#0a0a0a;background:#fafafa;font-weight:650;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 3px 14px -4px rgba(255,255,255,.35)}
+.topnav a.nl.proto:hover{background:#e5e5e5}
+@media(max-width:640px){.topnav{gap:8px;padding:9px 12px}.topnav .brand .sub{display:none}.topnav a.nl{padding:6px 8px;font-size:12px}}
 img{max-width:100%;display:block}
 /* top bar */
 .top{position:sticky;top:0;z-index:20;background:rgba(2,8,23,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
@@ -172,12 +187,16 @@ footer a{color:var(--muted-foreground)}
 </head>
 <body>
 
-<div class="top"><div class="topin">
-  <a class="home" href="index.html"><span class="g">K</span>keystone / day 2 · walkthrough</a>
-  <span class="topsp"></span>
-  <a class="topcta" href="docs.html">Docs</a>
-  <a class="topcta pri" href="keystone/" target="_blank" rel="noopener">Open prototype →</a>
-</div></div>
+<header class="topnav">
+  <a class="brand" href="index.html"><span class="g">K</span>keystone <span class="sub">/ Jul 4 · walkthrough</span></a>
+  <div class="navlinks">
+    <a class="nl" data-page="index.html" href="index.html">Home</a>
+    <a class="nl" data-page="day-1.html" href="day-1.html">Jul 3</a>
+    <a class="nl" data-page="day-2.html" href="day-2.html">Jul 4</a>
+    <a class="nl docs" data-page="docs.html" href="docs.html">Docs</a>
+    <a class="nl proto" href="keystone/" target="_blank" rel="noopener">Prototype ↗</a>
+  </div>
+</header>
 
 <div class="wrap">
 
@@ -596,5 +615,6 @@ Open the prototype → Overview → open GST QnA → live-test a row → Run →
  render(current.n);
 })();
 </script>
+<script>(function(){var p=(location.pathname.split('/').pop()||'index.html');if(p==='day-2-walkthrough.html')p='day-2.html';document.querySelectorAll('.topnav a.nl[data-page]').forEach(function(a){if(a.getAttribute('data-page')===p)a.classList.add('on');});})();</script>
 </body>
 </html>

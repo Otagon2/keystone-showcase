@@ -7,16 +7,41 @@
 <title>Keystone — Docs</title>
 <style>
 :root{
-  --background:#020817; --card:#0b1220; --foreground:#f8fafc;
+  --background:#000000; --card:#0b1220; --foreground:#f8fafc;
   --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
-  --primary:#f8fafc; --ring:#94a3b8; --accent:#8b5cf6;
+  --primary:#f8fafc; --ring:#94a3b8; --accent:#2dd4bf;
   --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
   --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;display:flex;height:100vh;overflow:hidden}
-a{color:#a78bfa}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;height:100vh;overflow:hidden;filter:grayscale(1)}
+a{color:#5eead4}
+/* shared top nav */
+.topnav{position:sticky;top:0;z-index:50;flex:none;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px clamp(14px,4vw,28px);background:rgba(2,8,23,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topnav .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--foreground);text-decoration:none;flex:none}
+.topnav .brand .g{width:23px;height:23px;border-radius:7px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800;font-family:var(--sans);font-size:12px}
+.topnav .brand .sub{color:var(--muted-foreground);font-weight:400}
+.topnav .navlinks{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.topnav a.nl{font-size:13px;font-weight:550;color:var(--muted-foreground);text-decoration:none;padding:7px 11px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+.topnav a.nl:hover{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.on{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.docs{color:#5eead4}
+.topnav a.nl.docs:hover,.topnav a.nl.docs.on{color:#99f6e4;background:rgba(45,212,191,.14)}
+.topnav a.nl.proto{color:#0a0a0a;background:#fafafa;font-weight:650;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 3px 14px -4px rgba(255,255,255,.35)}
+.topnav a.nl.proto:hover{background:#e5e5e5}
+@media(max-width:640px){.topnav{gap:8px;padding:9px 12px}.topnav .brand .sub{display:none}.topnav a.nl{padding:6px 8px;font-size:12px}}
+/* docs shell + sidebar search/groups */
+.shell{display:flex;flex:1;min-height:0;overflow:hidden}
+.sidehead{padding:2px 6px 10px}
+.docsearch{width:100%;background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--foreground);font-family:var(--sans);font-size:13px;outline:none;transition:border-color .15s}
+.docsearch::placeholder{color:var(--muted-foreground)}
+.docsearch:focus{border-color:var(--accent)}
+.grpitems.collapsed{display:none}
+.chev{width:11px;height:11px;flex:none;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;opacity:.6}
+.grouplabel.collapsed .chev{transform:rotate(-90deg)}
+.gcount{font-family:var(--mono);font-weight:600;letter-spacing:0;color:var(--muted-foreground);background:var(--muted);border-radius:99px;padding:1px 7px;font-size:10px}
+.sidenote{padding:14px 8px 4px;font-size:11.5px;color:var(--muted-foreground)}
 ::-webkit-scrollbar{width:11px;height:11px}
 ::-webkit-scrollbar-thumb{background:var(--input);border-radius:7px;border:3px solid var(--background);background-clip:padding-box}
 ::-webkit-scrollbar-track{background:transparent}
@@ -25,7 +50,9 @@ a{color:#a78bfa}
 .home{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--muted-foreground);font-family:var(--mono);font-size:12.5px;padding:6px 8px;border-radius:6px}
 .home:hover{background:var(--muted);color:var(--foreground)}
 .home .g{width:22px;height:22px;border-radius:6px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800;font-size:11px}
-.grouplabel{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-foreground);padding:16px 8px 5px}
+.grouplabel{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;cursor:pointer;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-foreground);padding:15px 8px 6px;transition:color .15s}
+.grouplabel:hover{color:var(--foreground)}
+.grouplabel .gname{flex:1;text-align:left}
 .docitem{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:9px 10px;border-radius:8px;color:inherit;transition:background .15s}
 .docitem:hover{background:var(--muted)}
 .docitem.on{background:var(--muted);box-shadow:inset 2px 0 0 var(--accent)}
@@ -66,8 +93,20 @@ a{color:#a78bfa}
 </style>
 </head>
 <body>
+<header class="topnav">
+  <a class="brand" href="index.html"><span class="g">K</span>keystone <span class="sub">/ docs</span></a>
+  <div class="navlinks">
+    <a class="nl" data-page="index.html" href="index.html">Home</a>
+    <a class="nl" data-page="day-1.html" href="day-1.html">Jul 3</a>
+    <a class="nl" data-page="day-2.html" href="day-2.html">Jul 4</a>
+    <a class="nl docs" data-page="docs.html" href="docs.html">Docs</a>
+    <a class="nl proto" href="keystone/" target="_blank" rel="noopener">Prototype ↗</a>
+  </div>
+</header>
+<div class="shell">
 <nav class="side" id="side"></nav>
 <main class="read"><div class="crumbbar"><span id="crumb"></span><button class="copymd" id="copymd" type="button" title="Copy this document's raw Markdown to the clipboard"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="lbl">Copy markdown</span></button></div><div class="doc"><div class="md" id="md"><div class="loading">Loading…</div></div></div></main>
+</div>
 <script>
 'use strict';
 const DOCS=[
@@ -131,12 +170,30 @@ function md2html(src){
  }
  return h;
 }
+let sideQuery='', collapsed={};
 function renderSide(cur){
- let g='',html='<a class="home" href="index.html">'+'<span class="g">K</span>keystone / docs</a>';
- DOCS.forEach(d=>{if(d.g!==g){g=d.g;html+='<div class="grouplabel">'+g+'</div>'}
-  html+='<button class="docitem'+(d.s===cur?' on':'')+'" onclick="location.hash=\''+d.s+'\'"><b>'+d.t+'</b><span>'+d.sum+'</span></button>'});
+ const q=sideQuery.trim().toLowerCase();
+ const order=[],map={};
+ DOCS.forEach(d=>{if(!map[d.g]){map[d.g]=[];order.push(d.g)}map[d.g].push(d)});
+ let html='<div class="sidehead"><input id="docsearch" class="docsearch" type="search" placeholder="Search docs…" autocomplete="off" value="'+esc(sideQuery)+'"></div>';
+ let shown=0;
+ order.forEach(g=>{
+  const items=map[g].filter(d=>!q||(d.t+' '+d.sum).toLowerCase().includes(q));
+  if(!items.length)return; shown+=items.length;
+  const gid='grp-'+g.replace(/[^a-z0-9]/gi,''), coll=q?false:!!collapsed[g];
+  html+='<div class="grp"><button type="button" class="grouplabel'+(coll?' collapsed':'')+'" data-g="'+esc(g)+'">'
+   +'<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>'
+   +'<span class="gname">'+esc(g)+'</span><span class="gcount">'+items.length+'</span></button>'
+   +'<div class="grpitems'+(coll?' collapsed':'')+'" id="'+gid+'">';
+  items.forEach(d=>{html+='<button class="docitem'+(d.s===cur?' on':'')+'" onclick="location.hash=\''+d.s+'\'"><b>'+esc(d.t)+'</b><span>'+esc(d.sum)+'</span></button>'});
+  html+='</div></div>';
+ });
+ if(!shown)html+='<div class="sidenote">No docs match “'+esc(sideQuery)+'”.</div>';
  html+='<a class="pdflink" href="Keystone-Design-Report.pdf" target="_blank" rel="noopener">↓ Design report (PDF)</a>';
- document.getElementById('side').innerHTML=html;
+ const side=document.getElementById('side'); side.innerHTML=html;
+ const si=document.getElementById('docsearch');
+ if(si)si.addEventListener('input',()=>{sideQuery=si.value;renderSide(cur);const n=document.getElementById('docsearch');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}});
+ side.querySelectorAll('.grouplabel').forEach(b=>b.addEventListener('click',()=>{const g=b.getAttribute('data-g');collapsed[g]=!collapsed[g];renderSide(cur);}));
 }
 async function load(){
  let s=location.hash.replace('#','')||'overview';
@@ -181,6 +238,7 @@ async function copyCurrentMd(){
 }
 document.getElementById('copymd').addEventListener('click',copyCurrentMd);
 window.addEventListener('hashchange',load); load();
+document.querySelectorAll('.topnav a.nl[data-page]').forEach(function(a){if(a.getAttribute('data-page')==='docs.html')a.classList.add('on');});
 </script>
 </body>
 </html>
