@@ -145,6 +145,24 @@ footer a{color:var(--muted-foreground)}
   <p class="lede">Clickable, self-contained mock-ups for four Keystone surfaces, built on shadcn/ui (New York) in a dark developer-console theme. No backend — every interaction is mocked. Dark by default; a light toggle lives in each account menu.</p>
   <div class="note">🔒 <span>Internal client work · unlisted preview.</span> Mock data only — nothing here talks to a real system.</div>
 
+  <div style="margin-top:22px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,#0d1424,#0b1220);padding:20px 20px 22px">
+    <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4ade80"><span style="width:7px;height:7px;border-radius:99px;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.15)"></span> New · Day 2</div>
+    <h2 style="font-size:20px;font-weight:700;letter-spacing:-.01em;margin:9px 0 6px">The clickable Keystone prototype</h2>
+    <p style="font-size:13.5px;color:var(--muted-foreground);line-height:1.6;max-width:660px">The full evaluation loop as a real shadcn “New York” app — <b style="color:var(--foreground)">Dataset → Prompt → Evaluator → Experiment → Trace</b>. Dark by default (light toggle top-right), responsive, mock data. <b style="color:var(--foreground)">Zaki &amp; Safi</b> — here’s the 60-second path to test it yourself:</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 16px">
+      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">1 · Overview</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">See the 5-step loop; click <b style="color:#fff">Prompts</b>.</div></div>
+      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">2 · Edit</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">Open <b style="color:#fff">GST QnA</b>; live-test a row, hit Run.</div></div>
+      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">3 · Run</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">Batch the dataset → <b style="color:#fff">Run as an experiment</b>.</div></div>
+      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">4 · Scorecard</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">83% pass — click any <b style="color:#fff">row</b>.</div></div>
+      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">5 · Trace</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">See the span tree + <b style="color:#fff">why it failed</b>.</div></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px">
+      <a class="linkchip" style="background:var(--primary);color:var(--background);border-color:var(--primary)" href="keystone/" target="_blank" rel="noopener">▶ Open the prototype</a>
+      <a class="linkchip" href="day-2.html">Day 2 walkthrough →</a>
+    </div>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground)">Tip — click <b style="color:var(--foreground)">“Why this design?”</b> (bottom-right) on any screen for the decision behind it, or press <b style="color:var(--foreground)">⌘K</b> for the command palette.</div>
+  </div>
+
   <div class="prds">
     <div class="prdhead">Source PRDs <span class="n">· the live briefs on GitHub — tracked for updates</span></div>
     <div class="prdrow">
@@ -200,7 +218,7 @@ footer a{color:var(--muted-foreground)}
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Research, the four briefs, the gap analysis, design principles &amp; decisions, and the six-round audit — 15 docs, readable in-browser, plus the design-report PDF.</p>
+    <p>Day 2’s design review + Arize/Braintrust teardown + hi-fi plan &amp; build log, plus the research, four briefs, gap analysis, design principles &amp; decisions and the audit — 19 docs, readable in-browser, plus the design-report PDF.</p>
   </a>
 
   <div class="docsx">
@@ -332,17 +350,39 @@ The clickable base for the design work is live and ready to review — all mock 
 • I'll also review the Arize and Braintrust UIs and flows for reference
 
 🔗 Today's work: https://aman-esberi.github.io/esberi.github.com/` },
- { n:2, date:'2026-07-04', status:'planned',
-   title:'First design iterations (expected)',
-   summary:'Planned for Day 2 — the first iteration pass on the designs, folding in the reviewed docs and the latest PRDs. Links appear here as the work ships.',
+ { n:2, date:'2026-07-04', status:'done', page:'day-2.html',
+   title:'The evaluation loop — designed and made clickable',
+   summary:'Took the loop (Dataset → Prompt → Evaluator → Experiment → Trace) from research + wireframes to a real, clickable shadcn “New York” prototype you can walk end-to-end — grounded in the actual esberi/keystone repo + PRD #1, dark + light, responsive, with an in-app “Why this design?” guide. Audited and fixed.',
    items:[
-     {t:'First iteration of the four surface designs', done:false},
-     {t:'Prompt Management updated to the revised PRD #1', done:false},
-     {t:'Organization Admin aligned to the real brief #2 (five surfaces)', done:false},
-     {t:'Amaan’s documentation-review feedback incorporated', done:false},
-     {t:'Next UI/UX audit round + responsive & all-flows check', done:false},
+     {t:'Clickable Keystone prototype — 13 screens, the full loop (dark + light, responsive)', href:'keystone/', done:true},
+     {t:'Day 2 write-up — research, principles, decisions, before/after, walkthrough', href:'day-2.html', done:true},
+     {t:'Arize + Braintrust teardown — ran the loop live on both; copy vs avoid', href:'docs.html#day2-competitor-teardown', done:true},
+     {t:'Design review — the 7 principles + every decision & why', href:'docs.html#day2-design-review', done:true},
+     {t:'Hi-fi build log + adversarial audit (1 blocker + 6 majors, all fixed)', href:'docs.html#day2-hifi-build', done:true},
    ],
-   note:'Placeholder — the daily update adds Day 2’s live links here as work ships.' },
+   note:'The clickable prototype is the headline — open it and walk Overview → Edit → Run → Experiment → Trace.',
+   slack:`:rocket: *Keystone — Day 2 · Sat, Jul 4*
+
+The evaluation loop is now a *clickable prototype* you can walk end-to-end — all mock data (no backend), for look, flow and feel.
+
+*What's ready*
+• The full loop as a real shadcn "New York" app — Overview → Prompt → Run → Experiment → Trace, plus Datasets, Evaluators, Manage, Compress and edge-case states (13 screens, dark + light, responsive to mobile)
+• Grounded in the real esberi/keystone repo + PRD #1 — token-spend (no invented $ cost), single-brace {variable} to match the shipped parser, evaluator designed as a first-class object
+• An in-app "Why this design?" button on every screen — the decision + why + how we beat Arize/Braintrust, as you click
+• A Day 2 write-up: research, the 7 principles, decisions, before → after, and a screen-by-screen walkthrough
+
+*How to test it (60 seconds)*
+Open the prototype → Overview → open GST QnA → live-test a row → Run → "Run as an experiment" → click a row → read the trace + the evaluator's reasoning.
+
+*Last 24 hours*
+• Reviewed Arize + Braintrust live (ran the same GST loop on both) and folded the lessons in
+• Built the prototype, then ran an adversarial audit — 1 blocker + 6 majors, all fixed and re-verified
+• Published it on the showcase + mirrored today's artefacts (Pencil file, HTML, screenshots, docs) to Google Drive
+
+*Open questions before backend wiring* (in the Day 2 doc)
+• Evaluator-as-object binding, prompt compression scope, org cost/budgets, and a canned sample project
+
+🔗 Prototype + write-up: https://aman-esberi.github.io/esberi.github.com/day-2.html` },
 ];
 (function(){
  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -381,6 +421,7 @@ The clickable base for the design work is live and ready to review — all mock 
 /* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
 (function(){
  const DOCS=[
+  {s:'day2-design-review',t:'Day 2 — Design review'},{s:'day2-competitor-teardown',t:'Day 2 — Arize & Braintrust teardown'},{s:'day2-hifi-plan',t:'Day 2 — Hi-fi plan'},{s:'day2-hifi-build',t:'Day 2 — Hi-fi build log'},
   {s:'overview',t:'At a glance'},{s:'readme',t:'README — folder index'},{s:'engagement-report',t:'Engagement report'},
   {s:'domain-guide',t:'Domain guide + jargon'},{s:'gap-analysis',t:'Gap analysis'},{s:'shadcn-newyork-spec',t:'shadcn New York spec'},
   {s:'execution-plan',t:'Execution plan'},{s:'audit-notes',t:'Audit notes'},{s:'brief-prompts',t:'#1 Prompt Management'},

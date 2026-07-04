@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Keystone — Day 2 · Design & Prototype</title>
+<style>
+:root{
+  --background:#020817; --card:#0b1220; --foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
+  --primary:#f8fafc; --ring:#94a3b8;
+  --prompts:#8b5cf6; --inbox:#f59e0b; --platform:#22d3ee; --org:#4ade80; --pass:#4ade80; --fail:#f87171;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:#a78bfa;text-decoration:none}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+img{max-width:100%;display:block}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:rgba(2,8,23,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topin{max-width:960px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:12px}
+.home{display:flex;align-items:center;gap:9px;color:var(--muted-foreground);font-family:var(--mono);font-size:12.5px}
+.home .g{width:24px;height:24px;border-radius:7px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800}
+.home:hover{color:var(--foreground)}
+.topsp{flex:1}
+.topcta{font-size:12.5px;font-weight:600;color:var(--foreground);border:1px solid var(--border);border-radius:7px;padding:7px 12px}
+.topcta:hover{background:var(--muted);border-color:var(--input)}
+.topcta.pri{background:var(--primary);color:var(--background);border-color:var(--primary)}
+.topcta.pri:hover{opacity:.9}
+/* hero */
+.hero{padding:52px 0 8px}
+.kick{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted-foreground);display:flex;align-items:center;gap:8px}
+.kick .pill{background:#231605;color:#fbbf24;border:1px solid #78350f;border-radius:6px;padding:2px 8px;font-weight:700}
+h1{font-size:38px;font-weight:750;letter-spacing:-.025em;margin:16px 0 12px;line-height:1.12}
+.lede{font-size:16.5px;color:#cbd5e1;max-width:720px;line-height:1.62}
+.by{margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted-foreground)}
+.by b{color:var(--foreground);font-weight:600}
+.herocta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;border-radius:9px;padding:11px 16px;border:1px solid var(--border);color:var(--foreground);background:var(--card);transition:background .15s,border-color .15s,transform .08s}
+.btn:hover{background:var(--muted);border-color:var(--input);transform:translateY(-1px)}
+.btn.pri{background:var(--primary);color:var(--background);border-color:var(--primary)}
+.btn.pri:hover{opacity:.92}
+/* section */
+section{padding:44px 0;border-top:1px solid var(--border)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-foreground);display:flex;align-items:center;gap:9px}
+.eyebrow .num{color:var(--background);background:var(--ring);border-radius:5px;padding:1px 7px;font-size:11px}
+h2{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:12px 0 10px}
+h3{font-size:17px;font-weight:650;margin:26px 0 8px}
+p.body{font-size:15px;color:#cbd5e1;max-width:760px;margin-bottom:12px}
+p.body b{color:var(--foreground);font-weight:650}
+.mono{font-family:var(--mono)}
+.tokchip{font-family:var(--mono);font-size:12px;background:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 6px;color:#e7c6ff}
+/* flow steps (how to test) */
+.flowbox{margin-top:14px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,#0d1424,#0b1220);padding:22px}
+.flowbox .fh{font-size:15px;font-weight:650;margin-bottom:4px}
+.flowbox .fs{font-size:13px;color:var(--muted-foreground);margin-bottom:16px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:760px){.steps{grid-template-columns:1fr 1fr}}
+.step{background:var(--background);border:1px solid var(--border);border-radius:10px;padding:12px}
+.step .sn{width:22px;height:22px;border-radius:6px;background:var(--muted);border:1px solid var(--border);display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--foreground);margin-bottom:9px}
+.step b{font-size:13px;font-weight:650;display:block;margin-bottom:3px}
+.step span{font-size:12px;color:var(--muted-foreground);line-height:1.5}
+/* cards / bullets */
+.bullets{list-style:none;display:flex;flex-direction:column;gap:9px;margin:6px 0 4px}
+.bullets li{display:flex;gap:10px;font-size:14.5px;color:#cbd5e1}
+.bullets .ic{flex:none;margin-top:2px;width:16px;height:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--ring))}
+.card .t{font-size:15px;font-weight:650;margin-bottom:5px}
+.card .w{font-size:13.5px;color:var(--muted-foreground);line-height:1.55}
+.card .why{margin-top:10px;font-size:13px;color:#cbd5e1}
+.card .why b{color:#fff}
+.dec{--accent:var(--prompts)}
+/* competitor two-up */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:760px){.compare{grid-template-columns:1fr}}
+.crev{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.crev h3{margin:0 0 4px;font-size:16px}
+.crev .verdict{font-size:13.5px;color:#cbd5e1;line-height:1.55}
+.crev .row{display:flex;gap:8px;font-size:12.5px;margin-top:9px}
+.tagok{color:#4ade80} .tagno{color:#f87171}
+figure{margin:14px 0}
+figure img{border:1px solid var(--border);border-radius:10px;background:var(--muted)}
+figcaption{font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);margin-top:7px}
+.imgrow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.imrow{grid-template-columns:1fr}}
+/* before/after */
+.ba{margin-top:18px}
+.ba .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:760px){.ba .pair{grid-template-columns:1fr}}
+.ba .side .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:inline-flex;align-items:center;gap:7px;margin-bottom:8px}
+.ba .before .lbl{color:#f87171}.ba .before .lbl::before{content:"";width:8px;height:8px;border-radius:99px;background:#f87171}
+.ba .after .lbl{color:#4ade80}.ba .after .lbl::before{content:"";width:8px;height:8px;border-radius:99px;background:#4ade80}
+.ba img{border:1px solid var(--border);border-radius:10px}
+.ba .cap{font-size:13.5px;color:#cbd5e1;margin-top:20px}
+.ba .cap b{color:#fff}
+/* walkthrough */
+.wt{border:1px solid var(--border);border-radius:14px;background:var(--card);overflow:hidden;margin-top:16px}
+.wt>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:15px 18px;user-select:none}
+.wt>summary::-webkit-details-marker{display:none}
+.wt>summary:hover{background:var(--muted)}
+.wt .wn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);flex:none}
+.wt .wtt{font-size:15.5px;font-weight:650;flex:1;min-width:0}
+.wt .route{font-family:var(--mono);font-size:11px;color:var(--muted-foreground);flex:none}
+.wt .chev{flex:none;width:16px;height:16px;stroke:var(--muted-foreground);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+.wt[open] .chev{transform:rotate(90deg)}
+.wtbody{border-top:1px solid var(--border);padding:18px}
+.wtbody .shot{border:1px solid var(--border);border-radius:10px;margin-bottom:16px}
+.wtcols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:680px){.wtcols{grid-template-columns:1fr}}
+.wtcols h4{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:8px}
+.p1{--accent:var(--prompts)}.p2{--accent:var(--org)}.p3{--accent:var(--inbox)}.p4{--accent:var(--platform)}
+/* scorecard */
+.score{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px;display:block;overflow-x:auto}
+.score th,.score td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+.score th{background:var(--muted);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted-foreground);white-space:nowrap}
+.score td.ks{color:#fff;font-weight:600}
+.score tr td:first-child{font-weight:600;white-space:nowrap}
+footer{border-top:1px solid var(--border);padding:34px 0 60px;font-family:var(--mono);font-size:12px;color:var(--muted-foreground);line-height:1.9}
+footer a{color:var(--muted-foreground)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 20px}
+.linkchip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 14px}
+.linkchip:hover{background:var(--muted);border-color:var(--input)}
+.svgi{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.svgi.f{fill:currentColor;stroke:none}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="topin">
+  <a class="home" href="index.html"><span class="g">K</span>keystone / day 2</a>
+  <span class="topsp"></span>
+  <a class="topcta" href="docs.html">Docs</a>
+  <a class="topcta pri" href="keystone/" target="_blank" rel="noopener">Open prototype →</a>
+</div></div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kick">DAY 2 · Sat, Jul 4, 2026 · <span class="pill">Design + clickable prototype</span></div>
+    <h1>Keystone — the evaluation loop,<br>designed and made clickable</h1>
+    <p class="lede">Today I took the loop — <b>Dataset → Prompt → Evaluator → Experiment → Trace</b> — from research and wireframes all the way to a real, clickable <b>shadcn “New York”</b> prototype you can walk end-to-end. This page is the full story: what we learned from Arize &amp; Braintrust, the principles and decisions behind the design, before → after, and a walkthrough of every screen.</p>
+    <div class="by">by <b>Amaan</b> · for <b>Zaki</b> &amp; <b>Safi</b> · grounded in the real <span class="mono">esberi/keystone</span> repo + PRD&nbsp;#1</div>
+    <div class="herocta">
+      <a class="btn pri" href="keystone/" target="_blank" rel="noopener">▶ Open the clickable prototype</a>
+      <a class="btn" href="#test">How to test it yourself</a>
+      <a class="btn" href="#walk">Screen-by-screen walkthrough</a>
+      <a class="btn" href="docs.html">Read the full docs</a>
+    </div>
+  </div>
+
+  <!-- HOW TO TEST -->
+  <section id="test">
+    <div class="eyebrow"><span class="num">01</span> Try it yourself — the 60-second path</div>
+    <h2>Walk the loop, the way a user would</h2>
+    <p class="body">The prototype opens on the <b>Overview</b>. Everything is mock data (the GST-FAQ worked example), dark by default with a light toggle in the top-right. Follow these five steps and you’ll have seen the whole product. Press <span class="tokchip">⌘K</span> anywhere for the command palette, and click the <b>“Why this design?”</b> button (bottom-right) on any screen to see the decision behind it.</p>
+    <div class="flowbox">
+      <div class="fh">The golden path</div>
+      <div class="fs">Overview → Prompt → Run → Experiment → Trace — from “what do I test” to “why did this row fail”.</div>
+      <div class="steps">
+        <div class="step"><div class="sn">1</div><b>Overview</b><span>See the 5-step loop. Click <b>Prompts</b> in the rail.</span></div>
+        <div class="step"><div class="sn">2</div><b>Edit a prompt</b><span>Open <b>GST QnA</b>. Live-test a row on the right; hit <b>Run</b>.</span></div>
+        <div class="step"><div class="sn">3</div><b>Run the batch</b><span>Run over the dataset, then <b>“Run as an experiment →”</b>.</span></div>
+        <div class="step"><div class="sn">4</div><b>Read the scorecard</b><span>83% pass. Click any <b>row</b>.</span></div>
+        <div class="step"><div class="sn">5</div><b>Open the trace</b><span>See the span tree + the evaluator’s reasoning for why it failed.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT WE SHIPPED -->
+  <section>
+    <div class="eyebrow"><span class="num">02</span> What shipped today</div>
+    <h2>From wireframes to a real app</h2>
+    <ul class="bullets">
+      <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>A clickable shadcn “New York” prototype</b> — 13 screens, the full loop, dark + light, responsive to mobile, with a command palette and an in-app “Why this design?” guide.</span></li>
+      <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Grounded in the real repo</b> — every screen binds to actual <span class="mono">esberi/keystone</span> entities and PRD&nbsp;#1; where the shipped UX had gaps, we designed the better product and flagged what needs backend work.</span></li>
+      <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Adversarially audited &amp; fixed</b> — a review pass caught 1 blocker + 6 majors (all interaction bugs); every one fixed and re-verified.</span></li>
+      <li><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><b>Full documentation</b> — the design review, competitor teardown, hi-fi plan and build log are all in the <a href="docs.html">docs viewer</a>.</span></li>
+    </ul>
+  </section>
+
+  <!-- RESEARCH -->
+  <section>
+    <div class="eyebrow"><span class="num">03</span> The research</div>
+    <h2>We used Arize &amp; Braintrust for real</h2>
+    <p class="body">Before designing, I ran Zaki’s exact loop end-to-end on both reference tools with the same GST dataset — importing data, writing a prompt, building an evaluator, running an experiment, and drilling into traces — and mapped every interaction. The full teardown (UX reports, interaction maps, side-by-side comparison) is in <a href="docs.html#day2-competitor-teardown">the competitor doc</a>.</p>
+    <div class="compare">
+      <div class="crev">
+        <h3>Braintrust</h3>
+        <p class="verdict">The strongest reference — excellent <b>experiment → trace</b> linkage and column-mapping on import. But the <b>playground is ephemeral</b> (a run vanishes until you promote it), scorer setup is painful, and you wait for the whole run before seeing anything.</p>
+        <div class="row"><span class="tagok">✓ copy</span> summary + trace linkage, column mapping</div>
+        <div class="row"><span class="tagno">✗ avoid</span> ephemeral playground, painful scorers, no streaming</div>
+        <figure><img src="img/day2/bt-experiment.png" alt="Braintrust experiment detail" loading="lazy"><figcaption>Braintrust — experiment detail</figcaption></figure>
+      </div>
+      <div class="crev">
+        <h3>Arize Phoenix</h3>
+        <p class="verdict">Deep and capable, but <b>dense and developer-first</b>. The dataset import is a multi-step schema mapping, the summary is buried under raw tables, and the <b>trace drill-down is hard to find</b> — the opposite of summary-first.</p>
+        <div class="row"><span class="tagok">✓ copy</span> rich experiment metrics, span detail</div>
+        <div class="row"><span class="tagno">✗ avoid</span> density, buried traces, table-first defaults</div>
+        <figure><img src="img/day2/az-experiment.png" alt="Arize experiment view" loading="lazy"><figcaption>Arize Phoenix — experiment view</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section>
+    <div class="eyebrow"><span class="num">04</span> Design principles</div>
+    <h2>The rules we set — and followed on every screen</h2>
+    <div class="grid2">
+      <div class="card dec"><div class="t">Summary-first, always</div><div class="w">Every results view opens on the scorecard, not a raw table. Zaki’s #1 principle — and where both competitors fail.</div></div>
+      <div class="card dec"><div class="t">Teach the loop by walking it</div><div class="w">The IA <i>is</i> the loop (Build · Evaluate · Observe). A first-timer learns eval by navigating; a veteran moves fast.</div></div>
+      <div class="card dec"><div class="t">Honest numbers only</div><div class="w">The repo has no cost concept — so we show <b>token-spend</b>, never a fabricated dollar figure.</div></div>
+      <div class="card dec"><div class="t">Ground every pixel in the repo</div><div class="w">Real entities, real fields, and full <span class="mono">ks</span> CLI parity. Divergences from the shipped app are deliberate and flagged.</div></div>
+      <div class="card dec"><div class="t">Flat over drawers</div><div class="w">Centered dialogs and inline flows, not the shipped side-drawers. Fewer places to get lost.</div></div>
+      <div class="card dec"><div class="t">Accessible &amp; responsive by default</div><div class="w">Status by icon-shape (not colour alone), dark + light both shipped, usable down to 390px.</div></div>
+    </div>
+  </section>
+
+  <!-- DECISIONS -->
+  <section>
+    <div class="eyebrow"><span class="num">05</span> Decisions &amp; why</div>
+    <h2>The calls that make it Keystone</h2>
+    <div class="grid2">
+      <div class="card dec"><div class="t">Token-spend, never dollars</div><div class="why"><b>Why:</b> the repo tracks only tokens. Dollar figures would be invented — a credibility risk with an ex-Arize/Braintrust reviewer. We lead with token-spend + latency.</div></div>
+      <div class="card dec"><div class="t">Single-brace <span class="tokchip">{question}</span></div><div class="why"><b>Why:</b> matches the shipped parser <span class="mono">/\{(\w+)\}/</span>. The brief’s <span class="mono">{{mustache}}</span> would break at runtime.</div></div>
+      <div class="card dec"><div class="t">Dark leads, light co-equal</div><div class="why"><b>Why:</b> a developer console reads dark-first; but light is fully built and AA-checked, toggled from the header.</div></div>
+      <div class="card dec"><div class="t">shadcn New York + slate</div><div class="why"><b>Why:</b> read from the repo’s own components (button geometry, lucide, indigo removed). Calm monochrome; green/red only for pass/fail.</div></div>
+      <div class="card dec"><div class="t">Evaluator is first-class</div><div class="why"><b>Why:</b> “how is my output judged” is the heart of the loop. We designed it as a real, reusable object and flagged the backend binding (⚑).</div></div>
+      <div class="card dec"><div class="t">One run, capturable</div><div class="why"><b>Why:</b> Braintrust’s ephemeral playground loses work. Our live-test run is capturable and promotable to a tracked experiment.</div></div>
+    </div>
+    <p class="body" style="margin-top:18px">Every decision is logged with before/after reasoning in the <a href="docs.html#day2-design-review">design review</a>.</p>
+  </section>
+
+  <!-- BEFORE / AFTER -->
+  <section id="ba">
+    <div class="eyebrow"><span class="num">06</span> Before → after</div>
+    <h2>The shipped app &amp; the competitors vs. ours</h2>
+
+    <div class="ba">
+      <div class="pair">
+        <div class="side before"><div class="lbl">Before · shipped keystone</div><img src="img/day2/before-prompts.png" alt="Shipped Keystone prompts" loading="lazy"></div>
+        <div class="side after"><div class="lbl">After · Keystone redesign</div><img src="img/day2/hifi-list-dark.png" alt="Our prompt list" loading="lazy"></div>
+      </div>
+      <p class="cap"><b>Prompt library.</b> The shipped list is a bare table. Ours adds <b>version, environment, labels, icon-shape last-run and token-spend</b> at a glance — with hover-Run and a govern menu, so the list is a control surface, not just an index.</p>
+    </div>
+
+    <div class="ba">
+      <div class="pair">
+        <div class="side before"><div class="lbl">Before · shipped “new prompt”</div><img src="img/day2/before-newprompt.png" alt="Shipped new-prompt drawer" loading="lazy"></div>
+        <div class="side after"><div class="lbl">After · write + try in one place</div><img src="img/day2/hifi-edit.png" alt="Our editor" loading="lazy"></div>
+      </div>
+      <p class="cap"><b>Authoring.</b> The shipped flow is a cramped right-drawer. Ours is a full two-pane editor: compose on the left, a <b>live test on a real dataset row</b> on the right (tokens + latency, capture, “Run as an experiment →”) — no context switch.</p>
+    </div>
+
+    <div class="ba">
+      <div class="pair">
+        <div class="side before"><div class="lbl">Before · Braintrust experiment</div><img src="img/day2/bt-experiment.png" alt="Braintrust experiment" loading="lazy"></div>
+        <div class="side after"><div class="lbl">After · summary-first scorecard</div><img src="img/day2/hifi-experiment.png" alt="Our experiment scorecard" loading="lazy"></div>
+      </div>
+      <p class="cap"><b>Experiment.</b> We open on the <b>scorecard</b> — pass-rate, score distribution, token/latency — then the row table that drills straight into a trace. Summary-first by default.</p>
+    </div>
+
+    <div class="ba">
+      <div class="pair">
+        <div class="side before"><div class="lbl">Before · Arize trace (buried)</div><img src="img/day2/az-trace.png" alt="Arize trace" loading="lazy"></div>
+        <div class="side after"><div class="lbl">After · one-click trace</div><img src="img/day2/hifi-trace-pass.png" alt="Our trace" loading="lazy"></div>
+      </div>
+      <p class="cap"><b>Trace.</b> One click from any row. The span tree reconciles token-spend, and the <b>evaluator’s reasoning</b> is front-and-centre next to output vs. expected — no hunting.</p>
+    </div>
+  </section>
+
+  <!-- WALKTHROUGH -->
+  <section id="walk">
+    <div class="eyebrow"><span class="num">07</span> Screen-by-screen walkthrough</div>
+    <h2>Every page, and why it’s designed that way</h2>
+    <p class="body">Expand any screen for its shot, the design decisions, and how it beats Arize &amp; Braintrust. (This is the same content as the in-app <b>“Why this design?”</b> button.)</p>
+
+    <details class="wt p1" open>
+      <summary><span class="wn">01</span><span class="wtt">Overview — the loop, learnable</span><span class="route">/#/</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-overview.png" alt="Overview" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Loop-as-onboarding: a 5-step checklist (Build · Evaluate · Observe).</span></li><li><span>Summary-first: progress + the next action up top.</span></li><li><span>Secrets never render — “Your API key stays hidden”.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>They drop you in an empty dashboard; we teach the loop by walking it.</span></li><li><span>Honest token framing, never a fake $ cost.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p1">
+      <summary><span class="wn">02</span><span class="wtt">Prompts — the versioned library</span><span class="route">/#/prompts</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-list-dark.png" alt="Prompt list" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Run status by icon shape (WCAG), not colour alone.</span></li><li><span>Version, env dot, labels, last-run all visible.</span></li><li><span>Row → Edit; hover-Run; ⋯ menu to govern.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>A real library with env + version; competitors bury versioning.</span></li><li><span>Token-spend column, never a made-up dollar figure.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p1">
+      <summary><span class="wn">03</span><span class="wtt">Edit — write &amp; try in one place</span><span class="route">/#/prompts/gst-qna</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-edit.png" alt="Edit" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Single-brace <span class="tokchip">{question}</span> — matches the shipped parser.</span></li><li><span>Live test: tokens + latency (no cost) + Capture.</span></li><li><span>Inspector: output type, inputs, references, token budget.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Braintrust’s playground is ephemeral; ours is capturable + promotable.</span></li><li><span>One surface: write → try → “Run as an experiment →”.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p1">
+      <summary><span class="wn">04</span><span class="wtt">Run — batch over the dataset</span><span class="route">/#/prompts/gst-qna/run</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-run.png" alt="Run" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Rows stream in as they finish.</span></li><li><span>Temporary until promoted to a tracked experiment.</span></li><li><span>Token-spend + latency per row.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Braintrust makes you wait for the whole run; ours streams.</span></li><li><span>A clear ephemeral → tracked seam.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p1">
+      <summary><span class="wn">05</span><span class="wtt">Compress — trim tokens, keep behaviour</span><span class="route">/#/prompts/gst-qna/compress</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-compress.png" alt="Compress" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Greyed = removed (with a legend), not struck.</span></li><li><span>Token savings shown (1,240 → 890, 28%).</span></li><li><span>LLMLingua backend flagged as a fast-follow (⚑).</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Neither competitor offers prompt compression with token economics.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p2">
+      <summary><span class="wn">06</span><span class="wtt">Manage — versions, envs, people</span><span class="route">/#/prompts/gst-qna/manage</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-manage.png" alt="Manage" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Promote disabled when already in production (tooltip why).</span></li><li><span>Owner static; members removable; roles as selects.</span></li><li><span>Delete gated by type-to-confirm.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Governance is first-class + summary-first, not buried in settings.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p2">
+      <summary><span class="wn">07</span><span class="wtt">Dataset — the test set</span><span class="route">/#/datasets</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-datasets.png" alt="Datasets" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Column mapping set once at import (input/expected/metadata).</span></li><li><span>One standard dataset template across the loop.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Arize’s import is dense + multi-step; ours is a single mapping.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p2">
+      <summary><span class="wn">08</span><span class="wtt">Evaluator — how answers are scored</span><span class="route">/#/evaluators</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-evaluators.png" alt="Evaluators" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Evaluator is a first-class, reusable object (⚑ backend flagged).</span></li><li><span>Variables mapped once (input/output/expected).</span></li><li><span>Live test shows verdict + reasoning + token-spend.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Braintrust’s scorer setup is painful; ours is a template + live test.</span></li><li><span>Decoupled evaluators, reusable across experiments.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p2">
+      <summary><span class="wn">09</span><span class="wtt">Experiment — the scorecard</span><span class="route">/#/experiments/7</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-experiment.png" alt="Experiment" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Summary-first: 83% pass + distribution before the table.</span></li><li><span>Token-spend + latency tiles (no $).</span></li><li><span>Any row → its own trace in one click.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Summary-first by default — competitors open on a raw table.</span></li><li><span>One-click experiment → trace linkage.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p4">
+      <summary><span class="wn">10</span><span class="wtt">Trace — the drill-down</span><span class="route">/#/traces/gst-003</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-trace-pass.png" alt="Trace" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Token chip + reconciling span totals (no $).</span></li><li><span>Reasoning / Messages / Raw JSON tabs.</span></li><li><span>Every row opens its own trace.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Braintrust’s link is good; Arize buries it — ours is one click.</span></li><li><span>The evaluator’s reasoning is front-and-centre.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p3">
+      <summary><span class="wn">11</span><span class="wtt">States &amp; edge cases</span><span class="route">/#/states</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <img class="shot" src="img/day2/hifi-states.png" alt="States" loading="lazy">
+        <div class="wtcols">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Empty states with one clear call-to-action.</span></li><li><span>A streaming “running” progress state.</span></li><li><span>Errored rows show n/a + the reason (429), never a silent blank.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>They under-design these; we make them first-class.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="wt p4">
+      <summary><span class="wn">12</span><span class="wtt">Responsive + in-app guide</span><span class="route">any width</span><svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="wtbody">
+        <div class="imrow imgrow" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <figure style="margin:0"><img class="shot" style="margin:0" src="img/day2/hifi-mobile-list-cards.png" alt="Mobile" loading="lazy"><figcaption>Mobile — table becomes cards; rail collapses to a sheet.</figcaption></figure>
+          <figure style="margin:0"><img class="shot" style="margin:0" src="img/day2/hifi-guide.png" alt="Guide button" loading="lazy"><figcaption>The “Why this design?” panel — on every screen.</figcaption></figure>
+        </div>
+        <div class="wtcols" style="margin-top:6px">
+          <div><h4>Design decisions</h4><ul class="bullets"><li><span>Usable to 390px: rail → hamburger sheet, panes stack, tables → cards.</span></li><li><span>⌘K, loop ribbon and summary-first are identical at every width.</span></li></ul></div>
+          <div><h4>Better than Arize &amp; Braintrust</h4><ul class="bullets"><li><span>Both are effectively unusable below ~1000px.</span></li><li><span>The in-app guide explains our thinking as you click — no doc-hunting.</span></li></ul></div>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- SCORECARD -->
+  <section>
+    <div class="eyebrow"><span class="num">08</span> The bottom line</div>
+    <h2>How Keystone beats the reference tools</h2>
+    <table class="score">
+      <thead><tr><th>Dimension</th><th>Braintrust</th><th>Arize</th><th>Keystone</th></tr></thead>
+      <tbody>
+        <tr><td>First-run / empty states</td><td>bare</td><td>bare</td><td class="ks">Guided, one CTA each</td></tr>
+        <tr><td>Results default</td><td>table-ish</td><td>dense tables</td><td class="ks">Summary-first scorecard</td></tr>
+        <tr><td>Experiment → trace</td><td>good</td><td>buried</td><td class="ks">One click</td></tr>
+        <tr><td>Running a batch</td><td>wait for all</td><td>wait</td><td class="ks">Rows stream in</td></tr>
+        <tr><td>Errors</td><td>often silent</td><td>opaque</td><td class="ks">n/a + reason + retry</td></tr>
+        <tr><td>Command palette</td><td>generic</td><td>generic</td><td class="ks">Context-aware, 10 verbs</td></tr>
+        <tr><td>Responsive</td><td>desktop-only</td><td>desktop-only</td><td class="ks">Down to 390px</td></tr>
+        <tr><td>Cost honesty</td><td>$ estimates</td><td>$ estimates</td><td class="ks">Token-spend (no fake $)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <div class="links">
+      <a class="linkchip" href="keystone/" target="_blank" rel="noopener"><svg class="svgi" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>Open the prototype</a>
+      <a class="linkchip" href="docs.html"><svg class="svgi" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>Read the docs</a>
+      <a class="linkchip" href="https://drive.google.com/drive/folders/1gpu2vbfQFWN8FaoEotStJr9d5Ml4bhPE" target="_blank" rel="noopener"><svg class="svgi" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>Deliverables on Drive</a>
+      <a class="linkchip" href="index.html"><svg class="svgi" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Back to the showcase</a>
+    </div>
+    Keystone · Day 2 · shadcn New York · dark + light · token-spend, no fake $ · ⌘K everywhere · mock data, no backend<br>
+    by Amaan · for Zaki &amp; Safi · <a href="https://github.com/aman-esberi/esberi.github.com/tree/keystone-prototypes" target="_blank" rel="noopener">source on GitHub</a>
+  </footer>
+
+</div>
+</body>
+</html>
