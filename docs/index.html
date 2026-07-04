@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Keystone — Prototypes</title>
+<title>Keystone — Day 2 · The evaluation loop</title>
 <style>
 :root{
   --background:#020817; --card:#0b1220; --foreground:#f8fafc;
@@ -141,27 +141,9 @@ footer a{color:var(--muted-foreground)}
 <body>
 <div class="wrap">
   <div class="mark"><span class="glyph">K</span>keystone<span style="opacity:.5">/ prototypes</span></div>
-  <h1>Keystone — design prototypes</h1>
-  <p class="lede">Clickable, self-contained mock-ups for four Keystone surfaces, built on shadcn/ui (New York) in a dark developer-console theme. No backend — every interaction is mocked. Dark by default; a light toggle lives in each account menu.</p>
+  <h1>Keystone — the evaluation loop</h1>
+  <p class="lede"><b>Day 2.</b> The loop — from research and wireframes to a clickable shadcn/ui “New York” prototype you can walk end-to-end: Dataset → Prompt → Evaluator → Experiment → Trace. No backend, mock data. Dark by default; a light toggle lives in each account menu. <span style="color:var(--muted-foreground)">Day 1’s four admin surfaces are on the <a href="day-1.html">Day 1 page</a> — or use the calendar below.</span></p>
   <div class="note">🔒 <span>Internal client work · unlisted preview.</span> Mock data only — nothing here talks to a real system.</div>
-
-  <div style="margin-top:22px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(180deg,#0d1424,#0b1220);padding:20px 20px 22px">
-    <div style="display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#4ade80"><span style="width:7px;height:7px;border-radius:99px;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.15)"></span> New · Day 2</div>
-    <h2 style="font-size:20px;font-weight:700;letter-spacing:-.01em;margin:9px 0 6px">The clickable Keystone prototype</h2>
-    <p style="font-size:13.5px;color:var(--muted-foreground);line-height:1.6;max-width:660px">The full evaluation loop as a real shadcn “New York” app — <b style="color:var(--foreground)">Dataset → Prompt → Evaluator → Experiment → Trace</b>. Dark by default (light toggle top-right), responsive, mock data. <b style="color:var(--foreground)">Zaki &amp; Safi</b> — here’s the 60-second path to test it yourself:</p>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin:15px 0 16px">
-      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">1 · Overview</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">See the 5-step loop; click <b style="color:#fff">Prompts</b>.</div></div>
-      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">2 · Edit</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">Open <b style="color:#fff">GST QnA</b>; live-test a row, hit Run.</div></div>
-      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">3 · Run</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">Batch the dataset → <b style="color:#fff">Run as an experiment</b>.</div></div>
-      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">4 · Scorecard</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">83% pass — click any <b style="color:#fff">row</b>.</div></div>
-      <div style="flex:1;min-width:150px;background:var(--background);border:1px solid var(--border);border-radius:9px;padding:10px 12px"><div style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted-foreground);margin-bottom:5px">5 · Trace</div><div style="font-size:12.5px;color:#cbd5e1;line-height:1.45">See the span tree + <b style="color:#fff">why it failed</b>.</div></div>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px">
-      <a class="linkchip" style="background:var(--primary);color:var(--background);border-color:var(--primary)" href="keystone/" target="_blank" rel="noopener">▶ Open the prototype</a>
-      <a class="linkchip" href="day-2.html">Day 2 walkthrough →</a>
-    </div>
-    <div style="margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground)">Tip — click <b style="color:var(--foreground)">“Why this design?”</b> (bottom-right) on any screen for the decision behind it, or press <b style="color:var(--foreground)">⌘K</b> for the command palette.</div>
-  </div>
 
   <div class="prds">
     <div class="prdhead">Source PRDs <span class="n">· the live briefs on GitHub — tracked for updates</span></div>
@@ -173,7 +155,7 @@ footer a{color:var(--muted-foreground)}
     </div>
   </div>
 
-  <details class="cal" id="cal">
+  <details class="cal" id="cal" open>
     <summary class="calbar">
       <svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       <span class="caldate" id="calDate">—</span>
@@ -188,109 +170,76 @@ footer a{color:var(--muted-foreground)}
     </div>
   </details>
 
+  <a class="cardlink" href="keystone/" target="_blank" rel="noopener" style="--accent:#a78bfa;display:block;margin-top:16px">
+    <div class="tag">CLICKABLE PROTOTYPE · THE LOOP</div>
+    <h2><span class="dot"></span>The evaluation loop →</h2>
+    <p>The full loop as a real shadcn “New York” app — Dataset → Prompt → Evaluator → Experiment → Trace. Open the Overview, live-test a prompt, run it as an experiment, open a row, read the trace. Dark + light, responsive, with an in-app “Why this design?” on every screen.</p>
+    <div class="open">Open the prototype →</div>
+  </a>
+
   <div class="grid">
-    <a class="cardlink p1" href="prompts.html">
-      <div class="tag">ISSUE #1</div>
-      <h2><span class="dot"></span>Prompt Management</h2>
-      <p>Write → try → batch → compare → compress → govern, without leaving the surface. Streaming runs, drag-to-reorder segments, LLMLingua compression with token economics.</p>
-      <div class="open">Open prototype →</div>
+    <a class="cardlink p1" href="day-2-walkthrough.html">
+      <div class="tag">WALKTHROUGH</div>
+      <h2><span class="dot"></span>The design story</h2>
+      <p>Start to end: what we learned from Arize &amp; Braintrust, the 7 principles, every decision &amp; why, before → after, and a screen-by-screen walkthrough of the prototype.</p>
+      <div class="open">Read the walkthrough →</div>
     </a>
-    <a class="cardlink p2" href="org-admin.html">
-      <div class="tag">ISSUE #2</div>
-      <h2><span class="dot"></span>Organization Admin</h2>
-      <p>Org-scope governance in five surfaces: members &amp; roles (domain-bound, promote/demote), the project portfolio with transfer-ownership, an org label taxonomy, settings, and a read-only audit lens.</p>
-      <div class="open">Open prototype →</div>
+    <a class="cardlink p2" href="docs.html#day2-competitor-teardown">
+      <div class="tag">RESEARCH</div>
+      <h2><span class="dot"></span>Arize &amp; Braintrust teardown</h2>
+      <p>We ran the same GST loop live on both tools — interaction maps, accessibility notes, and a copy-vs-avoid verdict per pattern that shaped the design.</p>
+      <div class="open">Read the teardown →</div>
     </a>
-    <a class="cardlink p3" href="inbox.html">
-      <div class="tag">ISSUE #3</div>
-      <h2><span class="dot"></span>Inbox</h2>
-      <p>A cross-project feed + task queue where notifications clear by reading and tasks clear only by acting. Deciding animates an item out of the queue.</p>
-      <div class="open">Open prototype →</div>
+    <a class="cardlink p1" href="docs.html#day2-design-review">
+      <div class="tag">DESIGN REVIEW</div>
+      <h2><span class="dot"></span>Principles &amp; decisions</h2>
+      <p>The 7 principles the loop is built on and every decision with its rationale — token-spend not $, single-brace {variable}, summary-first, evaluator as a first-class object.</p>
+      <div class="open">Read the review →</div>
     </a>
-    <a class="cardlink p4" href="platform.html">
-      <div class="tag">ISSUE #4</div>
-      <h2><span class="dot"></span>System Admin</h2>
-      <p>The platform control plane — provision orgs, and the audited “Enter-org” assume-role that lets an operator govern a tenant without reading its data.</p>
-      <div class="open">Open prototype →</div>
+    <a class="cardlink p4" href="docs.html#day2-hifi-build">
+      <div class="tag">BUILD + AUDIT</div>
+      <h2><span class="dot"></span>Hi-fi build log</h2>
+      <p>How the prototype was built and then adversarially audited — 1 blocker + 6 majors found and fixed, re-verified, and type-checked clean.</p>
+      <div class="open">Read the build log →</div>
     </a>
   </div>
 
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Day 2’s design review + Arize/Braintrust teardown + hi-fi plan &amp; build log, plus the research, four briefs, gap analysis, design principles &amp; decisions and the audit — 19 docs, readable in-browser, plus the design-report PDF.</p>
+    <p>Every doc, readable in-browser — Day 2’s design review, the competitor teardown and the hi-fi plan &amp; build log, on top of all of Day 1’s research, the four briefs, gap analysis, principles &amp; decisions and the audit. 19 docs, plus the design-report PDF.</p>
   </a>
 
   <div class="docsx">
     <div class="docsxhead">
-      <div class="t">Copy the docs as Markdown <span id="docsxN"></span></div>
+      <div class="t">Copy Day 2’s docs as Markdown <span id="docsxN"></span></div>
       <button class="copyall" id="copyAll" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="lbl">Copy all docs</span></button>
     </div>
     <div class="docsxgrid" id="docsxGrid"></div>
   </div>
 
   <section class="gh">
-    <h2>GitHub updates <span class="ghsub">· replies to issues #1–#4</span></h2>
-    <p class="ghlede">The status posted back on each of Zaki's four issues — what shipped, the decisions to ratify, and the open questions before backend wiring. Each links to its clickable prototype; the full write-ups are in the <a href="docs.html#github-comments">GitHub comment drafts</a> doc.</p>
+    <h2>GitHub update <span class="ghsub">· Day 2 — the evaluation loop</span></h2>
+    <p class="ghlede">What we posted back on <a href="https://github.com/esberi/keystone/issues/1" target="_blank" rel="noopener">issue #1</a> today: the loop is now a clickable prototype, the decisions to ratify, and the open questions before backend wiring. The full drafts are in the <a href="docs.html#github-comments">GitHub comment drafts</a> doc.</p>
 
     <details class="ghitem p1" open>
-      <summary><span class="ghtag">#1</span><span class="ghtitle">Prompt Management</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <summary><span class="ghtag">#1</span><span class="ghtitle">Prompt Management → the evaluation loop</span><span class="ghstatus">Clickable prototype</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
       <div class="ghbody">
-        <p>All ten jobs-to-be-done are mockable and reachable: <b>List</b> (env badges, labels, hover-run, ⋯ menu) · <b>Edit</b> (chat + text, <code>{{variable}}</code> highlighting, reference chips, live token budget) · <b>Run</b> (Single / Batch / Compare / Inspect) · <b>Compress</b> (three LLMLingua methods with token economics) · <b>Manage</b> · ⌘K.</p>
+        <p>The full loop is now walkable end-to-end — <b>Dataset → Prompt → Evaluator → Experiment → Trace</b> — as a real shadcn “New York” app: <b>Edit</b> (chat + text, <code>{variable}</code> highlighting, reference chips, live token budget) · <b>Run</b> (single / batch / compare / inspect) · <b>Experiment</b> (summary-first scorecard, rows stream in) · <b>Trace</b> (span tree + the evaluator's reasoning, one click from a row) · <b>Compress</b> · <b>Manage</b> · ⌘K.</p>
         <span class="lbl">Decisions to ratify</span>
         <ul>
-          <li>Every save <b>auto-versions</b> ("Saved as v13"); <b>Restore is non-destructive</b> (restores into a new version), matching <code>keystone-main</code>.</li>
-          <li><b>Kind is fixed at creation</b> (chat vs text); dark is default, light is fully implemented + AA-checked.</li>
+          <li><b>Token-spend, never $</b> — the repo has no cost concept, so we show tokens, not fabricated dollars.</li>
+          <li><b>Single-brace <code>{variable}</code></b> to match the shipped parser (<code>/\{(\w+)\}/</code>), not the brief's <code>{{message}}</code>.</li>
+          <li><b>Evaluator is a first-class object</b> (reusable, versioned), bound into experiments — not a per-experiment setting.</li>
         </ul>
         <span class="lbl">Open questions before wiring</span>
         <ul>
-          <li>Variable syntax: the brief writes <code>{{message}}</code>, but <code>keystone-main</code> ships f-string <code>{message}</code> — which should the UI teach?</li>
-          <li>The library entity stores a single flat <code>template</code>; a chat prompt's <code>messages[]</code> has nowhere to live — is a per-kind <code>body</code> shape the committed direction?</li>
-          <li>No price table exists in the repo — is a rate card planned, or should cost stay estimate-labelled?</li>
+          <li>Evaluator-as-object ↔ experiment binding — confirm the model.</li>
+          <li>Prompt-compression scope for v1.</li>
+          <li>Org cost / budgets — is a rate card planned, or does spend stay token-only?</li>
+          <li>Ship a canned sample project so first-run isn't empty?</li>
         </ul>
-        <a class="ghopen" href="prompts.html">Open prototype →</a>
-      </div>
-    </details>
-
-    <details class="ghitem p2">
-      <summary><span class="ghtag">#2</span><span class="ghtitle">Organization Admin</span><span class="ghstatus">Rebuilt to your brief</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
-      <div class="ghbody">
-        <p>Now rebuilt to the <b>full brief you published</b> (the earlier version was synthesized while #2 had no text). The surface is the <b>five governance surfaces</b> the brief specifies — nothing more:</p>
-        <ul>
-          <li><b>Members</b> — org roles (<code>org_admin</code>/<code>member</code>) + a <code>can_create_projects</code> flag; <b>domain-bound</b> invites (rejects non-<code>@northwind.com</code>); remove <b>reassigns owned projects</b> first; the at-least-one-admin guardrail.</li>
-          <li><b>Projects</b> — the portfolio + <b>transfer-ownership</b> (the one power no project role has); archive/unarchive.</li>
-          <li><b>Labels</b> — the org <code>key:value</code> taxonomy (usage counts, rename, <b>merge</b>, delete); read-only to projects.</li>
-          <li><b>Settings</b> — org name/region/residency; email domain <b>read-only</b> (system-admin owned).</li>
-          <li><b>Audit</b> — read-only org-lens stream; scope + source badges; before→after; export.</li>
-        </ul>
-        <p><b>Dropped per your scope (§10):</b> Secrets, Connections, Billing, API keys — project-scoped or deferred for v1.</p>
-        <a class="ghopen" href="org-admin.html">Open prototype →</a>
-      </div>
-    </details>
-
-    <details class="ghitem p3">
-      <summary><span class="ghtag">#3</span><span class="ghtitle">Inbox</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
-      <div class="ghbody">
-        <p>The load-bearing rule is <b>enforced in code, not just drawn</b>: informational = read-to-clear, actionable = <b>act-to-clear</b> (mark-read never touches an actionable). Deciding resolves in place — the item leaves Needs-action, stays in All with an outcome chip, and the account-block badge decrements live.</p>
-        <ul>
-          <li>Needs-action sorts by urgency; All is reverse-chronological.</li>
-          <li>One approval <b>auto-resolves ~20s after you open the Inbox</b> ("Resolved by another approver") — the first-decision-wins / no-zombie-tasks property, demonstrated. An expired approval shows "expired · missed".</li>
-        </ul>
-        <span class="lbl">Deferred exactly per your non-goals</span>
-        <ul><li>Preferences/channels, bulk approve, threads, grouping/digests.</li></ul>
-        <a class="ghopen" href="inbox.html">Open prototype →</a>
-      </div>
-    </details>
-
-    <details class="ghitem p4">
-      <summary><span class="ghtag">#4</span><span class="ghtitle">System Admin</span><span class="ghstatus">Prototype ready</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
-      <div class="ghbody">
-        <p>The control plane with the <b>tenant boundary enforced</b>: three operator surfaces (Organizations · Platform Settings · Platform Audit), no project shell. Org lifecycle with guarded actions — <b>Delete disabled until suspended</b>, resend-invite only while pending-setup.</p>
-        <ul>
-          <li><b>Enter org (the showpiece)</b>: re-auth → "you'll act as an administrator; this session is audited" → the shell switches to that org's Admin under a persistent banner. The northwind "no reachable admin" recovery journey works end-to-end.</li>
-          <li>Delete is guarded: suspend-first → re-auth → type-the-name with blast radius → 30-day soft window + Restore. <b>Platform Audit</b> highlights <code>operator.*</code> rows — the "prove isolation" view.</li>
-        </ul>
-        <a class="ghopen" href="platform.html">Open prototype →</a>
+        <a class="ghopen" href="keystone/" target="_blank" rel="noopener">Open the prototype →</a>
       </div>
     </details>
   </section>
@@ -355,7 +304,7 @@ The clickable base for the design work is live and ready to review — all mock 
    summary:'Took the loop (Dataset → Prompt → Evaluator → Experiment → Trace) from research + wireframes to a real, clickable shadcn “New York” prototype you can walk end-to-end — grounded in the actual esberi/keystone repo + PRD #1, dark + light, responsive, with an in-app “Why this design?” guide. Audited and fixed.',
    items:[
      {t:'Clickable Keystone prototype — 13 screens, the full loop (dark + light, responsive)', href:'keystone/', done:true},
-     {t:'Day 2 write-up — research, principles, decisions, before/after, walkthrough', href:'day-2.html', done:true},
+     {t:'Day 2 walkthrough — research, principles, decisions, before/after, screen-by-screen', href:'day-2-walkthrough.html', done:true},
      {t:'Arize + Braintrust teardown — ran the loop live on both; copy vs avoid', href:'docs.html#day2-competitor-teardown', done:true},
      {t:'Design review — the 7 principles + every decision & why', href:'docs.html#day2-design-review', done:true},
      {t:'Hi-fi build log + adversarial audit (1 blocker + 6 majors, all fixed)', href:'docs.html#day2-hifi-build', done:true},
@@ -421,12 +370,10 @@ Open the prototype → Overview → open GST QnA → live-test a row → Run →
 /* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
 (function(){
  const DOCS=[
-  {s:'day2-design-review',t:'Day 2 — Design review'},{s:'day2-competitor-teardown',t:'Day 2 — Arize & Braintrust teardown'},{s:'day2-hifi-plan',t:'Day 2 — Hi-fi plan'},{s:'day2-hifi-build',t:'Day 2 — Hi-fi build log'},
-  {s:'overview',t:'At a glance'},{s:'readme',t:'README — folder index'},{s:'engagement-report',t:'Engagement report'},
-  {s:'domain-guide',t:'Domain guide + jargon'},{s:'gap-analysis',t:'Gap analysis'},{s:'shadcn-newyork-spec',t:'shadcn New York spec'},
-  {s:'execution-plan',t:'Execution plan'},{s:'audit-notes',t:'Audit notes'},{s:'brief-prompts',t:'#1 Prompt Management'},
-  {s:'brief-org-admin',t:'#2 Organization Admin'},{s:'brief-inbox',t:'#3 Inbox'},{s:'brief-system-admin',t:'#4 System Admin'},
-  {s:'style-contract',t:'Style contract'},{s:'redesign-brief',t:'Redesign brief'},{s:'github-comments',t:'GitHub comment drafts'}
+  {s:'day2-design-review',t:'Design review — principles & decisions'},
+  {s:'day2-competitor-teardown',t:'Arize & Braintrust teardown'},
+  {s:'day2-hifi-plan',t:'Hi-fi plan'},
+  {s:'day2-hifi-build',t:'Hi-fi build log + audit'}
  ];
  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
  function cleanMd(src){
@@ -454,7 +401,7 @@ Open the prototype → Overview → open GST QnA → live-test a row → Run →
   all.querySelector('.lbl').textContent='Copying…';let ok=false;
   try{
    const parts=await Promise.all(DOCS.map(d=>fetchMd(d.s).catch(()=>'')));
-   const body='# Keystone — Complete Documentation\n\n*Every engagement doc, copied from the showcase. Read them one-by-one at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
+   const body='# Keystone — Day 2 Documentation\n\n*Day 2’s design docs, copied from the showcase. Read them at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
    ok=await clip(body);
   }catch(e){ok=false;}
   feedback(all,ok,'Copy all docs');

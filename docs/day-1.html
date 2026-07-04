@@ -155,7 +155,7 @@ footer a{color:var(--muted-foreground)}
     </div>
   </div>
 
-  <details class="cal" id="cal">
+  <details class="cal" id="cal" open>
     <summary class="calbar">
       <svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       <span class="caldate" id="calDate">—</span>
@@ -332,17 +332,17 @@ The clickable base for the design work is live and ready to review — all mock 
 • I'll also review the Arize and Braintrust UIs and flows for reference
 
 🔗 Today's work: https://aman-esberi.github.io/esberi.github.com/` },
- { n:2, date:'2026-07-04', status:'planned',
-   title:'First design iterations (expected)',
-   summary:'Planned for Day 2 — the first iteration pass on the designs, folding in the reviewed docs and the latest PRDs. Links appear here as the work ships.',
+ { n:2, date:'2026-07-04', status:'done', page:'day-2.html',
+   title:'The evaluation loop — designed and made clickable',
+   summary:'Took the loop (Dataset → Prompt → Evaluator → Experiment → Trace) from research + wireframes to a real, clickable shadcn “New York” prototype you can walk end-to-end — grounded in the actual esberi/keystone repo + PRD #1, dark + light, responsive, with an in-app “Why this design?” guide. Audited and fixed.',
    items:[
-     {t:'First iteration of the four surface designs', done:false},
-     {t:'Prompt Management updated to the revised PRD #1', done:false},
-     {t:'Organization Admin aligned to the real brief #2 (five surfaces)', done:false},
-     {t:'Amaan’s documentation-review feedback incorporated', done:false},
-     {t:'Next UI/UX audit round + responsive & all-flows check', done:false},
+     {t:'Clickable Keystone prototype — 13 screens, the full loop (dark + light, responsive)', href:'keystone/', done:true},
+     {t:'Day 2 walkthrough — research, principles, decisions, before/after, screen-by-screen', href:'day-2-walkthrough.html', done:true},
+     {t:'Arize + Braintrust teardown — ran the loop live on both; copy vs avoid', href:'docs.html#day2-competitor-teardown', done:true},
+     {t:'Design review — the 7 principles + every decision & why', href:'docs.html#day2-design-review', done:true},
+     {t:'Hi-fi build log + adversarial audit (1 blocker + 6 majors, all fixed)', href:'docs.html#day2-hifi-build', done:true},
    ],
-   note:'Placeholder — the daily update adds Day 2’s live links here as work ships.' },
+   note:'The clickable prototype is the headline — open it and walk Overview → Edit → Run → Experiment → Trace.' },
 ];
 (function(){
  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
