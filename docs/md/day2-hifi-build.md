@@ -108,3 +108,32 @@ token (dialog/alert-dialog/sheet); Sheet close focus ring; 5 ⌘K no-ops now rou
 
 **Status: demo-ready** for the desktop golden path + mobile, dark + light, audited + fixed. Next is the customer
 step (#8): before/after pack + Adel review + esberi/keystone issue #1 — pending Zaki's build-mode/deploy answers.
+
+---
+
+## Iteration 2 — client feedback round (Jul 5, 2026)
+
+Zaki & Safi walked all 13 screens of the clickable prototype; feedback was captured per-screen and implemented the same day, then rebuilt and redeployed.
+
+**Structure & navigation**
+- Loop-stage ribbon (Dataset → Prompt → Evaluator → Experiment → Trace) added to the Prompt screens (it already appeared on Dataset/Evaluator/Experiment/Trace).
+- Edit / Run / Manage tab bar made identical in position across all three prompt tabs — it previously jumped between tabs.
+- "States & edge cases" page added to the side rail (Reference group) so it's reachable, not URL-only.
+
+**Onboarding (Overview)**
+- Getting-started now starts fresh at step 1 and shows the whole loop — create dataset → write first prompt → add evaluator → run experiment → open trace — instead of dropping you mid-flow.
+- Recent-activity rows are now clickable links to their dataset / prompt / experiment / trace.
+
+**Every dead CTA wired up**
+- Datasets: a real CSV import wizard — choose/drag a file (or the sample) → preview → **map each column to a role** (input / expected / metadata / ignore), the pattern we liked in Arize *and* Braintrust — plus a working Add-row and rename / edit-mapping / delete lifecycle.
+- Evaluators: "Add to experiment" wired.
+- Experiment: **Compare** (pass-rate delta + per-row score diff) and the result-row → **trace** drill-down.
+- Experiments & Traces lists: per-row ⋯ actions, filter / sort / search, compare, and row-click navigation.
+
+**Prompts**
+- Chat vs text is now explained (one-line menu descriptions + an in-editor tooltip) and the two "New prompt" options open genuinely different editors (chat = system/user/assistant turns; text = a single free-form template).
+
+**Fix**
+- Trace deep-links now resolve to the requested row (the earlier gst-003 → gst-001 behaviour was a stale build; the source already honoured the id).
+
+Delivered via four parallel build agents with strict file ownership, typecheck-clean (`tsc --noEmit` exit 0), then `npm run build` → redeploy to `docs/keystone/`.
