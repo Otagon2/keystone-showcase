@@ -202,12 +202,18 @@ footer a{color:var(--muted-foreground)}
       <p>How the prototype was built and then adversarially audited — 1 blocker + 6 majors found and fixed, re-verified, and type-checked clean.</p>
       <div class="open">Read the build log →</div>
     </a>
+    <a class="cardlink p2" href="docs.html#day2-ux-audit" style="grid-column:1/-1">
+      <div class="tag">AUDIT &amp; ITERATION</div>
+      <h2><span class="dot"></span>UX audit → hardened</h2>
+      <p>Five independent reviewers audited every screen and the whole flow; we then implemented every finding — identity propagation, real Evaluator/Dataset libraries, per-topic &amp; multi-metric scorecards, a production Logs pillar, human review on traces, a real ⌘K and an accessibility pass. See the findings and the decisions &amp; why.</p>
+      <div class="open">Read the audit →</div>
+    </a>
   </div>
 
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Every doc, readable in-browser — Day 2’s design review, the competitor teardown and the hi-fi plan &amp; build log, on top of all of Day 1’s research, the four briefs, gap analysis, principles &amp; decisions and the audit. 19 docs, plus the design-report PDF.</p>
+    <p>Every doc, readable in-browser — Day 2’s UX audit &amp; design-decisions write-up, the design review, competitor teardown and hi-fi build log, on top of all of Day 1’s research, the four briefs, gap analysis and audit. 21 docs, plus the design-report PDF.</p>
   </a>
 
   <div class="docsx">
@@ -370,6 +376,8 @@ Open the prototype → Overview → open GST QnA → live-test a row → Run →
 /* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
 (function(){
  const DOCS=[
+  {s:'day2-ux-audit',t:'UX audit — 5 reviewers'},
+  {s:'day2-design-decisions',t:'Design decisions & why'},
   {s:'day2-design-review',t:'Design review — principles & decisions'},
   {s:'day2-competitor-teardown',t:'Arize & Braintrust teardown'},
   {s:'day2-hifi-plan',t:'Hi-fi plan'},
