@@ -294,41 +294,6 @@ footer a{color:var(--muted-foreground)}
 'use strict';
 /* Engagement day log. daily-ship-update appends one entry per day (with that day's links). */
 const DAYS=[
- { n:1, date:'2026-07-03', status:'done', page:'day-1.html',
-   title:'Base links ready — prototypes, docs & showcase are live',
-   summary:'The clickable base for design review is up: four surface prototypes, the documentation viewer, the GitHub-updates section, and the source-PRD tracker — all on the live site. Docs are ready for review.',
-   items:[
-     {t:'Live showcase (this site)', href:'index.html', done:true},
-     {t:'Prompt Management prototype', href:'prompts.html', done:true},
-     {t:'Organization Admin prototype', href:'org-admin.html', done:true},
-     {t:'Inbox prototype', href:'inbox.html', done:true},
-     {t:'System Admin prototype', href:'platform.html', done:true},
-     {t:'Documentation viewer — 15 docs, at-a-glance + copy-markdown', href:'docs.html', done:true},
-   ],
-   note:'Base links for design review. Docs need Amaan’s review next.',
-   slack:`:rocket: *Keystone — Day 1 · Fri, Jul 3*
-
-The clickable base for the design work is live and ready to review — all mock (no backend), for look, flow and feel.
-
-*What's ready (base links for review)*
-• All four surfaces as clickable prototypes — Prompt Management, Organization Admin, Inbox, System Admin (shadcn "New York", dark console theme)
-• A docs viewer with the full thinking — research, the four briefs, gap analysis, design principles, audit notes (15 docs, each copy-able)
-• A live tracker of Zaki's four PRDs + a day-by-day timeline of the work
-
-*Last 24 hours*
-• Built and refined the four prototypes and published them as a live showcase
-• Wrote the full documentation set + a design-report PDF
-• Stood up the showcase, docs viewer, PRD tracker and day-log calendar; mirrored deliverables to Google Drive
-
-*PRD watch*
-• #2 Organization Admin's full brief landed — the prototype is already rebuilt to it (five governance surfaces: members, projects, labels, settings, audit). #1 Prompt Management was also updated; folding that into tomorrow's iteration. #3 and #4 are unchanged.
-
-*Next*
-• Docs are ready for my review
-• Tomorrow (Day 2) I'll drop the first design iterations — folding in the doc review + the latest PRDs
-• I'll also review the Arize and Braintrust UIs and flows for reference
-
-🔗 Today's work: https://aman-esberi.github.io/esberi.github.com/` },
  { n:2, date:'2026-07-04', status:'done', page:'day-2.html',
    title:'The evaluation loop — designed and made clickable',
    summary:'Took the loop (Dataset → Prompt → Evaluator → Experiment → Trace) from research + wireframes to a real, clickable shadcn “New York” prototype you can walk end-to-end — grounded in the actual esberi/keystone repo + PRD #1, dark + light, responsive, with an in-app “Why this design?” guide. Audited and fixed.',
@@ -339,29 +304,7 @@ The clickable base for the design work is live and ready to review — all mock 
      {t:'Design review — the 7 principles + every decision & why', href:'docs.html#day2-design-review', done:true},
      {t:'Hi-fi build log + adversarial audit (1 blocker + 6 majors, all fixed)', href:'docs.html#day2-hifi-build', done:true},
    ],
-   note:'The clickable prototype is the headline — open it and walk Overview → Edit → Run → Experiment → Trace.',
-   slack:`:rocket: *Keystone — Day 2 · Sat, Jul 4*
-
-The evaluation loop is now a *clickable prototype* you can walk end-to-end — all mock data (no backend), for look, flow and feel.
-
-*What's ready*
-• The full loop as a real shadcn "New York" app — Overview → Prompt → Run → Experiment → Trace, plus Datasets, Evaluators, Manage, Compress and edge-case states (13 screens, dark + light, responsive to mobile)
-• Grounded in the real esberi/keystone repo + PRD #1 — token-spend (no invented $ cost), single-brace {variable} to match the shipped parser, evaluator designed as a first-class object
-• An in-app "Why this design?" button on every screen — the decision + why + how we beat Arize/Braintrust, as you click
-• A Day 2 write-up: research, the 7 principles, decisions, before → after, and a screen-by-screen walkthrough
-
-*How to test it (60 seconds)*
-Open the prototype → Overview → open GST QnA → live-test a row → Run → "Run as an experiment" → click a row → read the trace + the evaluator's reasoning.
-
-*Last 24 hours*
-• Reviewed Arize + Braintrust live (ran the same GST loop on both) and folded the lessons in
-• Built the prototype, then ran an adversarial audit — 1 blocker + 6 majors, all fixed and re-verified
-• Published it on the showcase + mirrored today's artefacts (Pencil file, HTML, screenshots, docs) to Google Drive
-
-*Open questions before backend wiring* (in the Day 2 doc)
-• Evaluator-as-object binding, prompt compression scope, org cost/budgets, and a canned sample project
-
-🔗 Prototype + write-up: https://aman-esberi.github.io/esberi.github.com/day-2.html` },
+   note:'The clickable prototype is the headline — open it and walk Overview → Edit → Run → Experiment → Trace.' },
 ];
 (function(){
  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
