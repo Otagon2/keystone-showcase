@@ -86,5 +86,5 @@ engineer-first. Ours keeps the loop framing, persists runs, and shows cost + sco
 ## Closing line
 "Braintrust is clean but hides things; Arize/Phoenix are complete but dense and raw-first.
 Keystone gives you their power with a legible loop, real governance, and it stays calm from
-row one to row ten-thousand." See `day4-vs-competitors.md` for the capability-by-capability
-comparison.
+row one to row ten-thousand." See `day3-sunday-vs-competitors.md` for the capability-by-
+capability comparison.
