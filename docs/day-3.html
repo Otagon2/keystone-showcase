@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Keystone — Day 2 · The evaluation loop</title>
+<title>Keystone — Day 3 · navigation + Datasets & Prompt Management to PRD</title>
 <style>
 :root{
   --background:#000000; --card:#0b1220; --foreground:#f8fafc;
@@ -166,14 +166,15 @@ footer a{color:var(--muted-foreground)}
   </div>
 </header>
 <div class="wrap">
-  <h1>Keystone — the evaluation loop</h1>
-  <p class="lede"><b>Day 2.</b> The loop — from research and wireframes to a clickable shadcn/ui “New York” prototype you can walk end-to-end: Dataset → Prompt → Evaluator → Experiment → Trace. No backend, mock data. Dark by default; a light toggle lives in each account menu. <span style="color:var(--muted-foreground)">Day 1’s four admin surfaces are on the <a href="day-1.html">Day 1 page</a> — or use the calendar below.</span></p>
+  <h1>Keystone — review round, answered</h1>
+  <p class="lede"><b>Day 3.</b> Zaki’s review, answered point by point — breadcrumbs removed, page titles &amp; CTAs moved into the top bar, a collapsible sidebar, Light/Dark/System theme in the account menu — plus the full <b>Dataset Management PRD (#5)</b> and <b>Prompt Management PRD (#1)</b> built out, grounded in a fresh live teardown of Braintrust and Arize. <span style="color:var(--muted-foreground)">Earlier days: <a href="day-1.html">Jul 3</a> · <a href="day-2.html">Jul 4</a>.</span></p>
   <div class="note">🔒 <span>Internal client work · unlisted preview.</span> Mock data only — nothing here talks to a real system.</div>
 
   <div class="prds">
     <div class="prdhead">Source PRDs <span class="n">· the live briefs on GitHub — tracked for updates</span></div>
     <div class="prdrow">
-      <a class="prd i1" href="https://github.com/esberi/keystone/issues/1" target="_blank" rel="noopener"><span class="pn">#1</span><span class="pt">Prompt Management</span><span class="upd"><span class="fresh"></span>updated Jul 3</span></a>
+      <a class="prd i1" href="https://github.com/esberi/keystone/issues/5" target="_blank" rel="noopener"><span class="pn">#5</span><span class="pt">Dataset Management</span><span class="upd"><span class="fresh"></span>new Jul 9</span></a>
+      <a class="prd i1" href="https://github.com/esberi/keystone/issues/1" target="_blank" rel="noopener"><span class="pn">#1</span><span class="pt">Prompt Management</span><span class="upd">updated Jul 3</span></a>
       <a class="prd i2" href="https://github.com/esberi/keystone/issues/2" target="_blank" rel="noopener"><span class="pn">#2</span><span class="pt">Organization Admin</span><span class="upd">updated Jul 2</span></a>
       <a class="prd i3" href="https://github.com/esberi/keystone/issues/3" target="_blank" rel="noopener"><span class="pn">#3</span><span class="pt">User Inbox</span><span class="upd">updated Jul 2</span></a>
       <a class="prd i4" href="https://github.com/esberi/keystone/issues/4" target="_blank" rel="noopener"><span class="pn">#4</span><span class="pt">System Admin</span><span class="upd">updated Jul 2</span></a>
@@ -196,81 +197,67 @@ footer a{color:var(--muted-foreground)}
   </details>
 
   <a class="cardlink" href="keystone/" target="_blank" rel="noopener" style="--accent:#a78bfa;display:block;margin-top:16px">
-    <div class="tag">CLICKABLE PROTOTYPE · THE LOOP</div>
-    <h2><span class="dot"></span>The evaluation loop →</h2>
-    <p>The full loop as a real shadcn “New York” app — Dataset → Prompt → Evaluator → Experiment → Trace. Open the Overview, live-test a prompt, run it as an experiment, open a row, read the trace. Dark + light, responsive, with an in-app “Why this design?” on every screen.</p>
+    <div class="tag">CLICKABLE PROTOTYPE · REBUILT SHELL + DATASETS + PROMPTS</div>
+    <h2><span class="dot"></span>Open the updated prototype →</h2>
+    <p>New navigation (top-bar page headers, collapsible sidebar, ⌘K, Light/Dark/System), the complete Datasets area (stats + filters + Display columns, three create paths with a drag-to-bucket CSV mapper, Items/Versions/Experiments/Manage, version pins &amp; golden tags) and Prompt Management finished to PRD #1 (editable segments, runner binding with Secrets gating, Single/Batch/Compare, Inspect, Add-to-Dataset).</p>
     <div class="open">Open the prototype →</div>
   </a>
 
   <div class="grid">
-    <a class="cardlink p1" href="day-2-walkthrough.html">
-      <div class="tag">WALKTHROUGH</div>
-      <h2><span class="dot"></span>The design story</h2>
-      <p>Start to end: what we learned from Arize &amp; Braintrust, the 7 principles, every decision &amp; why, before → after, and a screen-by-screen walkthrough of the prototype.</p>
-      <div class="open">Read the walkthrough →</div>
+    <a class="cardlink p1" href="docs.html#day3-zaki-feedback-response">
+      <div class="tag">REVIEW RESPONSE</div>
+      <h2><span class="dot"></span>Zaki’s review, answered</h2>
+      <p>Every point from the July 9 review — breadcrumbs, top-bar headers, theme menu, sidebar hide/open, the Datasets table and the three create paths — with before → after → why for each.</p>
+      <div class="open">Read the response →</div>
     </a>
-    <a class="cardlink p2" href="docs.html#day2-competitor-teardown">
-      <div class="tag">RESEARCH</div>
-      <h2><span class="dot"></span>Arize &amp; Braintrust teardown</h2>
-      <p>We ran the same GST loop live on both tools — interaction maps, accessibility notes, and a copy-vs-avoid verdict per pattern that shaped the design.</p>
+    <a class="cardlink p2" href="docs.html#day3-datasets-vs-competitors">
+      <div class="tag">LIVE RESEARCH</div>
+      <h2><span class="dot"></span>Braintrust &amp; Arize, torn down again</h2>
+      <p>A fresh hands-on pass over both Datasets areas — create flows, CSV mapping, detail surfaces, shells — and the eight places Keystone now does better (accessible mapper, human versioning, provenance, typed-name delete…).</p>
       <div class="open">Read the teardown →</div>
     </a>
-    <a class="cardlink p1" href="docs.html#day2-design-review">
-      <div class="tag">DESIGN REVIEW</div>
-      <h2><span class="dot"></span>Principles &amp; decisions</h2>
-      <p>The 7 principles the loop is built on and every decision with its rationale — token-spend not $, single-brace {variable}, summary-first, evaluator as a first-class object.</p>
-      <div class="open">Read the review →</div>
-    </a>
-    <a class="cardlink p4" href="docs.html#day2-hifi-build">
-      <div class="tag">BUILD + AUDIT</div>
-      <h2><span class="dot"></span>Hi-fi build log</h2>
-      <p>How the prototype was built and then adversarially audited — 1 blocker + 6 majors found and fixed, re-verified, and type-checked clean.</p>
-      <div class="open">Read the build log →</div>
-    </a>
-    <a class="cardlink p2" href="docs.html#day2-ux-audit" style="grid-column:1/-1">
-      <div class="tag">AUDIT &amp; ITERATION</div>
-      <h2><span class="dot"></span>UX audit → hardened</h2>
-      <p>Five independent reviewers audited every screen and the whole flow; we then implemented every finding — identity propagation, real Evaluator/Dataset libraries, per-topic &amp; multi-metric scorecards, a production Logs pillar, human review on traces, a real ⌘K and an accessibility pass. See the findings and the decisions &amp; why.</p>
-      <div class="open">Read the audit →</div>
+    <a class="cardlink p4" href="docs.html#day3-design-decisions" style="grid-column:1/-1">
+      <div class="tag">DECISIONS &amp; WHY</div>
+      <h2><span class="dot"></span>Day 3 design decisions</h2>
+      <p>The reasoning behind the shell, the Datasets build (labels vs tags vs record-tags, working draft → Save version, provenance &amp; origin) and the Prompt Management completion (the runner binding, live variable parsing, Inspect) — plus the invented names flagged for ratification.</p>
+      <div class="open">Read the decisions →</div>
     </a>
   </div>
 
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Every doc, readable in-browser — Day 2’s UX audit &amp; design-decisions write-up, the design review, competitor teardown and hi-fi build log, on top of all of Day 1’s research, the four briefs, gap analysis and audit. 21 docs, plus the design-report PDF.</p>
+    <p>Every doc, readable in-browser — Day 3’s review response, live teardown and design decisions, on top of Day 2’s audits and Day 1’s research and briefs. 24 docs.</p>
   </a>
 
   <div class="docsx">
     <div class="docsxhead">
-      <div class="t">Copy Day 2’s docs as Markdown <span id="docsxN"></span></div>
+      <div class="t">Copy Day 3’s docs as Markdown <span id="docsxN"></span></div>
       <button class="copyall" id="copyAll" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="lbl">Copy all docs</span></button>
     </div>
     <div class="docsxgrid" id="docsxGrid"></div>
   </div>
 
   <section class="gh">
-    <h2>GitHub update <span class="ghsub">· Day 2 — the evaluation loop</span></h2>
-    <p class="ghlede">What we posted back on <a href="https://github.com/esberi/keystone/issues/1" target="_blank" rel="noopener">issue #1</a> today: the loop is now a clickable prototype, the decisions to ratify, and the open questions before backend wiring. The full drafts are in the <a href="docs.html#github-comments">GitHub comment drafts</a> doc.</p>
+    <h2>GitHub update <span class="ghsub">· Day 3 — Datasets to PRD #5</span></h2>
+    <p class="ghlede">Ready to post on <a href="https://github.com/esberi/keystone/issues/5" target="_blank" rel="noopener">issue #5</a>: the Dataset surface is clickable end-to-end, with the decisions to ratify and the open naming questions.</p>
 
     <details class="ghitem p1" open>
-      <summary><span class="ghtag">#1</span><span class="ghtitle">Prompt Management → the evaluation loop</span><span class="ghstatus">Clickable prototype</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <summary><span class="ghtag">#5</span><span class="ghtitle">Dataset Management → clickable to the appendices</span><span class="ghstatus">Clickable prototype</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
       <div class="ghbody">
-        <p>The full loop is now walkable end-to-end — <b>Dataset → Prompt → Evaluator → Experiment → Trace</b> — as a real shadcn “New York” app: <b>Edit</b> (chat + text, <code>{variable}</code> highlighting, reference chips, live token budget) · <b>Run</b> (single / batch / compare / inspect) · <b>Experiment</b> (summary-first scorecard, rows stream in) · <b>Trace</b> (span tree + the evaluator's reasoning, one click from a row) · <b>Compress</b> · <b>Manage</b> · ⌘K.</p>
+        <p>The full Dataset surface is walkable — <b>list</b> (stats bar · filters · Display columns · bulk · full row ⋯) · <b>create</b> (Upload CSV with a drag-to-bucket mapper · via skill · via code: CLI/TS/Python/REST + Create API key) · <b>editor frame</b> (Items · Versions · Experiments · Manage pills) · working draft → <b>Save version</b> · tags as movable version pointers (<code>golden → v3</code>) · provenance + Origin backlinks · experiments that pin a version.</p>
         <span class="lbl">Decisions to ratify</span>
         <ul>
-          <li><b>Token-spend, never $</b> — the repo has no cost concept, so we show tokens, not fabricated dollars.</li>
-          <li><b>Single-brace <code>{variable}</code></b> to match the shipped parser (<code>/\{(\w+)\}/</code>), not the brief's <code>{{message}}</code>.</li>
-          <li><b>Evaluator is a first-class object</b> (reusable, versioned), bound into experiments — not a per-experiment setting.</li>
+          <li><b>Human version numbers with change notes</b> — not txids (Braintrust) or timestamps (Arize).</li>
+          <li><b>Mapper accessibility</b> — drag-to-bucket plus a per-column menu, so import works by keyboard/touch.</li>
+          <li><b>Type-name-to-confirm delete</b> per the PRD — stricter than either competitor.</li>
         </ul>
-        <span class="lbl">Open questions before wiring</span>
+        <span class="lbl">Open naming questions</span>
         <ul>
-          <li>Evaluator-as-object ↔ experiment binding — confirm the model.</li>
-          <li>Prompt-compression scope for v1.</li>
-          <li>Org cost / budgets — is a rate card planned, or does spend stay token-only?</li>
-          <li>Ship a canned sample project so first-run isn't empty?</li>
+          <li>CLI/SDK names (<code>@keystone-ai/cli</code>, <code>keystone_ai</code>), <code>api.keystone.dev</code>, key format <code>ks_live_…</code> — all invented for the mock.</li>
+          <li>Skill install path (<code>npx skills add esberi/keystone-skills</code>) — confirm the org/repo.</li>
         </ul>
-        <a class="ghopen" href="keystone/" target="_blank" rel="noopener">Open the prototype →</a>
+        <a class="ghopen" href="keystone/#/datasets" target="_blank" rel="noopener">Open Datasets →</a>
       </div>
     </details>
   </section>
@@ -295,17 +282,17 @@ footer a{color:var(--muted-foreground)}
 'use strict';
 /* Engagement day log. daily-ship-update appends one entry per day (with that day's links). */
 const DAYS=[
- { n:2, date:'2026-07-04', status:'done', page:'day-2.html',
-   title:'The evaluation loop — designed and made clickable',
-   summary:'Took the loop (Dataset → Prompt → Evaluator → Experiment → Trace) from research + wireframes to a real, clickable shadcn “New York” prototype you can walk end-to-end — grounded in the actual esberi/keystone repo + PRD #1, dark + light, responsive, with an in-app “Why this design?” guide. Audited and fixed.',
+ { n:3, date:'2026-07-09', status:'done', page:'day-3.html',
+   title:'Navigation rebuilt + Datasets & Prompt Management completed to PRD',
+   summary:'Zaki\u2019s review answered point by point \u2014 no breadcrumbs, top-bar page headers + CTAs, collapsible sidebar, Light/Dark/System \u2014 plus the complete Dataset Management PRD (#5) and Prompt Management PRD (#1) built into the prototype, grounded in a fresh live teardown of Braintrust and Arize.',
    items:[
-     {t:'Clickable Keystone prototype — 13 screens, the full loop (dark + light, responsive)', href:'keystone/', done:true},
-     {t:'Day 2 walkthrough — research, principles, decisions, before/after, screen-by-screen', href:'day-2-walkthrough.html', done:true},
-     {t:'Arize + Braintrust teardown — ran the loop live on both; copy vs avoid', href:'docs.html#day2-competitor-teardown', done:true},
-     {t:'Design review — the 7 principles + every decision & why', href:'docs.html#day2-design-review', done:true},
-     {t:'Hi-fi build log + adversarial audit (1 blocker + 6 majors, all fixed)', href:'docs.html#day2-hifi-build', done:true},
+     {t:'Rebuilt shell \u2014 top-bar page headers, collapsible sidebar, + New, \u2318K, Light/Dark/System', href:'keystone/', done:true},
+     {t:'Datasets to PRD #5 \u2014 list, 3 create paths (CSV mapper \u00b7 skill \u00b7 code), Items/Versions/Experiments/Manage', href:'keystone/#/datasets', done:true},
+     {t:'Prompt Management to PRD #1 \u2014 editable segments, runner binding, Single/Batch/Compare, Inspect', href:'keystone/#/prompts', done:true},
+     {t:'Zaki\u2019s review \u2014 answered point by point (before \u2192 after \u2192 why)', href:'docs.html#day3-zaki-feedback-response', done:true},
+     {t:'Live Braintrust & Arize Datasets teardown \u2014 and the 8 places we beat them', href:'docs.html#day3-datasets-vs-competitors', done:true},
    ],
-   note:'The clickable prototype is the headline — open it and walk Overview → Edit → Run → Experiment → Trace.' },
+   note:'Start in the prototype: collapse the sidebar ([), open Datasets \u2192 New dataset \u2192 Upload CSV, then walk GST FAQ\u2019s Items/Versions/Experiments/Manage.' },
 ];
 (function(){
  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -344,12 +331,10 @@ const DAYS=[
 /* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
 (function(){
  const DOCS=[
-  {s:'day2-ux-audit',t:'UX audit — 5 reviewers'},
-  {s:'day2-design-decisions',t:'Design decisions & why'},
-  {s:'day2-design-review',t:'Design review — principles & decisions'},
-  {s:'day2-competitor-teardown',t:'Arize & Braintrust teardown'},
-  {s:'day2-hifi-plan',t:'Hi-fi plan'},
-  {s:'day2-hifi-build',t:'Hi-fi build log + audit'}
+  {s:'day3-zaki-feedback-response',t:'Zaki’s review, answered'},
+  {s:'day3-datasets-vs-competitors',t:'Live Braintrust & Arize teardown'},
+  {s:'day3-design-decisions',t:'Day 3 design decisions & why'},
+  {s:'day3-prd-coverage',t:'PRD coverage checklist (#1 & #5)'}
  ];
  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
  function cleanMd(src){
@@ -377,7 +362,7 @@ const DAYS=[
   all.querySelector('.lbl').textContent='Copying…';let ok=false;
   try{
    const parts=await Promise.all(DOCS.map(d=>fetchMd(d.s).catch(()=>'')));
-   const body='# Keystone — Day 2 Documentation\n\n*Day 2’s design docs, copied from the showcase. Read them at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
+   const body='# Keystone — Day 3 Documentation\n\n*Day 3’s design docs, copied from the showcase. Read them at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
    ok=await clip(body);
   }catch(e){ok=false;}
   feedback(all,ok,'Copy all docs');
