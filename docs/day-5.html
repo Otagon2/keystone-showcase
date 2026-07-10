@@ -215,12 +215,18 @@ footer a{color:var(--muted-foreground)}
       <p>The seven gaps the self-audit found (with why each mattered), the eleven changes that closed them, the mapper redesign from live feedback, and what was deliberately cut and why.</p>
       <div class="open">Read the pass-2 doc →</div>
     </a>
+    <a class="cardlink p3" href="docs.html#zaki-walkthrough" style="grid-column:1/-1">
+      <div class="tag">FOR THE GPM REVIEW · THE PRESENTER'S SCRIPT</div>
+      <h2><span class="dot"></span>The Zaki walkthrough — every screen, one by one</h2>
+      <p>Dataset Management first, Prompt Management second, then every remaining screen in loop order — what to show, the flow each screen serves, why it sits where it sits in the IA, and every decision with its why. Plus the 10-point decisions register and a 90-minute session shape.</p>
+      <div class="open">Open the walkthrough script →</div>
+    </a>
   </div>
 
   <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
     <div class="tag">DOCUMENTATION</div>
     <h2><span class="dot"></span>Read the thinking →</h2>
-    <p>Every doc, readable in-browser — Day 5's pass-2 record, on top of Day 4's teardown and audit log, Day 3's review response and PRD builds, Day 2's audits, and Day 1's research and briefs. 27 docs.</p>
+    <p>Every doc, readable in-browser — Day 5's walkthrough script and pass-2 record, on top of Day 4's teardown and audit log, Day 3's review response and PRD builds, Day 2's audits, and Day 1's research and briefs. 28 docs.</p>
   </a>
 
   <div class="docsx">
@@ -285,9 +291,10 @@ const DAYS=[
      {t:'A/B/n playground compare — three versions side by side, best highlighted, Promote winner', href:'keystone/#/prompts/gst-qna/run', done:true},
      {t:'CSV import mapper redesigned — per-column dropdowns with sample values; the dialog no longer closes mid-mapping', href:'keystone/#/datasets', done:true},
      {t:'The full pass-2 record — what was overlooked, what shipped, what was cut and why', href:'docs.html#day5-ux-pass2', done:true},
+     {t:'The GPM walkthrough script — every screen one by one (Datasets → Prompts → the loop), with flows, IA and every decision’s why', href:'docs.html#zaki-walkthrough', done:true},
    ],
    note:'Three-minute review path: Connect (Simulate first trace) → Playground Compare (add v11) → Monitor Online evals → agree with the judge on trace gst-003 → the evaluator’s Alignment matrix.',
-   slack:':rocket: *Keystone — Day 5 · Saturday, Jul 11*\n\nDeep-dive day: we audited our own prototype the way we audited the competitors — and closed every gap we found, in eleven shipped changes.\n\n*Shipped today*\n• A brand-new Connect page — the “how does my data get in?” story: paste one line, and the product unlocks piece by piece as your first trace arrives\n• The loop now stays on after ship: Online evals — the same judge you trust in testing, scoring a sample of live traffic (one toggle, plain words)\n• Judge-the-judge: your agree/disagree verdicts now persist and roll up into an Alignment view on each evaluator — agreement %, where the judge is too lenient, links to the evidence\n• The playground compare grew up: put three prompt versions side by side, see which wins, and promote the winner in one click\n• The CSV import mapper redesigned after review feedback — each column is a plain row with a sample value and an “import as” dropdown; no more drag, no more vanishing dialog\n• Every dollar figure removed — cost speaks in tokens everywhere (task vs judge), matching our own design principle\n• Housekeeping across the board: one filter system on all lists, a Build·Evaluate·Observe compass in the top bar, a Home that switches to triage once you know the product, a real Settings page, and every dead button now works or honestly says “Preview”\n\n*PRD watch*\n• No changes to the five briefs (latest movement is still #5 on Jul 6).\n\n*Next*\n• Walkthrough review with Zaki — then the group-PM presentation, now with the new opener (Connect) and closer (online evals → judge-the-judge).\n\n🔗 Today’s work: https://aman-esberi.github.io/esberi.github.com/day-5.html' },
+   slack:':rocket: *Keystone — Day 5 · Saturday, Jul 11*\n\nDeep-dive day: we audited our own prototype the way we audited the competitors — and closed every gap we found, in eleven shipped changes.\n\n*Shipped today*\n• A brand-new Connect page — the “how does my data get in?” story: paste one line, and the product unlocks piece by piece as your first trace arrives\n• The loop now stays on after ship: Online evals — the same judge you trust in testing, scoring a sample of live traffic (one toggle, plain words)\n• Judge-the-judge: your agree/disagree verdicts now persist and roll up into an Alignment view on each evaluator — agreement %, where the judge is too lenient, links to the evidence\n• The playground compare grew up: put three prompt versions side by side, see which wins, and promote the winner in one click\n• The CSV import mapper redesigned after review feedback — each column is a plain row with a sample value and an “import as” dropdown; no more drag, no more vanishing dialog\n• Every dollar figure removed — cost speaks in tokens everywhere (task vs judge), matching our own design principle\n• Housekeeping across the board: one filter system on all lists, a Build·Evaluate·Observe compass in the top bar, a Home that switches to triage once you know the product, a real Settings page, and every dead button now works or honestly says “Preview”\n\n*PRD watch*\n• No changes to the five briefs (latest movement is still #5 on Jul 6).\n\n*Next*\n• The full walkthrough with Zaki — Dataset Management and Prompt Management first, then every screen one by one (flows, structure, and the reasoning behind each decision). The presenter’s script is on the site.\n\n🔗 Today’s work: https://aman-esberi.github.io/esberi.github.com/day-5.html' },
 ];
 (function(){
  const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -325,6 +332,7 @@ const DAYS=[
 /* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
 (function(){
  const DOCS=[
+  {s:'zaki-walkthrough',t:'The Zaki walkthrough — every screen, one by one'},
   {s:'day5-ux-pass2',t:'UX Pass 2 — what we overlooked, and what shipped'}
  ];
  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
