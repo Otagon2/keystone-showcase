@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Keystone — Day 5 · UX Pass 2: auditing ourselves, closing every gap</title>
+<style>
+:root{
+  --background:#000000; --card:#0b1220; --foreground:#f8fafc;
+  --muted:#111a29; --muted-foreground:#8b96a5; --border:#1e293b; --input:#475569;
+  --primary:#f8fafc; --ring:#94a3b8;
+  --prompts:#8b5cf6; --inbox:#f59e0b; --platform:#22d3ee; --org:#4ade80;
+  --sans:ui-sans-serif,system-ui,"Segoe UI",Inter,Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--background);color:var(--foreground);-webkit-font-smoothing:antialiased;min-height:100vh;padding:0 0 80px;filter:grayscale(1)}
+a{color:#cbd5e1}
+.wrap{max-width:900px;margin:0 auto;padding:34px 24px 0}
+/* shared top nav */
+.topnav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px clamp(14px,4vw,28px);background:rgba(2,8,23,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.topnav .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13.5px;font-weight:600;color:var(--foreground);text-decoration:none;flex:none}
+.topnav .brand .g{width:23px;height:23px;border-radius:7px;background:var(--primary);color:var(--background);display:grid;place-items:center;font-weight:800;font-family:var(--sans);font-size:12px}
+.topnav .brand .sub{color:var(--muted-foreground);font-weight:400}
+.topnav .navlinks{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.topnav a.nl{font-size:13px;font-weight:550;color:var(--muted-foreground);text-decoration:none;padding:7px 11px;border-radius:8px;transition:background .15s,color .15s;white-space:nowrap}
+.topnav a.nl:hover{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.on{color:var(--foreground);background:var(--muted)}
+.topnav a.nl.docs{color:#5eead4}
+.topnav a.nl.docs:hover,.topnav a.nl.docs.on{color:#99f6e4;background:rgba(45,212,191,.12)}
+.topnav a.nl.proto{color:#0a0a0a;background:#fafafa;font-weight:650;box-shadow:0 0 0 1px rgba(255,255,255,.5),0 3px 14px -4px rgba(255,255,255,.35)}
+.topnav a.nl.proto:hover{background:#e5e5e5}
+@media(max-width:640px){.topnav{gap:8px;padding:9px 12px}.topnav .brand .sub{display:none}.topnav a.nl{padding:6px 8px;font-size:12px}}
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:22px 0 8px}
+.lede{font-size:15px;color:var(--muted-foreground);max-width:620px;line-height:1.6}
+.note{margin-top:14px;display:inline-flex;gap:8px;align-items:center;font-size:12.5px;color:var(--muted-foreground);border:1px solid var(--border);border-radius:6px;padding:7px 11px;background:var(--card)}
+.note b{color:var(--foreground);font-weight:600}
+/* PRD tracker */
+.prds{margin-top:26px;border:1px solid var(--border);border-radius:12px;background:var(--card);padding:15px 17px}
+.prdhead{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-foreground);display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.prdhead .n{font-family:var(--mono);font-weight:500;letter-spacing:.02em;text-transform:none;font-size:11.5px;color:var(--muted-foreground)}
+.prdrow{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (max-width:680px){.prdrow{grid-template-columns:1fr}}
+.prd{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;transition:background .15s,border-color .15s}
+.prd:hover{background:var(--muted);border-color:var(--input)}
+.prd .pn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);flex:none}
+.prd .pt{font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prd .upd{font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);flex:none;display:inline-flex;align-items:center;gap:5px}
+.prd.i1{--accent:var(--prompts)} .prd.i2{--accent:var(--org)} .prd.i3{--accent:var(--inbox)} .prd.i4{--accent:var(--platform)}
+/* engagement calendar / day navigator */
+.cal{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden}
+.calbar{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:12px 15px;user-select:none}
+.calbar::-webkit-details-marker{display:none}
+.calbar:hover{background:var(--muted)}
+.calbar .cicon{width:16px;height:16px;flex:none;stroke:var(--muted-foreground);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.caldate{font-weight:650;font-size:13.5px}
+.calmeta{font-family:var(--mono);font-size:11px;color:var(--muted-foreground)}
+.calsp{flex:1}
+.calhint{font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);letter-spacing:.04em}
+.calchev{width:15px;height:15px;flex:none;stroke:var(--muted-foreground);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+.cal[open] .calchev{transform:rotate(180deg)}
+.calbody{border-top:1px solid var(--border);padding:14px 15px}
+.daytabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.daytab{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--background);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;color:inherit;transition:background .15s,border-color .15s;min-width:104px}
+.daytab:hover{background:var(--muted)}
+.daytab.on{border-color:var(--input);background:var(--muted);box-shadow:inset 2px 0 0 var(--ring)}
+.daytab b{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px}
+.daytab .dt{font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);font-weight:400}
+.daytab .doneb{color:#4ade80}
+.daytab .planned{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fbbf24;border:1px solid #78350f;background:#231605;border-radius:5px;padding:1px 5px}
+.daypanel h4{font-size:14.5px;font-weight:650;color:var(--foreground);margin:0 0 3px}
+.daypanel .dsum{color:var(--muted-foreground);font-size:12.5px;line-height:1.55;margin-bottom:11px}
+.dayitems{list-style:none;display:flex;flex-direction:column;gap:7px}
+.dayitems li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:#cbd5e1}
+.dayitems .mk{flex:none;margin-top:1px;width:14px;height:14px;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.dayitems .mk.done{stroke:#4ade80}
+.dayitems .mk.plan{stroke:var(--muted-foreground)}
+.dayitems a{color:#a78bfa;text-decoration:none;font-weight:500}
+.dayitems a:hover{text-decoration:underline}
+.daypage{display:inline-flex;align-items:center;gap:6px;margin-top:13px;font-size:12.5px;font-weight:600;color:var(--foreground);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 11px;transition:background .15s,border-color .15s}
+.daypage:hover{background:var(--muted);border-color:var(--input)}
+.daynote{margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--muted-foreground);border-top:1px dashed var(--border);padding-top:9px;line-height:1.5}
+.dayslack{margin-top:14px;border:1px solid var(--border);border-radius:8px;background:var(--background);overflow:hidden}
+.dayslackhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 11px;border-bottom:1px solid var(--border);background:var(--muted)}
+.dayslackhead b{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)}
+.slackcopy{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.slackcopy:hover{background:var(--muted);border-color:var(--input)}
+.slackcopy.done{color:#4ade80;border-color:#14532d}
+.slacktext{margin:0;padding:11px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.6;color:#cbd5e1;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:34px}
+@media (max-width:680px){.grid{grid-template-columns:1fr}}
+.cardlink{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .16s,transform .08s,box-shadow .16s;position:relative;overflow:hidden}
+.cardlink:hover{border-color:var(--input);transform:translateY(-2px);box-shadow:0 12px 30px -12px rgba(0,0,0,.7)}
+.cardlink::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.cardlink .tag{font-family:var(--mono);font-size:11px;color:var(--muted-foreground);letter-spacing:.04em}
+.cardlink h2{font-size:18px;font-weight:650;margin:8px 0 6px;display:flex;align-items:center;gap:9px}
+.dot{width:9px;height:9px;border-radius:99px;background:var(--accent);flex:none}
+.cardlink p{font-size:13px;color:var(--muted-foreground);line-height:1.55}
+.cardlink .open{margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);display:inline-flex;align-items:center;gap:6px}
+.p1{--accent:var(--prompts)} .p2{--accent:var(--org)} .p3{--accent:var(--inbox)} .p4{--accent:var(--platform)}
+/* github updates section */
+.gh{margin-top:46px;border-top:1px solid var(--border);padding-top:30px}
+.gh h2{font-size:20px;font-weight:680;letter-spacing:-.01em;display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.ghsub{font-family:var(--mono);font-size:12px;color:var(--muted-foreground);font-weight:400;letter-spacing:.02em}
+.ghlede{font-size:13.5px;color:var(--muted-foreground);line-height:1.62;max-width:640px;margin:9px 0 20px}
+.ghlede a{color:#a78bfa}
+.ghitem{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;position:relative}
+.ghitem::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.ghitem>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:14px 16px 14px 19px;user-select:none}
+.ghitem>summary::-webkit-details-marker{display:none}
+.ghitem>summary:hover{background:var(--muted)}
+.ghtag{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--accent);flex:none}
+.ghtitle{font-size:14.5px;font-weight:620;flex:1;min-width:0}
+.ghstatus{font-size:11px;font-weight:600;color:#4ade80;border:1px solid #14532d;background:#0d1f14;border-radius:6px;padding:3px 8px;white-space:nowrap}
+.ghstatus.warn{color:#fbbf24;border-color:#78350f;background:#231605}
+.ghchev{flex:none;width:15px;height:15px;stroke:var(--muted-foreground);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+.ghitem[open] .ghchev{transform:rotate(90deg)}
+.ghbody{padding:0 19px 18px 19px;font-size:13px;color:#cbd5e1;line-height:1.62}
+.ghbody p{margin:0 0 10px}
+.ghbody b{color:var(--foreground);font-weight:620}
+.ghbody .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);display:block;margin:13px 0 5px}
+.ghbody ul{margin:0;padding-left:18px}
+.ghbody li{margin-bottom:5px}
+.ghbody code{font-family:var(--mono);font-size:11.5px;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:#e7c6ff}
+.ghopen{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-size:12.5px;font-weight:600;color:var(--foreground);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:6px 11px;transition:background .15s,border-color .15s}
+.ghopen:hover{background:var(--muted);border-color:var(--input)}
+/* copy docs as markdown */
+.docsx{margin-top:16px;border:1px solid var(--border);border-radius:12px;background:var(--card);padding:16px 17px}
+.docsxhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:13px}
+.docsxhead .t{font-size:13.5px;font-weight:650}
+.docsxhead .t span{color:var(--muted-foreground);font-weight:400;font-family:var(--mono);font-size:11px;margin-left:7px}
+.copyall{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--background);background:var(--primary);border:1px solid var(--primary);border-radius:7px;padding:7px 13px;cursor:pointer;transition:opacity .15s,background .15s,color .15s}
+.copyall:hover{opacity:.9}
+.copyall svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.copyall.done{background:#0d1f14;color:#4ade80;border-color:#14532d}
+.docsxgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+@media(max-width:680px){.docsxgrid{grid-template-columns:1fr}}
+.docx{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:6px 8px 6px 11px;background:var(--background)}
+.docx .dn{flex:1;min-width:0;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.docxcopy{flex:none;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.docxcopy:hover{background:var(--muted);border-color:var(--input)}
+.docxcopy.done{color:#4ade80;border-color:#14532d}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:34px}
+.linkchip{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-size:13px;font-weight:600;color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;transition:background .15s,border-color .15s,transform .08s}
+.linkchip:hover{background:var(--muted);border-color:var(--input);transform:translateY(-1px)}
+.linkchip svg{width:16px;height:16px;flex:none}
+.linkchip .sub{font-weight:400;color:var(--muted-foreground);font-family:var(--mono);font-size:11px}
+footer{margin-top:40px;font-family:var(--mono);font-size:11.5px;color:var(--muted-foreground);border-top:1px solid var(--border);padding-top:18px;line-height:1.9}
+footer a{color:var(--muted-foreground)}
+</style>
+</head>
+<body>
+<header class="topnav">
+  <a class="brand" href="index.html"><span class="g">K</span>keystone <span class="sub">/ showcase</span></a>
+  <div class="navlinks">
+    <a class="nl" data-page="index.html" href="index.html">Home</a>
+    <a class="nl" data-page="day-1.html" href="day-1.html">Jul 3</a>
+    <a class="nl" data-page="day-2.html" href="day-2.html">Jul 4</a>
+    <a class="nl" data-page="day-3.html" href="day-3.html">Jul 9</a>
+    <a class="nl" data-page="day-4.html" href="day-4.html">Jul 10</a>
+    <a class="nl" data-page="day-5.html" href="day-5.html">Jul 11</a>
+    <a class="nl docs" data-page="docs.html" href="docs.html">Docs</a>
+    <a class="nl proto" href="keystone/" target="_blank" rel="noopener">Prototype ↗</a>
+  </div>
+</header>
+<div class="wrap">
+  <h1>Keystone — the audit lens turned on ourselves</h1>
+  <p class="lede"><b>Day 5.</b> After beating both competitors on the scorecard, we audited our own prototype the same way — every screen, every teardown recommendation left open, plus the six screens the teardown never scored. Seven overlooked gaps found, <b>all closed in eleven shipped changes</b>: a Connect on-ramp, online evals on live traffic, judge-the-judge alignment, an A/B/n playground, a persistent loop compass, a real Settings page — and the CSV import mapper redesigned from live feedback. <span style="color:var(--muted-foreground)">Earlier days: <a href="day-1.html">Jul 3</a> · <a href="day-2.html">Jul 4</a> · <a href="day-3.html">Jul 9</a> · <a href="day-4.html">Jul 10</a>.</span></p>
+  <div class="note">🔒 <span>Internal client work · unlisted preview.</span> Mock data only — nothing here talks to a real system.</div>
+
+  <div class="prds">
+    <div class="prdhead">Source PRDs <span class="n">· the live briefs on GitHub — tracked for updates · no changes today</span></div>
+    <div class="prdrow">
+      <a class="prd i1" href="https://github.com/esberi/keystone/issues/5" target="_blank" rel="noopener"><span class="pn">#5</span><span class="pt">Dataset Management</span><span class="upd">updated Jul 6</span></a>
+      <a class="prd i1" href="https://github.com/esberi/keystone/issues/1" target="_blank" rel="noopener"><span class="pn">#1</span><span class="pt">Prompt Management</span><span class="upd">updated Jul 3</span></a>
+      <a class="prd i2" href="https://github.com/esberi/keystone/issues/2" target="_blank" rel="noopener"><span class="pn">#2</span><span class="pt">Organization Admin</span><span class="upd">updated Jul 2</span></a>
+      <a class="prd i3" href="https://github.com/esberi/keystone/issues/3" target="_blank" rel="noopener"><span class="pn">#3</span><span class="pt">User Inbox</span><span class="upd">updated Jul 2</span></a>
+      <a class="prd i4" href="https://github.com/esberi/keystone/issues/4" target="_blank" rel="noopener"><span class="pn">#4</span><span class="pt">System Admin</span><span class="upd">updated Jul 2</span></a>
+    </div>
+  </div>
+
+  <details class="cal" id="cal" open>
+    <summary class="calbar">
+      <svg class="cicon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span class="caldate" id="calDate">—</span>
+      <span class="calmeta" id="calMeta"></span>
+      <span class="calsp"></span>
+      <span class="calhint">daily log ▾</span>
+      <svg class="calchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </summary>
+    <div class="calbody">
+      <div class="daytabs" id="dayTabs"></div>
+      <div class="daypanel" id="dayPanel"></div>
+    </div>
+  </details>
+
+  <a class="cardlink" href="keystone/" target="_blank" rel="noopener" style="--accent:#a78bfa;display:block;margin-top:16px">
+    <div class="tag">CLICKABLE PROTOTYPE · UX PASS 2 — ELEVEN SHIPPED CHANGES</div>
+    <h2><span class="dot"></span>Open the upgraded prototype →</h2>
+    <p>Everything from Day 4, plus: a <b>Connect</b> on-ramp (one-line setup, "unlocks with your first trace" — try Simulate first trace) · <b>Online evals</b> on Monitor — the same judge scoring live traffic · <b>judge-the-judge</b> — your agree/disagree verdicts persist and roll up into an Alignment view on the evaluator · <b>A/B/n compare</b> in the playground with a Promote-winner button · a <b>Build · Evaluate · Observe</b> compass in the top bar · the CSV mapper redesigned (plain per-column dropdowns, no more drag) · all cost in <b>tokens</b>, never fabricated dollars · a real <b>Settings</b> page · every dead button now works or says "Preview".</p>
+    <div class="open">Open the prototype →</div>
+  </a>
+
+  <div class="grid">
+    <a class="cardlink p1" href="keystone/#/connect?state=new" target="_blank" rel="noopener">
+      <div class="tag">NEW SURFACE · THE DEMO OPENER</div>
+      <h2><span class="dot"></span>Connect — how data gets in</h2>
+      <p>The question every evaluation starts with, and the one both competitors fumble. One-line setup, a write-only key, and four "unlocks with your first trace" cards that light up when you click <b>Simulate first trace</b>.</p>
+      <div class="open">Try the first-run flow →</div>
+    </a>
+    <a class="cardlink p2" href="docs.html#day5-ux-pass2">
+      <div class="tag">THE FULL RECORD</div>
+      <h2><span class="dot"></span>What we overlooked — and what shipped</h2>
+      <p>The seven gaps the self-audit found (with why each mattered), the eleven changes that closed them, the mapper redesign from live feedback, and what was deliberately cut and why.</p>
+      <div class="open">Read the pass-2 doc →</div>
+    </a>
+  </div>
+
+  <a class="cardlink" href="docs.html" style="--accent:#94a3b8;display:block;margin-top:16px">
+    <div class="tag">DOCUMENTATION</div>
+    <h2><span class="dot"></span>Read the thinking →</h2>
+    <p>Every doc, readable in-browser — Day 5's pass-2 record, on top of Day 4's teardown and audit log, Day 3's review response and PRD builds, Day 2's audits, and Day 1's research and briefs. 27 docs.</p>
+  </a>
+
+  <div class="docsx">
+    <div class="docsxhead">
+      <div class="t">Copy Day 5's docs as Markdown <span id="docsxN"></span></div>
+      <button class="copyall" id="copyAll" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="lbl">Copy all docs</span></button>
+    </div>
+    <div class="docsxgrid" id="docsxGrid"></div>
+  </div>
+
+  <section class="gh">
+    <h2>For the review <span class="ghsub">· Day 5 — what to look at first</span></h2>
+    <p class="ghlede">The next step is a walkthrough with Zaki — here's the three-minute path through today's work, and the decisions worth ratifying.</p>
+
+    <details class="ghitem p1" open>
+      <summary><span class="ghtag">Day 5</span><span class="ghtitle">The self-audit → seven gaps closed</span><span class="ghstatus">Ready to review</span><svg class="ghchev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></summary>
+      <div class="ghbody">
+        <p><b>The three-minute path:</b> open <a href="keystone/#/connect?state=new" target="_blank" rel="noopener">Connect (first-run)</a> and click <b>Simulate first trace</b> (the new demo opener) → <a href="keystone/#/prompts/gst-qna/run" target="_blank" rel="noopener">Playground → Compare</a> and add the v11 variant (A/B/n with a Promote-winner button) → <a href="keystone/#/monitor?view=online" target="_blank" rel="noopener">Monitor → Online evals</a> (the loop staying on in production) → agree with the judge on <a href="keystone/#/traces/gst-003?exp=7" target="_blank" rel="noopener">trace gst-003</a>, then open <a href="keystone/#/evaluators/qa-correctness" target="_blank" rel="noopener">the evaluator</a> and scroll to <b>Alignment</b> — your verdict is already in the judge-vs-human matrix.</p>
+        <span class="lbl">Decisions to ratify</span>
+        <ul>
+          <li><b>Connect as the on-ramp</b> — one-line setup + "unlocks with your first trace" (the pattern our teardown rated best-in-class at Braintrust, done clearer).</li>
+          <li><b>Cost speaks tokens only</b> — every fabricated dollar removed; task-vs-judge split everywhere (our own principle, now consistently applied).</li>
+          <li><b>Judge-the-judge</b> — human verdicts persist and grade the evaluator (agreement %, too-lenient cell, linked disagreements). Neither competitor closes this loop.</li>
+          <li><b>The import mapper redesign</b> — per-column dropdowns with sample values replace drag-to-bucket (from Amaan's live review; also fixes the dialog closing mid-drag).</li>
+        </ul>
+        <span class="lbl">Open for later</span>
+        <ul>
+          <li>Full RBAC/audit/billing (Settings shows an honest roadmap panel today) · natural-language log filters (positioned as the copilot's job) · Operate / Learn planes.</li>
+        </ul>
+        <a class="ghopen" href="keystone/" target="_blank" rel="noopener">Open the prototype →</a>
+      </div>
+    </details>
+  </section>
+
+  <div class="links">
+    <a class="linkchip" href="https://drive.google.com/drive/folders/1sm0dNsvzI5EXE3PrLsqToAPuw2Rr5aN5" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+      Day 5 deliverables on Google Drive <span class="sub">folder ↗</span>
+    </a>
+    <a class="linkchip" href="https://github.com/aman-esberi/esberi.github.com/tree/keystone-prototypes" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.68-1.28-1.68-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.38-5.25 5.67.41.35.78 1.05.78 2.12 0 1.53-.01 2.77-.01 3.15 0 .31.21.68.8.56A11.51 11.51 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+      Source on GitHub <span class="sub">keystone-prototypes ↗</span>
+    </a>
+  </div>
+
+  <footer>
+    shadcn/ui New York · lucide icons · dark + light · one interaction rule · ⌘K everywhere · mock, no backend<br>
+    Tip — press <b style="color:var(--foreground)">⌘K</b> (or Ctrl-K) inside any prototype for the command palette.
+  </footer>
+</div>
+<script>
+'use strict';
+/* Engagement day log. daily-ship-update appends one entry per day (with that day's links). */
+const DAYS=[
+ { n:5, date:'2026-07-11', status:'done', page:'day-5.html',
+   title:'UX Pass 2 — the audit lens turned on ourselves, seven gaps closed',
+   summary:'A full self-audit of the prototype (every screen, every open teardown recommendation, plus the six screens the teardown never scored) found seven overlooked gaps — all closed in eleven shipped changes: a Connect on-ramp, online evals on live traffic, judge-the-judge alignment, an A/B/n playground with Promote-winner, a loop compass in the top bar, token-only cost, a real Settings page — and the CSV import mapper redesigned from live feedback.',
+   items:[
+     {t:'Connect — one-line setup + “unlocks with your first trace” (click Simulate first trace)', href:'keystone/#/connect?state=new', done:true},
+     {t:'Online evals — the same judge scoring 5% of live traffic, one toggle on Monitor', href:'keystone/#/monitor?view=online', done:true},
+     {t:'Judge-the-judge — verdicts persist and grade the evaluator (agreement %, confusion matrix, linked disagreements)', href:'keystone/#/evaluators/qa-correctness', done:true},
+     {t:'A/B/n playground compare — three versions side by side, best highlighted, Promote winner', href:'keystone/#/prompts/gst-qna/run', done:true},
+     {t:'CSV import mapper redesigned — per-column dropdowns with sample values; the dialog no longer closes mid-mapping', href:'keystone/#/datasets', done:true},
+     {t:'The full pass-2 record — what was overlooked, what shipped, what was cut and why', href:'docs.html#day5-ux-pass2', done:true},
+   ],
+   note:'Three-minute review path: Connect (Simulate first trace) → Playground Compare (add v11) → Monitor Online evals → agree with the judge on trace gst-003 → the evaluator’s Alignment matrix.',
+   slack:':rocket: *Keystone — Day 5 · Saturday, Jul 11*\n\nDeep-dive day: we audited our own prototype the way we audited the competitors — and closed every gap we found, in eleven shipped changes.\n\n*Shipped today*\n• A brand-new Connect page — the “how does my data get in?” story: paste one line, and the product unlocks piece by piece as your first trace arrives\n• The loop now stays on after ship: Online evals — the same judge you trust in testing, scoring a sample of live traffic (one toggle, plain words)\n• Judge-the-judge: your agree/disagree verdicts now persist and roll up into an Alignment view on each evaluator — agreement %, where the judge is too lenient, links to the evidence\n• The playground compare grew up: put three prompt versions side by side, see which wins, and promote the winner in one click\n• The CSV import mapper redesigned after review feedback — each column is a plain row with a sample value and an “import as” dropdown; no more drag, no more vanishing dialog\n• Every dollar figure removed — cost speaks in tokens everywhere (task vs judge), matching our own design principle\n• Housekeeping across the board: one filter system on all lists, a Build·Evaluate·Observe compass in the top bar, a Home that switches to triage once you know the product, a real Settings page, and every dead button now works or honestly says “Preview”\n\n*PRD watch*\n• No changes to the five briefs (latest movement is still #5 on Jul 6).\n\n*Next*\n• Walkthrough review with Zaki — then the group-PM presentation, now with the new opener (Connect) and closer (online evals → judge-the-judge).\n\n🔗 Today’s work: https://aman-esberi.github.io/esberi.github.com/day-5.html' },
+];
+(function(){
+ const MO=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+ const dow=d=>DOW[new Date(d+'T00:00:00').getDay()];
+ const fmt=d=>{const p=d.split('-');return MO[+p[1]-1]+' '+(+p[2])+', '+p[0];};
+ const CHK='<svg class="mk done" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+ const DOT='<svg class="mk plan" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg>';
+ const tabs=document.getElementById('dayTabs'), panel=document.getElementById('dayPanel');
+ const current=[...DAYS].reverse().find(d=>d.status!=='planned')||DAYS[DAYS.length-1];
+ document.getElementById('calDate').textContent=dow(current.date)+', '+fmt(current.date);
+ document.getElementById('calMeta').textContent='Engagement timeline · Day '+current.n;
+ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+ function render(sel){
+  tabs.innerHTML=DAYS.map(d=>'<button class="daytab'+(d.n===sel?' on':'')+'" data-n="'+d.n+'"><b>'+(d.status==='done'?'<span class="doneb">✓</span>':'')+'Day '+d.n+(d.status==='planned'?' <span class="planned">planned</span>':'')+'</b><span class="dt">'+dow(d.date)+' '+fmt(d.date)+'</span></button>').join('');
+  const d=DAYS.find(x=>x.n===sel)||current;
+  panel.innerHTML='<h4>'+esc(d.title)+'</h4><div class="dsum">'+esc(d.summary)+'</div><ul class="dayitems">'+
+   d.items.map(it=>'<li>'+(it.done?CHK:DOT)+(it.href?'<a href="'+it.href+'">'+esc(it.t)+'</a>':'<span>'+esc(it.t)+'</span>')+'</li>').join('')+
+   '</ul>'+(d.page?'<a class="daypage" href="'+d.page+'">Open the full Day '+d.n+' page →</a>':'')+(d.note?'<div class="daynote">'+esc(d.note)+'</div>':'')+
+   (d.slack?'<div class="dayslack"><div class="dayslackhead"><b>Slack update · Day '+d.n+'</b><button class="slackcopy" type="button">Copy message</button></div><pre class="slacktext">'+esc(d.slack)+'</pre></div>':'');
+  tabs.querySelectorAll('.daytab').forEach(b=>b.addEventListener('click',()=>render(+b.dataset.n)));
+  const sc=panel.querySelector('.slackcopy');
+  if(sc)sc.addEventListener('click',async()=>{
+   const msg=(DAYS.find(x=>x.n===sel)||{}).slack||'';let ok=true;
+   try{await navigator.clipboard.writeText(msg);}catch(e){try{const ta=document.createElement('textarea');ta.value=msg;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(e2){ok=false;}}
+   sc.textContent=ok?'Copied':'Copy failed';sc.classList.toggle('done',ok);
+   setTimeout(()=>{sc.textContent='Copy message';sc.classList.remove('done');},1600);
+  });
+ }
+ render(current.n);
+})();
+</script>
+<script>
+'use strict';
+/* Copy the docs as Markdown — master (all) + per-doc, straight from the landing page */
+(function(){
+ const DOCS=[
+  {s:'day5-ux-pass2',t:'UX Pass 2 — what we overlooked, and what shipped'}
+ ];
+ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+ function cleanMd(src){
+  const L=src.replace(/\r\n?/g,'\n').split('\n');const out=[];let inF=false;
+  for(let i=0;i<L.length;i++){let ln=L[i];const f=/^\s*(```|~~~)/.test(ln);if(f)inF=!inF;
+   if(!inF&&!f)ln=ln.replace(/[ \t]+$/,'');
+   if(!inF&&!f&&/^#{1,6}\s/.test(ln)&&out.length&&out[out.length-1].trim()!=='')out.push('');
+   out.push(ln);
+   if(!inF&&!f&&/^#{1,6}\s/.test(ln)&&L[i+1]!==undefined&&L[i+1].trim()!=='')out.push('');}
+  return out.join('\n').replace(/\n{3,}/g,'\n\n').replace(/\s+$/,'')+'\n';
+ }
+ async function fetchMd(s){const r=await fetch('md/'+s+'.md');if(!r.ok)throw new Error('404 '+s);return cleanMd(await r.text());}
+ async function clip(t){try{await navigator.clipboard.writeText(t);return true;}catch(e){try{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');ta.remove();return true;}catch(e2){return false;}}}
+ function feedback(btn,ok,restore){const l=btn.querySelector('.lbl');l.textContent=ok?'Copied':'Failed';btn.classList.toggle('done',ok);clearTimeout(btn._t);btn._t=setTimeout(()=>{l.textContent=restore;btn.classList.remove('done');},1700);}
+ const nEl=document.getElementById('docsxN');if(nEl)nEl.textContent='· '+DOCS.length+' docs';
+ const grid=document.getElementById('docsxGrid');
+ grid.innerHTML=DOCS.map(d=>'<div class="docx"><span class="dn">'+esc(d.t)+'</span><button class="docxcopy" data-s="'+d.s+'" type="button"><span class="lbl">Copy</span></button></div>').join('');
+ grid.querySelectorAll('.docxcopy').forEach(b=>b.addEventListener('click',async()=>{
+  b.querySelector('.lbl').textContent='…';let ok=false;
+  try{ok=await clip(await fetchMd(b.dataset.s));}catch(e){ok=false;}
+  feedback(b,ok,'Copy');
+ }));
+ const all=document.getElementById('copyAll');
+ all.addEventListener('click',async()=>{
+  all.querySelector('.lbl').textContent='Copying…';let ok=false;
+  try{
+   const parts=await Promise.all(DOCS.map(d=>fetchMd(d.s).catch(()=>'')));
+   const body='# Keystone — Day 5 Documentation\n\n*Day 5’s docs, copied from the showcase. Read them at docs.html.*\n\n---\n\n'+parts.filter(Boolean).join('\n\n---\n\n')+'\n';
+   ok=await clip(body);
+  }catch(e){ok=false;}
+  feedback(all,ok,'Copy all docs');
+ });
+})();
+</script>
+<script>(function(){var p=(location.pathname.split('/').pop()||'index.html');if(p==='day-2-walkthrough.html')p='day-2.html';document.querySelectorAll('.topnav a.nl[data-page]').forEach(function(a){if(a.getAttribute('data-page')===p)a.classList.add('on');});})();</script>
+</body>
+</html>
