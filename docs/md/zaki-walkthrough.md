@@ -265,7 +265,8 @@ This is the deepest screen in Part 2. Walk all three modes.
 
 - **⌘K palette** — real fuzzy search over every entity, context verbs on the open prompt, create actions, theme, and the hidden **Reset demo data**.
 - **Ask Keystone** — the copilot that *routes*: every answer ends in a deep link to the right stage.
-- **Breadcrumb + sibling switcher** on detail pages; **g-chords** (`g d`, `g p`, `g c`…); collapsible rail; Light/Dark/System; skip-link and live-region a11y; fully responsive.
+- **Two-tier top bar** (Zaki's Databricks ask, built) — a thin global bar (the loop compass · search · Ask · account) over a slim **page bar** that carries every page's title, meta and CTAs, so the action you need never scrolls away; on detail pages the title doubles as a **sibling switcher** that keeps your mode (switch prompts without leaving the playground).
+- **g-chords** (`g d`, `g p`, `g c`…); collapsible rail; Light/Dark/System; skip-link and live-region a11y; fully responsive.
 - **The Build · Evaluate · Observe compass** in the top bar — the IA argument made permanent.
 - *(One dev-only route exists, `#/states`, a component-states gallery — not a product screen; mention only if asked.)*
 
